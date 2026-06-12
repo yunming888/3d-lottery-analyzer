@@ -15,13 +15,11 @@ def main():
     cmd = sys.argv[1] if len(sys.argv) > 1 else "all"
 
     if cmd in ("fetch", "all"):
-        print("\n[1/3] 抓取历史数据...\n")
-        from fetch_data import fetch_lottery_data, parse_and_save
-        raw = fetch_lottery_data()
-        if raw:
-            parse_and_save(raw)
-        else:
-            print("数据抓取失败, 使用已有数据继续")
+        print("\n[1/3] 抓取最新数据(东方财富)...\n")
+        from fetch_data import load_or_fetch
+        records = load_or_fetch()
+        if not records:
+            print("数据抓取失败, 无可用数据")
 
     if cmd in ("report", "all"):
         print("\n[2/3] 生成分析报告...\n")
