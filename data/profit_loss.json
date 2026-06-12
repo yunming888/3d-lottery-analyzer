@@ -1,0 +1,18 @@
+{
+  "start_date": "2026-06-13",
+  "end_date": "2026-06-30",
+  "bet_per_note": 2,
+  "prize_per_hit": 160,
+  "max_notes_per_day": 10,
+  "records": [],
+  "summary": {
+    "total_days": 0,
+    "active_days": 0,
+    "stop_days": 0,
+    "total_bets": 0,
+    "total_cost": 0,
+    "total_hits": 0,
+    "total_prize": 0,
+    "net_pnl": 0
+  }
+}
