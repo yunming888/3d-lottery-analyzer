@@ -4,15 +4,52 @@
   "bet_per_note": 2,
   "prize_per_hit": 160,
   "max_notes_per_day": 10,
-  "records": [],
+  "records": [
+    {
+      "date": "2026-06-12",
+      "draw": "2026153",
+      "draw_nums": [8, 8, 7],
+      "draw_type": "组三",
+      "recommendations": [],
+      "notes": 0,
+      "cost": 0,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": 0,
+      "reason": "熔断未推"
+    },
+    {
+      "date": "2026-06-13",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [4, 5, 9],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 9],
+        [0, 5, 6],
+        [1, 3, 9],
+        [2, 3, 5]
+      ],
+      "notes": 7,
+      "cost": 14,
+      "hits": null,
+      "prize": null,
+      "daily_pnl": null,
+      "reason": "组三2连→组六回归信号，谨慎推荐7注"
+    }
+  ],
   "summary": {
-    "total_days": 0,
-    "active_days": 0,
-    "stop_days": 0,
-    "total_bets": 0,
-    "total_cost": 0,
+    "total_days": 2,
+    "active_days": 1,
+    "stop_days": 1,
+    "total_bets": 7,
+    "total_cost": 14,
     "total_hits": 0,
     "total_prize": 0,
-    "net_pnl": 0
+    "net_pnl": 0,
+    "pending_bets": 7,
+    "pending_cost": 14
   }
 }
