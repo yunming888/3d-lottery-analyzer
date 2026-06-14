@@ -20,9 +20,9 @@
     },
     {
       "date": "2026-06-13",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026154",
+      "draw_nums": [3, 7, 7],
+      "draw_type": "组三",
       "recommendations": [
         [4, 5, 9],
         [0, 3, 6],
@@ -34,22 +34,35 @@
       ],
       "notes": 7,
       "cost": 14,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -14,
+      "reason": "组六7注全未命中组三开奖"
+    },
+    {
+      "date": "2026-06-14",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [],
+      "notes": 0,
+      "cost": 0,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "组三2连→组六回归信号，谨慎推荐7注"
+      "reason": "三重熔断: 近20期组三5次+三连组三+连续同形态"
     }
   ],
   "summary": {
-    "total_days": 2,
+    "total_days": 3,
     "active_days": 1,
-    "stop_days": 1,
+    "stop_days": 2,
     "total_bets": 7,
     "total_cost": 14,
     "total_hits": 0,
     "total_prize": 0,
-    "net_pnl": 0,
-    "pending_bets": 7,
-    "pending_cost": 14
+    "net_pnl": -14,
+    "pending_bets": 0,
+    "pending_cost": 0
   }
 }
