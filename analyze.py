@@ -1,7 +1,7 @@
 """
 福彩3D数据分析引擎
 统计：频率热冷号、遗漏值、和值分布、跨度、形态
-v2: 熔断规则修订(三连同形态→强推反向) + 自动推荐生成
+v3: 熔断规则简化为单条(组六8连→暂停) + 其余全推10注
 """
 import json
 import os
@@ -119,14 +119,16 @@ def type_analysis(records):
 
 def circuit_breaker(records, target_type="组六"):
     """
-    熔断判定 + 信号强度分析（修订版 v2）
+    熔断判定（v3 简化版）
+    唯一规则: 组六连续8期 → 暂停，需用户决策
+    其余情况: 每天推满10注组六
     返回: {
-        "stop": bool,          # 是否熔断停推
+        "stop": bool,          # 是否熔断
         "reason": str,         # 原因
-        "force_push": bool,    # 是否强推反向
+        "force_push": bool,    # 是否强制推荐
         "push_type": str,      # 推荐目标形态
-        "push_count": int,     # 建议推荐注数（0=不推荐，10=满推）
-        "signal_strength": str # 信号强度: 弱/中/强/极强
+        "push_count": int,     # 建议推荐注数
+        "signal_strength": str # 信号强度
     }
     """
     n = len(records)
@@ -134,71 +136,22 @@ def circuit_breaker(records, target_type="组六"):
         return {"stop": False, "reason": "数据不足", "force_push": False,
                 "push_type": target_type, "push_count": 10, "signal_strength": "弱"}
 
-    types_20 = [r["type"] for r in records[:20]]
-    sums_3 = [r["sum_val"] for r in records[:3]]
-    types_all = [r["type"] for r in records]
-
-    # 统计近20期组三
-    zs_count_20 = types_20.count("组三")
-
-    # 最近的形态序列（连续同形态）
-    streak_type = types_20[0]
-    streak_len = 1
-    for t in types_20[1:]:
-        if t == streak_type:
-            streak_len += 1
-        else:
-            break
-
-    # 最后2期是否都不是组三
-    last2_non_zs = all(t != "组三" for t in types_20[:2])
-
-    # === 规则1: 近20期组三>3 且 最近2期都不是组三 → 停止 ===
-    if zs_count_20 >= 3 and last2_non_zs:
-        return {"stop": True, "reason": f"组三过热({zs_count_20}/20次)且近2期已转组六，观望",
-                "force_push": False, "push_type": "", "push_count": 0, "signal_strength": ""}
-
-    # === 规则2: 近3期和值连续极端 → 停止 ===
-    if all(s <= 5 for s in sums_3):
-        return {"stop": True, "reason": f"近3期和值连续极端小({sums_3})",
-                "force_push": False, "push_type": "", "push_count": 0, "signal_strength": ""}
-    if all(s >= 22 for s in sums_3):
-        return {"stop": True, "reason": f"近3期和值连续极端大({sums_3})",
-                "force_push": False, "push_type": "", "push_count": 0, "signal_strength": ""}
-
-    # === 规则3: 连续2期同形态 → 观望 ===
-    if streak_len == 2:
-        return {"stop": True, "reason": f"连续2期{streak_type}，观望一期",
-                "force_push": False, "push_type": "", "push_count": 0, "signal_strength": ""}
-
-    # === 规则4: 连续3期同形态 → 强推反向！（不熔断，推满） ===
-    if streak_len == 3:
-        push_type = "组六" if streak_type == "组三" else "组三"
-        return {"stop": False, "reason": f"连续3期{streak_type}→强推反向{push_type}",
-                "force_push": True, "push_type": push_type, "push_count": 10, "signal_strength": "强"}
-
-    # === 规则5: 连续4期以上同形态 → 超级强推 ===
-    if streak_len >= 4:
-        push_type = "组六" if streak_type == "组三" else "组三"
-        extra = streak_len - 3
-        return {"stop": False,
-                "reason": f"连续{streak_len}期{streak_type}→强力推{push_type}(溢出+{extra}期)",
-                "force_push": True, "push_type": push_type, "push_count": 10,
-                "signal_strength": "极强"}
-
-    # === 规则6: 组六11连+ → 推组三（回归窗口） ===
+    # 唯一熔断规则: 组六连续8期 → 暂停，需用户决策
+    # (P(组六8连)下组三概率=91.8%, 显著窗口)
     zl_streak = 0
-    for t in types_all:
-        if t == "组六":
+    for r in records:
+        if r["type"] == "组六":
             zl_streak += 1
         else:
             break
-    if zl_streak >= 11:
-        return {"stop": False, "reason": f"组六{zl_streak}连→组三回归窗口",
-                "force_push": True, "push_type": "组三", "push_count": 10, "signal_strength": "强"}
 
-    # 正常情况
-    return {"stop": False, "reason": "无异常信号，正常推荐",
+    if zl_streak >= 8:
+        return {"stop": True,
+                "reason": f"组六连续{zl_streak}期 (组三概率91.8%+), 需用户决策是否推组三",
+                "force_push": False, "push_type": "", "push_count": 0, "signal_strength": "极强"}
+
+    # 正常情况: 每天推满10注组六
+    return {"stop": False, "reason": f"正常推荐 (当前组六{zl_streak}连)",
             "force_push": False, "push_type": target_type, "push_count": 10, "signal_strength": "中"}
 
 
@@ -327,6 +280,36 @@ def generate_recommendations(records, info, count=10):
         if len({a, b, c}) == 3:
             add_candidate([a, b, c], f"位置独立: 百{a}(热)+十{b}(热)+个{c}(热)")
         bai_top = bai_top[1:] + bai_top[:1]
+
+    # 策略6: 补位填充 — 不足10注时用遗漏号+热号随机组合补满
+    # 优先级: 含过冷号 > 和值靠近均值 > 跨度适中
+    fill_candidates = []
+    for a in cold[:6]:
+        for b in hot[:6]:
+            if b == a:
+                continue
+            for c in range(10):
+                if c == a or c == b:
+                    continue
+                key = tuple(sorted([a, b, c]))
+                if key not in seen_sets:
+                    s = sum(key)
+                    sp = max(key) - min(key)
+                    # 偏好: 和值10-16(近均值), 跨度3-7
+                    score = (1 if 10 <= s <= 16 else 0) + (1 if 3 <= sp <= 7 else 0) + (2 if a in cold[:3] else 0)
+                    fill_candidates.append((score, sorted([a, b, c]), key, s, sp))
+    fill_candidates.sort(key=lambda x: -x[0])
+    for score, nums, key, s, sp in fill_candidates:
+        if key not in seen_sets:
+            seen_sets.add(key)
+            candidates.append({
+                "nums": nums,
+                "logic": f"补位: {nums[0]}(缺{missing[nums[0]]})+{nums[1]}(热)+{nums[2]}, 和{s}跨{sp}",
+                "sum_val": s,
+                "span": sp
+            })
+            if len(candidates) >= count:
+                break
 
     return candidates[:count]
 
