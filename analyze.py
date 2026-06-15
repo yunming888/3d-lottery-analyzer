@@ -1,7 +1,7 @@
 """
 福彩3D数据分析引擎
 统计：频率热冷号、遗漏值、和值分布、跨度、形态
-v3: 熔断规则简化为单条(组六8连→暂停) + 其余全推10注
+v4: 3条熔断规则全部暂停等用户决策 + 正常每天10注
 """
 import json
 import os
@@ -119,13 +119,11 @@ def type_analysis(records):
 
 def circuit_breaker(records, target_type="组六"):
     """
-    熔断判定（v3 简化版）
-    唯一规则: 组六连续8期 → 暂停，需用户决策
-    其余情况: 每天推满10注组六
+    熔断判定 v4: 3条规则全部暂停等用户决策
     返回: {
-        "stop": bool,          # 是否熔断
-        "reason": str,         # 原因
-        "force_push": bool,    # 是否强制推荐
+        "stop": bool,          # 是否暂停（所有熔断都=true, 用户决定）
+        "reason": str,         # 触发原因
+        "suggest": str,        # 给用户的建议
         "push_type": str,      # 推荐目标形态
         "push_count": int,     # 建议推荐注数
         "signal_strength": str # 信号强度
@@ -133,11 +131,13 @@ def circuit_breaker(records, target_type="组六"):
     """
     n = len(records)
     if n < 10:
-        return {"stop": False, "reason": "数据不足", "force_push": False,
+        return {"stop": False, "reason": "数据不足", "suggest": "",
                 "push_type": target_type, "push_count": 10, "signal_strength": "弱"}
 
-    # 唯一熔断规则: 组六连续8期 → 暂停，需用户决策
-    # (P(组六8连)下组三概率=91.8%, 显著窗口)
+    types_all = [r["type"] for r in records]
+    sums_3 = [r["sum_val"] for r in records[:3]]
+
+    # 当前组六连出长度
     zl_streak = 0
     for r in records:
         if r["type"] == "组六":
@@ -145,14 +145,47 @@ def circuit_breaker(records, target_type="组六"):
         else:
             break
 
-    if zl_streak >= 8:
-        return {"stop": True,
-                "reason": f"组六连续{zl_streak}期 (组三概率91.8%+), 需用户决策是否推组三",
-                "force_push": False, "push_type": "", "push_count": 0, "signal_strength": "极强"}
+    # 当前连续同形态（组三或组六）
+    streak_type = types_all[0]
+    streak_len = 1
+    for t in types_all[1:]:
+        if t == streak_type:
+            streak_len += 1
+        else:
+            break
 
-    # 正常情况: 每天推满10注组六
-    return {"stop": False, "reason": f"正常推荐 (当前组六{zl_streak}连)",
-            "force_push": False, "push_type": target_type, "push_count": 10, "signal_strength": "中"}
+    # === 规则A: 组六连续8期 → 暂停 ===
+    if zl_streak >= 8:
+        p = 1 - (0.732 ** zl_streak)
+        return {"stop": True,
+                "reason": f"组六连续{zl_streak}期",
+                "suggest": f"组三概率已达{p*100:.0f}%，建议推10注组三搏回归。是否推？",
+                "push_type": "组三", "push_count": 10, "signal_strength": "极强"}
+
+    # === 规则B: 连续3期同形态 → 暂停建议强推反向 ===
+    if streak_len >= 3:
+        reverse = "组六" if streak_type == "组三" else "组三"
+        return {"stop": True,
+                "reason": f"连续{streak_len}期{streak_type}",
+                "suggest": f"3连{streak_type}后形态切换率>80%，建议推10注{reverse}。是否推？",
+                "push_type": reverse, "push_count": 10,
+                "signal_strength": "极强" if streak_len >= 4 else "强"}
+
+    # === 规则C: 近3期和值连续极端 → 暂停 ===
+    if all(s <= 5 for s in sums_3):
+        return {"stop": True,
+                "reason": f"近3期和值连续极端小({sums_3})",
+                "suggest": "和值异常走低，可能继续下行。建议观望或减量。是否推？",
+                "push_type": target_type, "push_count": 10, "signal_strength": ""}
+    if all(s >= 22 for s in sums_3):
+        return {"stop": True,
+                "reason": f"近3期和值连续极端大({sums_3})",
+                "suggest": "和值异常走高，可能均值回归。建议推均值附近10注组六。是否推？",
+                "push_type": target_type, "push_count": 10, "signal_strength": ""}
+
+    # === 正常情况: 每天推满10注组六 ===
+    return {"stop": False, "reason": f"正常推荐 (组六{zl_streak}连，{streak_len}连{streak_type})",
+            "suggest": "", "push_type": target_type, "push_count": 10, "signal_strength": "中"}
 
 
 def generate_recommendations(records, info, count=10):
@@ -387,11 +420,14 @@ def print_summary(report):
     for k, v in t["recent_100"].items():
         print(f"    {k}: {v}次")
 
-    print(f"\n  [熔断判定]")
-    print(f"    停止: {cb.get('stop', 'N/A')}")
+    print(f"\n  [熔断判定 v4]")
+    print(f"    触发: {'🛑 是' if cb.get('stop') else '✅ 否'}")
     print(f"    原因: {cb.get('reason', 'N/A')}")
-    print(f"    强推: {cb.get('force_push', False)} → {cb.get('push_type', '')} × {cb.get('push_count', 0)}")
-    print(f"    信号: {cb.get('signal_strength', '')}")
+    if cb.get('suggest'):
+        print(f"    ⚠️ 建议: {cb.get('suggest')}")
+    if not cb.get('stop'):
+        print(f"    推荐: {cb.get('push_type', '')} × {cb.get('push_count', 0)}")
+        print(f"    信号: {cb.get('signal_strength', '')}")
 
     recs = report.get("推荐号码", [])
     if recs:
