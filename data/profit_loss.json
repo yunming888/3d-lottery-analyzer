@@ -213,9 +213,13 @@
     },
     {
       "date": "2026-06-16",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026157",
+      "draw_nums": [
+        3,
+        2,
+        7
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           3,
@@ -270,22 +274,86 @@
       ],
       "notes": 10,
       "cost": 20,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -20,
+      "reason": "组六10注未命中开奖327"
+    },
+    {
+      "date": "2026-06-17",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          5,
+          5,
+          3
+        ],
+        [
+          5,
+          5,
+          2
+        ],
+        [
+          5,
+          5,
+          7
+        ],
+        [
+          5,
+          5,
+          6
+        ],
+        [
+          3,
+          3,
+          5
+        ],
+        [
+          3,
+          3,
+          8
+        ],
+        [
+          3,
+          3,
+          0
+        ],
+        [
+          8,
+          8,
+          5
+        ],
+        [
+          7,
+          7,
+          5
+        ],
+        [
+          2,
+          2,
+          5
+        ]
+      ],
+      "notes": 10,
+      "cost": 20,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "v3规则: 组六2连 正常推10注组六"
+      "reason": "规则4: 组六3连 → 强推组三10注 (反向形态窗口)"
     }
   ],
   "summary": {
-    "total_days": 5,
-    "settled_days": 4,
-    "active_days": 4,
+    "total_days": 6,
+    "settled_days": 5,
+    "active_days": 5,
     "stop_days": 1,
-    "total_bets": 27,
-    "total_cost": 54,
+    "total_bets": 47,
+    "total_cost": 94,
     "total_hits": 0,
     "total_prize": 0,
-    "net_pnl": -54,
+    "net_pnl": -74,
     "pending_bets": 10,
     "pending_cost": 20
   }
