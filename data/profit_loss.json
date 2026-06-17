@@ -281,9 +281,13 @@
     },
     {
       "date": "2026-06-17",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026158",
+      "draw_nums": [
+        1,
+        7,
+        8
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           0,
@@ -338,22 +342,86 @@
       ],
       "notes": 10,
       "cost": 20,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -20,
+      "reason": "组六10注→0命中开奖178组六, 盈亏-20元"
+    },
+    {
+      "date": "2026-06-18",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          0,
+          5,
+          6
+        ],
+        [
+          2,
+          5,
+          7
+        ],
+        [
+          3,
+          5,
+          8
+        ],
+        [
+          0,
+          2,
+          5
+        ],
+        [
+          1,
+          4,
+          5
+        ],
+        [
+          3,
+          4,
+          7
+        ],
+        [
+          0,
+          1,
+          9
+        ],
+        [
+          2,
+          3,
+          6
+        ],
+        [
+          4,
+          6,
+          9
+        ],
+        [
+          0,
+          5,
+          9
+        ]
+      ],
+      "notes": 10,
+      "cost": 20,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "组六3连→正常推10注组六（用户指定只推组六）"
+      "reason": "组六4连正常推组六（用户指定），5号缺11期核心锚点，10注全覆盖"
     }
   ],
   "summary": {
-    "total_days": 6,
-    "settled_days": 5,
-    "active_days": 5,
+    "total_days": 7,
+    "settled_days": 6,
+    "active_days": 6,
     "stop_days": 1,
-    "total_bets": 47,
-    "total_cost": 94,
+    "total_bets": 57,
+    "total_cost": 114,
     "total_hits": 0,
     "total_prize": 0,
-    "net_pnl": -74,
+    "net_pnl": -94,
     "pending_bets": 10,
     "pending_cost": 20
   }
