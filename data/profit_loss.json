@@ -163,28 +163,41 @@
     },
     {
       "date": "2026-06-24",
+      "draw": "2026165",
+      "draw_nums": [4, 2, 4],
+      "draw_type": "组三",
+      "recommendations": [[1,2,4],[3,7,8],[3,4,7],[0,1,2],[0,4,9],[1,2,9],[3,4,8],[2,5,8],[3,4,6],[3,4,9]],
+      "notes": 10,
+      "cost": 20,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -20,
+      "reason": "组六10注未命中开奖424组三"
+    },
+    {
+      "date": "2026-06-25",
       "draw": "待开奖",
       "draw_nums": [],
       "draw_type": "",
-      "recommendations": [[1,2,4],[3,7,8],[3,4,7],[0,1,2],[0,4,9],[1,2,9],[3,4,8],[2,5,8],[3,4,6],[3,4,9]],
+      "recommendations": [[1,3,8],[0,5,7],[1,2,3],[0,7,8],[1,3,9],[0,4,8],[2,3,8],[2,3,9],[3,4,8],[1,3,6]],
       "notes": 10,
       "cost": 20,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "熔断未触发，正常推10注组六。核心锚点: 4(缺9期)+1(缺6期)"
+      "reason": "熔断未触发(组三1连)，正常推10注组六。核心锚点: 1(缺7期)+8(缺3期)"
     }
   ],
   "summary": {
-    "total_days": 13,
-    "settled_days": 12,
-    "active_days": 7,
-    "stop_days": 6,
-    "total_bets": 67,
-    "total_cost": 134,
+    "total_days": 14,
+    "settled_days": 13,
+    "active_days": 9,
+    "stop_days": 5,
+    "total_bets": 77,
+    "total_cost": 154,
     "total_hits": 0,
     "total_prize": 0,
-    "net_pnl": -114,
+    "net_pnl": -134,
     "pending_bets": 10,
     "pending_cost": 20
   }
