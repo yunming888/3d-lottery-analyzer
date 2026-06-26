@@ -638,9 +638,13 @@
     },
     {
       "date": "2026-06-26",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026167",
+      "draw_nums": [
+        6,
+        3,
+        1
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           1,
@@ -695,23 +699,88 @@
       ],
       "notes": 10,
       "cost": 20,
+      "hits": 1,
+      "prize": 160,
+      "daily_pnl": 140,
+      "reason": "组六10注→1命中1 3 6开奖631组六"
+    },
+    {
+      "date": "2026-06-27",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          5,
+          7,
+          8
+        ],
+        [
+          0,
+          2,
+          4
+        ],
+        [
+          2,
+          3,
+          8
+        ],
+        [
+          0,
+          5,
+          8
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          0,
+          3,
+          8
+        ],
+        [
+          0,
+          2,
+          7
+        ],
+        [
+          0,
+          2,
+          6
+        ],
+        [
+          1,
+          3,
+          8
+        ],
+        [
+          3,
+          4,
+          8
+        ]
+      ],
+      "notes": 10,
+      "cost": 20,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "组三2连→推荐组六10注。核心锚点: 1(缺8期)+8(缺4期)+3(缺3期)"
+      "reason": "熔断触发(Rule1: 近20期组三9次≥3, 且最近2期不是组三(组三过热未到切换点))"
     }
   ],
   "summary": {
-    "total_days": 14,
+    "total_days": 16,
     "settled_days": 15,
-    "active_days": 8,
-    "stop_days": 5,
+    "active_days": 9,
     "total_bets": 87,
     "total_cost": 174,
-    "total_hits": 0,
-    "total_prize": 0,
-    "net_pnl": -174,
+    "total_hits": 1,
+    "total_prize": 160,
+    "net_pnl": -14,
     "pending_bets": 10,
-    "pending_cost": 20
+    "pending_cost": 20,
+    "last_settled": "2026-06-26",
+    "last_hit": "2026-06-26 1注"
   }
 }

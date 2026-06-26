@@ -239,6 +239,9 @@ def generate_recommendations(records, info, count=10):
     seen_sets = set()
 
     def add_candidate(nums, logic):
+        # 确保是组六（3个数字各不相同）
+        if len(set(nums)) < 3:
+            return
         key = tuple(sorted(nums))
         if key in seen_sets:
             return
