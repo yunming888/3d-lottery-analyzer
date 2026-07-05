@@ -1,1 +1,372 @@
-IiIiDQ0K56aP5b2pM0Tljoblj7LmlbDmja7mipPlj5YgdjINDQrmlbDmja7mupA6IOS4nOaWuei0ouWvjCBjYWlwaWFvLmVhc3Rtb25leS5jb20gKOS4uykgKyA1MDAuY29tICjooaXnvLopDQ0K562W55WlOiDmr4/mrKHmipPlj5Y15pyf5Lic6LSiLCDmo4DmtYtnYXDoh6rliqjku441MDAuY29t6KGl5YWoDQ0KIiIiDQ0KaW1wb3J0IHJlcXVlc3RzDQ0KaW1wb3J0IGpzb24NDQppbXBvcnQgb3MNDQppbXBvcnQgcmUNDQpmcm9tIGRhdGV0aW1lIGltcG9ydCBkYXRldGltZQ0NCg0NCkRBVEFfRklMRSA9ICJkYXRhLzNkX2hpc3RvcnkuanNvbiINDQoNDQpIRUFERVJTID0gew0NCiAgICAiVXNlci1BZ2VudCI6ICJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTIwLjAuMC4wIFNhZmFyaS81MzcuMzYiLA0NCiAgICAiQWNjZXB0IjogInRleHQvaHRtbCxhcHBsaWNhdGlvbi94aHRtbCt4bWwiLA0NCiAgICAiQWNjZXB0LUxhbmd1YWdlIjogInpoLUNOLHpoO3E9MC45IiwNDQogICAgIlJlZmVyZXIiOiAiaHR0cHM6Ly9jYWlwaWFvLmVhc3Rtb25leS5jb20vIiwNDQp9DQ0KDQ0KDQ0KZGVmIGZldGNoX2Vhc3Rtb25leSgpOg0NCiAgICAiIiLmipPlj5bkuJzmlrnotKLlr4zmnIDmlrA15pyf5byA5aWWIiIiDQ0KICAgIHVybCA9ICJodHRwczovL2NhaXBpYW8uZWFzdG1vbmV5LmNvbS9SZXN1bHQvQ2F0ZWdvcnkvZmMzZCINDQogICAgdHJ5Og0NCiAgICAgICAgcmVzcCA9IHJlcXVlc3RzLmdldCh1cmwsIGhlYWRlcnM9SEVBREVSUywgdGltZW91dD0xNSkNDQogICAgICAgIHJlc3AuZW5jb2RpbmcgPSAidXRmLTgiDQ0KICAgICAgICBodG1sID0gcmVzcC50ZXh0DQ0KICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToNDQogICAgICAgIHByaW50KGYiICDkuJzotKLmipPlj5blpLHotKU6IHtlfSIpDQ0KICAgICAgICByZXR1cm4gW10NDQoNDQogICAgcGF0dGVybiA9IHInPHN0cm9uZz4oXGR7N30p5pyfPC9zdHJvbmc+Lio/cmVkIj4oXGQpPC9zcGFuPi4qP3JlZCI+KFxkKTwvc3Bhbj4uKj9yZWQiPihcZCk8L3NwYW4+Jw0NCiAgICBtYXRjaGVzID0gcmUuZmluZGFsbChwYXR0ZXJuLCBodG1sLCByZS5ET1RBTEwpDQ0KDQ0KICAgIHJlY29yZHMgPSBbXQ0NCiAgICBmb3IgbSBpbiBtYXRjaGVzOg0NCiAgICAgICAgcWloYW8sIGJhaSwgc2hpLCBnZSA9IG1bMF0sIGludChtWzFdKSwgaW50KG1bMl0pLCBpbnQobVszXSkNDQogICAgICAgIG51bXMgPSBbYmFpLCBzaGksIGdlXQ0NCiAgICAgICAgbG90X3R5cGUgPSAi57uE5YWtIg0NCiAgICAgICAgaWYgYmFpID09IHNoaSA9PSBnZToNDQogICAgICAgICAgICBsb3RfdHlwZSA9ICLosbnlrZAiDQ0KICAgICAgICBlbGlmIGJhaSA9PSBzaGkgb3Igc2hpID09IGdlIG9yIGJhaSA9PSBnZToNDQogICAgICAgICAgICBsb3RfdHlwZSA9ICLnu4TkuIkiDQ0KDQ0KICAgICAgICBkYXRlID0gIiINDQogICAgICAgIGRhdGVfbWF0Y2ggPSByZS5zZWFyY2gocmYne3FpaGFvfeacnzwvc3Ryb25nPi4qP+W8gOWlluaXpeacn++8mihcZHt7NH19LVxke3syfX0tXGR7ezJ9fSknLCBodG1sLCByZS5ET1RBTEwpDQ0KICAgICAgICBpZiBkYXRlX21hdGNoOg0NCiAgICAgICAgICAgIGRhdGUgPSBkYXRlX21hdGNoLmdyb3VwKDEpDQ0KDQ0KICAgICAgICByZWNvcmRzLmFwcGVuZCh7DQ0KICAgICAgICAgICAgInFpaGFvIjogcWloYW8sDQ0KICAgICAgICAgICAgImRhdGUiOiBkYXRlLA0NCiAgICAgICAgICAgICJiYWkiOiBiYWksICJzaGkiOiBzaGksICJnZSI6IGdlLA0NCiAgICAgICAgICAgICJudW1zIjogbnVtcywNDQogICAgICAgICAgICAic3VtX3ZhbCI6IHN1bShudW1zKSwNDQogICAgICAgICAgICAic3BhbiI6IG1heChudW1zKSAtIG1pbihudW1zKSwNDQogICAgICAgICAgICAidHlwZSI6IGxvdF90eXBlDQ0KICAgICAgICB9KQ0NCg0NCiAgICByZXR1cm4gcmVjb3Jkcw0NCg0NCg0NCmRlZiBmZXRjaF81MDBjb20ocWloYW8pOg0NCiAgICAiIiLku441MDAuY29t5oqT5Y+W5Y2V5Liq5pyf5Y+377yI55So5LqO6KGl57y677yJIiIiDQ0KICAgIHVybCA9IGYiaHR0cHM6Ly9zcG9ydHMuMTYzLmNvbS9jYWlwaWFvL2xvdHRlcnkvZmMzZC97cWloYW99Ig0NCiAgICB0cnk6DQ0KICAgICAgICByZXNwID0gcmVxdWVzdHMuZ2V0KHVybCwgaGVhZGVycz1IRUFERVJTLCB0aW1lb3V0PTE1KQ0NCiAgICAgICAgcmVzcC5lbmNvZGluZyA9ICJ1dGYtOCINDQogICAgICAgIGh0bWwgPSByZXNwLnRleHQNDQogICAgZXhjZXB0IEV4Y2VwdGlvbjoNDQogICAgICAgICMg5aSH55SoOiA1MDAuY29tDQ0KICAgICAgICB0cnk6DQ0KICAgICAgICAgICAgdXJsID0gZiJodHRwczovL2thaWppYW5nLjUwMC5jb20vc2h0bWwvc2Qve3FpaGFvfS5zaHRtbCINDQogICAgICAgICAgICByZXNwID0gcmVxdWVzdHMuZ2V0KHVybCwgaGVhZGVycz1IRUFERVJTLCB0aW1lb3V0PTE1KQ0NCiAgICAgICAgICAgIHJlc3AuZW5jb2RpbmcgPSAidXRmLTgiDQ0KICAgICAgICAgICAgaHRtbCA9IHJlc3AudGV4dA0NCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOg0NCiAgICAgICAgICAgIHByaW50KGYiICDooaXnvLp7cWloYW995aSx6LSlOiB7ZX0iKQ0NCiAgICAgICAgICAgIHJldHVybiBOb25lDQ0KDQ0KICAgICMgNTAwLmNvbSDpobXpnaI6IOW8gOWlluWPt+eggTogLSBOIC0gTiAtIE4sIOWPt+eggeexu+Wei++8mue7hFgNDQogICAgIyAxNjMuY29tIOmhtemdojog5byA5aWW5Y+356CBXG5OXG5OXG5ODQ0KICAgIG51bXNfbWF0Y2ggPSByZS5maW5kYWxsKHIn5byA5aWW5Y+356CBW++8mjpdP1xzKjwvaFxkPj9ccyo8W14+XSo+XHMqKFxkKVxzKjwvW14+XSo+XHMqPFtePl0qPlxzKihcZClccyo8L1tePl0qPlxzKjxbXj5dKj5ccyooXGQpJywgaHRtbCwgcmUuRE9UQUxMIHwgcmUuSUdOT1JFQ0FTRSkNDQogICAgaWYgbm90IG51bXNfbWF0Y2g6DQ0KICAgICAgICAjIDUwMC5jb20gZm9ybWF0OiA8ZGl2IGNsYXNzPSJiYWxsX3JlZCI+TjwvZGl2Pg0NCiAgICAgICAgbnVtc19tYXRjaCA9IHJlLmZpbmRhbGwocidiYWxsX3JlZFtePl0qPlxzKihcZClccyo8JywgaHRtbCkNDQogICAgICAgIGlmIGxlbihudW1zX21hdGNoKSA+PSAzOg0NCiAgICAgICAgICAgIG51bXNfbWF0Y2ggPSBbKG51bXNfbWF0Y2hbMF0sIG51bXNfbWF0Y2hbMV0sIG51bXNfbWF0Y2hbMl0pXQ0NCiAgICAgICAgZWxzZToNDQogICAgICAgICAgICAjIFRyeSBvdGhlciBmb3JtYXRzDQ0KICAgICAgICAgICAgbnVtc19tYXRjaCA9IHJlLmZpbmRhbGwocidyZWRbXj5dKj5ccyooXGQpXHMqPFtePl0qPlxzKjxbXj5dKj5ccyooXGQpXHMqPFtePl0qPlxzKjxbXj5dKj5ccyooXGQpJywgaHRtbCwgcmUuRE9UQUxMKQ0NCg0NCiAgICBpZiBub3QgbnVtc19tYXRjaDoNDQogICAgICAgIHByaW50KGYiICDooaXnvLp7cWloYW99OiDml6Dms5Xop6PmnpDlj7fnoIEiKQ0NCiAgICAgICAgcmV0dXJuIE5vbmUNDQoNDQogICAgbSA9IG51bXNfbWF0Y2hbMF0NDQogICAgYmFpLCBzaGksIGdlID0gaW50KG1bMF0pLCBpbnQobVsxXSksIGludChtWzJdKQ0NCiAgICBudW1zID0gW2JhaSwgc2hpLCBnZV0NDQogICAgbG90X3R5cGUgPSAi57uE5YWtIg0NCiAgICBpZiBiYWkgPT0gc2hpID09IGdlOg0NCiAgICAgICAgbG90X3R5cGUgPSAi6LG55a2QIg0NCiAgICBlbGlmIGJhaSA9PSBzaGkgb3Igc2hpID09IGdlIG9yIGJhaSA9PSBnZToNDQogICAgICAgIGxvdF90eXBlID0gIue7hOS4iSINDQoNDQogICAgIyBFeHRyYWN0IGRhdGUNDQogICAgZGF0ZSA9ICIiDQ0KICAgIGRhdGVfbWF0Y2ggPSByZS5zZWFyY2gocicoXGR7NH0tXGR7Mn0tXGR7Mn0pJywgaHRtbCkNDQogICAgaWYgZGF0ZV9tYXRjaDoNDQogICAgICAgIGRhdGUgPSBkYXRlX21hdGNoLmdyb3VwKDEpDQ0KDQ0KICAgIHJldHVybiB7DQ0KICAgICAgICAicWloYW8iOiBzdHIocWloYW8pLA0NCiAgICAgICAgImRhdGUiOiBkYXRlLA0NCiAgICAgICAgImJhaSI6IGJhaSwgInNoaSI6IHNoaSwgImdlIjogZ2UsDQ0KICAgICAgICAibnVtcyI6IG51bXMsDQ0KICAgICAgICAic3VtX3ZhbCI6IHN1bShudW1zKSwNDQogICAgICAgICJzcGFuIjogbWF4KG51bXMpIC0gbWluKG51bXMpLA0NCiAgICAgICAgInR5cGUiOiBsb3RfdHlwZSwNDQogICAgICAgICJfc291cmNlIjogIjUwMC5jb23ooaXnvLoiDQ0KICAgIH0NDQoNDQoNDQpkZWYgZGV0ZWN0X2dhcHMocmVjb3Jkcyk6DQ0KICAgICIiIuajgOa1i+acrOWcsOaVsOaNruS4reeahOacn+WPt+e8uuWPoyIiIg0NCiAgICBpZiBsZW4ocmVjb3JkcykgPCAyOg0NCiAgICAgICAgcmV0dXJuIFtdDQ0KICAgIHFpaGFvcyA9IHNvcnRlZChbaW50KHJbInFpaGFvIl0pIGZvciByIGluIHJlY29yZHNdKQ0NCiAgICBnYXBzID0gW10NDQogICAgZm9yIGkgaW4gcmFuZ2UobGVuKHFpaGFvcykgLSAxKToNDQogICAgICAgIGN1cnIgPSBxaWhhb3NbaV0NDQogICAgICAgIG5leHRfcWggPSBxaWhhb3NbaSArIDFdDQ0KICAgICAgICBpZiBuZXh0X3FoIC0gY3VyciA+IDE6DQ0KICAgICAgICAgICAgZm9yIG1pc3NpbmcgaW4gcmFuZ2UoY3VyciArIDEsIG5leHRfcWgpOg0NCiAgICAgICAgICAgICAgICBnYXBzLmFwcGVuZChzdHIobWlzc2luZykpDQ0KICAgIHJldHVybiBnYXBzDQ0KDQ0KDQ0KZGVmIGZpbGxfZ2FwcyhyZWNvcmRzKToNDQogICAgIiIi5qOA5rWL57y65Y+j5bm25LuONTAwLmNvbeihpeWFqCIiIg0NCiAgICBnYXBzID0gZGV0ZWN0X2dhcHMocmVjb3JkcykNDQogICAgaWYgbm90IGdhcHM6DQ0KICAgICAgICByZXR1cm4gcmVjb3JkcywgMA0NCg0NCiAgICAjIOi3s+i/h+Wkp+e8uuWPoyAo6LaF6L+HNTDmnJ8sIOWPr+iDveaYr+aVsOaNrua6kOWIh+aNouWvvOiHtOeahOS4jei/nue7rSkNDQogICAgaWYgbGVuKGdhcHMpID4gNTA6DQ0KICAgICAgICBwcmludChmIiAg4pqg77iPIOajgOa1i+WIsHtsZW4oZ2Fwcyl95Liq57y65Y+jLCDmlbDph4/ov4flpJosIOi3s+i/h+ihpeWFqCIpDQ0KICAgICAgICByZXR1cm4gcmVjb3JkcywgMA0NCg0NCiAgICBwcmludChmIiAg8J+UjSDmo4DmtYvliLB7bGVuKGdhcHMpfeS4que8uuWPozogeycsICcuam9pbihnYXBzKX0iKQ0NCiAgICBmaWxsZWQgPSAwDQ0KICAgIGV4aXN0aW5nX21hcCA9IHtyWyJxaWhhbyJdOiByIGZvciByIGluIHJlY29yZHN9DQ0KDQ0KICAgIGZvciBxaWhhbyBpbiBnYXBzOg0NCiAgICAgICAgcHJpbnQoZiIgIOihpee8uiB7cWloYW99Li4uIiwgZW5kPSIgIikNDQogICAgICAgIHJlY29yZCA9IGZldGNoXzUwMGNvbShxaWhhbykNDQogICAgICAgIGlmIHJlY29yZDoNDQogICAgICAgICAgICBleGlzdGluZ19tYXBbcWloYW9dID0gcmVjb3JkDQ0KICAgICAgICAgICAgZmlsbGVkICs9IDENDQogICAgICAgICAgICBwcmludChmIuKchSB7Jycuam9pbihtYXAoc3RyLCByZWNvcmRbJ251bXMnXSkpfSB7cmVjb3JkWyd0eXBlJ119IikNDQogICAgICAgIGVsc2U6DQ0KICAgICAgICAgICAgcHJpbnQoIuKdjCIpDQ0KDQ0KICAgIGlmIGZpbGxlZCA+IDA6DQ0KICAgICAgICBtZXJnZWQgPSBzb3J0ZWQoZXhpc3RpbmdfbWFwLnZhbHVlcygpLCBrZXk9bGFtYmRhIHg6IHhbInFpaGFvIl0sIHJldmVyc2U9VHJ1ZSkNDQogICAgICAgIG9zLm1ha2VkaXJzKCJkYXRhIiwgZXhpc3Rfb2s9VHJ1ZSkNDQogICAgICAgIHdpdGggb3BlbihEQVRBX0ZJTEUsICJ3IiwgZW5jb2Rpbmc9InV0Zi04IikgYXMgZjoNDQogICAgICAgICAgICBqc29uLmR1bXAobWVyZ2VkLCBmLCBlbnN1cmVfYXNjaWk9RmFsc2UsIGluZGVudD0yKQ0NCiAgICAgICAgcHJpbnQoZiIgIOe8uuWPo+ihpeWFqDoge2ZpbGxlZH0ve2xlbihnYXBzKX0iKQ0NCiAgICAgICAgcmV0dXJuIG1lcmdlZCwgZmlsbGVkDQ0KDQ0KICAgIHJldHVybiByZWNvcmRzLCAwDQ0KDQ0KDQ0KZGVmIG1lcmdlX2FuZF9zYXZlKG5ld19yZWNvcmRzKToNDQogICAgIiIi5ZCI5bm25paw5pWw5o2u5Yiw5pys5Zyw5bqT77yM5Y676YeN5Y+q5L+d55WZ5pyA5pawIiIiDQ0KICAgIGlmIG5vdCBuZXdfcmVjb3JkczoNDQogICAgICAgIHJldHVybiBsb2FkX2RhdGEoKQ0NCg0NCiAgICBleGlzdGluZyA9IGxvYWRfZGF0YSgpDQ0KICAgIGV4aXN0aW5nX21hcCA9IHtyWyJxaWhhbyJdOiByIGZvciByIGluIGV4aXN0aW5nfQ0NCg0NCiAgICBmb3IgciBpbiBuZXdfcmVjb3JkczoNDQogICAgICAgIGV4aXN0aW5nX21hcFtyWyJxaWhhbyJdXSA9IHINDQoNDQogICAgbWVyZ2VkID0gc29ydGVkKGV4aXN0aW5nX21hcC52YWx1ZXMoKSwga2V5PWxhbWJkYSB4OiB4WyJxaWhhbyJdLCByZXZlcnNlPVRydWUpDQ0KICAgIG9zLm1ha2VkaXJzKCJkYXRhIiwgZXhpc3Rfb2s9VHJ1ZSkNDQogICAgd2l0aCBvcGVuKERBVEFfRklMRSwgInciLCBlbmNvZGluZz0idXRmLTgiKSBhcyBmOg0NCiAgICAgICAganNvbi5kdW1wKG1lcmdlZCwgZiwgZW5zdXJlX2FzY2lpPUZhbHNlLCBpbmRlbnQ9MikNDQoNDQogICAgcmV0dXJuIG1lcmdlZA0NCg0NCg0NCmRlZiBsb2FkX2RhdGEoKToNDQogICAgaWYgb3MucGF0aC5leGlzdHMoREFUQV9GSUxFKToNDQogICAgICAgIHdpdGggb3BlbihEQVRBX0ZJTEUsICJyIiwgZW5jb2Rpbmc9InV0Zi04IikgYXMgZjoNDQogICAgICAgICAgICByZXR1cm4ganNvbi5sb2FkKGYpDQ0KICAgIHJldHVybiBbXQ0NCg0NCg0NCmRlZiBsb2FkX29yX2ZldGNoKCk6DQ0KICAgICMgU3RlcCAxOiDkuJzotKLmipPmnIDmlrA15pyfDQ0KICAgIG5ld19yZWNvcmRzID0gZmV0Y2hfZWFzdG1vbmV5KCkNDQogICAgaWYgbmV3X3JlY29yZHM6DQ0KICAgICAgICByZWNvcmRzID0gbWVyZ2VfYW5kX3NhdmUobmV3X3JlY29yZHMpDQ0KICAgICAgICBwcmludChmIuS4nOaWuei0ouWvjDoge2xlbihuZXdfcmVjb3Jkcyl9IOacn+aWsOaVsOaNriwg5pys5Zyw5YWxIHtsZW4ocmVjb3Jkcyl9IOacnyIpDQ0KICAgIGVsc2U6DQ0KICAgICAgICByZWNvcmRzID0gbG9hZF9kYXRhKCkNDQogICAgICAgIGlmIHJlY29yZHM6DQ0KICAgICAgICAgICAgcHJpbnQoZiLkvb/nlKjmnKzlnLDnvJPlrZg6IHtsZW4ocmVjb3Jkcyl9IOacnyIpDQ0KDQ0KICAgICMgU3RlcCAyOiDmo4DmtYvlubbooaXlhajnvLrlj6MNDQogICAgcmVjb3JkcywgZmlsbGVkID0gZmlsbF9nYXBzKHJlY29yZHMpDQ0KICAgIHJldHVybiByZWNvcmRzDQ0KDQ0KDQ0KaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoNDQogICAgcmVjb3JkcyA9IGxvYWRfb3JfZmV0Y2goKQ0NCiAgICBpZiByZWNvcmRzOg0NCiAgICAgICAgbGF0ZXN0ID0gcmVjb3Jkc1swXQ0NCiAgICAgICAgcHJpbnQoZiLmnIDmlrA6IHtsYXRlc3RbJ3FpaGFvJ1195pyfIHwgeycgJy5qb2luKG1hcChzdHIsIGxhdGVzdFsnbnVtcyddKSl9IHwge2xhdGVzdFsndHlwZSddfSIpDQ0KICAgICAgICBwcmludChmIuiMg+WbtDoge3JlY29yZHNbLTFdWydxaWhhbyddfSB+IHtyZWNvcmRzWzBdWydxaWhhbyddfSIpDQ0KICAgICAgICBwcmludChmIuaAu+iuoToge2xlbihyZWNvcmRzKX0g5pyfIikNDQo=
+"""
+
+福彩3D历史数据抓取 v2
+
+数据源: 东方财富 caipiao.eastmoney.com (主) + 500.com (补缺)
+
+策略: 每次抓取5期东财, 检测gap自动从500.com补全
+
+"""
+
+import requests
+
+import json
+
+import os
+
+import re
+
+from datetime import datetime
+
+DATA_FILE = "data/3d_history.json"
+
+HEADERS = {
+
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+
+    "Accept": "text/html,application/xhtml+xml",
+
+    "Accept-Language": "zh-CN,zh;q=0.9",
+
+    "Referer": "https://caipiao.eastmoney.com/",
+
+}
+
+def fetch_eastmoney():
+
+    """抓取东方财富最新5期开奖"""
+
+    url = "https://caipiao.eastmoney.com/Result/Category/fc3d"
+
+    try:
+
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+
+        resp.encoding = "utf-8"
+
+        html = resp.text
+
+    except Exception as e:
+
+        print(f"  东财抓取失败: {e}")
+
+        return []
+
+    pattern = r'<strong>(\d{7})期</strong>.*?red">(\d)</span>.*?red">(\d)</span>.*?red">(\d)</span>'
+
+    matches = re.findall(pattern, html, re.DOTALL)
+
+    records = []
+
+    for m in matches:
+
+        qihao, bai, shi, ge = m[0], int(m[1]), int(m[2]), int(m[3])
+
+        nums = [bai, shi, ge]
+
+        lot_type = "组六"
+
+        if bai == shi == ge:
+
+            lot_type = "豹子"
+
+        elif bai == shi or shi == ge or bai == ge:
+
+            lot_type = "组三"
+
+        date = ""
+
+        date_match = re.search(rf'{qihao}期</strong>.*?开奖日期：(\d{{4}}-\d{{2}}-\d{{2}})', html, re.DOTALL)
+
+        if date_match:
+
+            date = date_match.group(1)
+
+        records.append({
+
+            "qihao": qihao,
+
+            "date": date,
+
+            "bai": bai, "shi": shi, "ge": ge,
+
+            "nums": nums,
+
+            "sum_val": sum(nums),
+
+            "span": max(nums) - min(nums),
+
+            "type": lot_type
+
+        })
+
+    return records
+
+def fetch_500com(qihao):
+
+    """从500.com抓取单个期号（用于补缺）"""
+
+    url = f"https://sports.163.com/caipiao/lottery/fc3d/{qihao}"
+
+    try:
+
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+
+        resp.encoding = "utf-8"
+
+        html = resp.text
+
+    except Exception:
+
+        # 备用: 500.com
+
+        try:
+
+            url = f"https://kaijiang.500.com/shtml/sd/{qihao}.shtml"
+
+            resp = requests.get(url, headers=HEADERS, timeout=15)
+
+            resp.encoding = "utf-8"
+
+            html = resp.text
+
+        except Exception as e:
+
+            print(f"  补缺{qihao}失败: {e}")
+
+            return None
+
+    # 500.com 页面: 开奖号码: - N - N - N, 号码类型：组X
+
+    # 163.com 页面: 开奖号码\nN\nN\nN
+
+    nums_match = re.findall(r'开奖号码[：:]?\s*</h\d>?\s*<[^>]*>\s*(\d)\s*</[^>]*>\s*<[^>]*>\s*(\d)\s*</[^>]*>\s*<[^>]*>\s*(\d)', html, re.DOTALL | re.IGNORECASE)
+
+    if not nums_match:
+
+        # 500.com format: <div class="ball_red">N</div>
+
+        nums_match = re.findall(r'ball_red[^>]*>\s*(\d)\s*<', html)
+
+        if len(nums_match) >= 3:
+
+            nums_match = [(nums_match[0], nums_match[1], nums_match[2])]
+
+        else:
+
+            # Try other formats
+
+            nums_match = re.findall(r'red[^>]*>\s*(\d)\s*<[^>]*>\s*<[^>]*>\s*(\d)\s*<[^>]*>\s*<[^>]*>\s*(\d)', html, re.DOTALL)
+
+    if not nums_match:
+
+        print(f"  补缺{qihao}: 无法解析号码")
+
+        return None
+
+    m = nums_match[0]
+
+    bai, shi, ge = int(m[0]), int(m[1]), int(m[2])
+
+    nums = [bai, shi, ge]
+
+    lot_type = "组六"
+
+    if bai == shi == ge:
+
+        lot_type = "豹子"
+
+    elif bai == shi or shi == ge or bai == ge:
+
+        lot_type = "组三"
+
+    # Extract date
+
+    date = ""
+
+    date_match = re.search(r'(\d{4}-\d{2}-\d{2})', html)
+
+    if date_match:
+
+        date = date_match.group(1)
+
+    return {
+
+        "qihao": str(qihao),
+
+        "date": date,
+
+        "bai": bai, "shi": shi, "ge": ge,
+
+        "nums": nums,
+
+        "sum_val": sum(nums),
+
+        "span": max(nums) - min(nums),
+
+        "type": lot_type,
+
+        "_source": "500.com补缺"
+
+    }
+
+def detect_gaps(records):
+
+    """检测本地数据中的期号缺口"""
+
+    if len(records) < 2:
+
+        return []
+
+    qihaos = sorted([int(r["qihao"]) for r in records])
+
+    gaps = []
+
+    for i in range(len(qihaos) - 1):
+
+        curr = qihaos[i]
+
+        next_qh = qihaos[i + 1]
+
+        if next_qh - curr > 1:
+
+            for missing in range(curr + 1, next_qh):
+
+                gaps.append(str(missing))
+
+    return gaps
+
+def fill_gaps(records):
+
+    """检测缺口并从500.com补全"""
+
+    gaps = detect_gaps(records)
+
+    if not gaps:
+
+        return records, 0
+
+    # 跳过大缺口 (超过50期, 可能是数据源切换导致的不连续)
+
+    if len(gaps) > 50:
+
+        print(f"  ⚠️ 检测到{len(gaps)}个缺口, 数量过多, 跳过补全")
+
+        return records, 0
+
+    print(f"  🔍 检测到{len(gaps)}个缺口: {', '.join(gaps)}")
+
+    filled = 0
+
+    existing_map = {r["qihao"]: r for r in records}
+
+    for qihao in gaps:
+
+        print(f"  补缺 {qihao}...", end=" ")
+
+        record = fetch_500com(qihao)
+
+        if record:
+
+            existing_map[qihao] = record
+
+            filled += 1
+
+            print(f"✅ {''.join(map(str, record['nums']))} {record['type']}")
+
+        else:
+
+            print("❌")
+
+    if filled > 0:
+
+        merged = sorted(existing_map.values(), key=lambda x: x["qihao"], reverse=True)
+
+        os.makedirs("data", exist_ok=True)
+
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+
+            json.dump(merged, f, ensure_ascii=False, indent=2)
+
+        print(f"  缺口补全: {filled}/{len(gaps)}")
+
+        return merged, filled
+
+    return records, 0
+
+def merge_and_save(new_records):
+
+    """合并新数据到本地库，去重只保留最新"""
+
+    if not new_records:
+
+        return load_data()
+
+    existing = load_data()
+
+    existing_map = {r["qihao"]: r for r in existing}
+
+    for r in new_records:
+
+        existing_map[r["qihao"]] = r
+
+    merged = sorted(existing_map.values(), key=lambda x: x["qihao"], reverse=True)
+
+    os.makedirs("data", exist_ok=True)
+
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+
+        json.dump(merged, f, ensure_ascii=False, indent=2)
+
+    return merged
+
+def load_data():
+
+    if os.path.exists(DATA_FILE):
+
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+
+            return json.load(f)
+
+    return []
+
+def load_or_fetch():
+
+    # Step 1: 东财抓最新5期
+
+    new_records = fetch_eastmoney()
+
+    if new_records:
+
+        records = merge_and_save(new_records)
+
+        print(f"东方财富: {len(new_records)} 期新数据, 本地共 {len(records)} 期")
+
+    else:
+
+        records = load_data()
+
+        if records:
+
+            print(f"使用本地缓存: {len(records)} 期")
+
+    # Step 2: 检测并补全缺口
+
+    records, filled = fill_gaps(records)
+
+    return records
+
+if __name__ == "__main__":
+
+    records = load_or_fetch()
+
+    if records:
+
+        latest = records[0]
+
+        print(f"最新: {latest['qihao']}期 | {' '.join(map(str, latest['nums']))} | {latest['type']}")
+
+        print(f"范围: {records[-1]['qihao']} ~ {records[0]['qihao']}")
+
+        print(f"总计: {len(records)} 期")
+

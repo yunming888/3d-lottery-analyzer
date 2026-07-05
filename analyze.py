@@ -1,1 +1,441 @@
-IiIiDQrnpo/lvakzROaVsOaNruWIhuaekOW8leaTjg0K57uf6K6h77ya6aKR546H54Ot5Ya35Y+344CB6YGX5ryP5YC844CB5ZKM5YC85YiG5biD44CB6Leo5bqm44CB5b2i5oCBDQp2NDogM+adoeeGlOaWreinhOWImeWFqOmDqOaaguWBnOetieeUqOaIt+WGs+etliArIOato+W4uOavj+WkqTEw5rOoDQoiIiINCmltcG9ydCBqc29uDQppbXBvcnQgb3MNCmZyb20gY29sbGVjdGlvbnMgaW1wb3J0IENvdW50ZXIsIGRlZmF1bHRkaWN0DQoNCkRBVEFfRklMRSA9ICJkYXRhLzNkX2hpc3RvcnkuanNvbiINCg0KZGVmIGxvYWRfZGF0YSgpOg0KICAgIHdpdGggb3BlbihEQVRBX0ZJTEUsICJyIiwgZW5jb2Rpbmc9InV0Zi04IikgYXMgZjoNCiAgICAgICAgcmV0dXJuIGpzb24ubG9hZChmKQ0KDQpkZWYgZnJlcXVlbmN5X2FuYWx5c2lzKHJlY29yZHMsIHRvcF9uPTUpOg0KICAgICIiIuavj+S4quS9jee9ruS4iueahOWPt+eggemikeeOhyArIOeDreWGt+WPtyIiIg0KICAgIHBvc19jb3VudGVycyA9IHsiYmFpIjogQ291bnRlcigpLCAic2hpIjogQ291bnRlcigpLCAiZ2UiOiBDb3VudGVyKCl9DQogICAgdG90YWxfY291bnRlciA9IENvdW50ZXIoKQ0KDQogICAgZm9yIHIgaW4gcmVjb3JkczoNCiAgICAgICAgcG9zX2NvdW50ZXJzWyJiYWkiXVtyWyJiYWkiXV0gKz0gMQ0KICAgICAgICBwb3NfY291bnRlcnNbInNoaSJdW3JbInNoaSJdXSArPSAxDQogICAgICAgIHBvc19jb3VudGVyc1siZ2UiXVtyWyJnZSJdXSArPSAxDQogICAgICAgIGZvciBuIGluIHJbIm51bXMiXToNCiAgICAgICAgICAgIHRvdGFsX2NvdW50ZXJbbl0gKz0gMQ0KDQogICAgcmV0dXJuIHsNCiAgICAgICAgInRvdGFsX2ZyZXEiOiB0b3RhbF9jb3VudGVyLm1vc3RfY29tbW9uKCksDQogICAgICAgICJiYWlfaG90IjogcG9zX2NvdW50ZXJzWyJiYWkiXS5tb3N0X2NvbW1vbih0b3BfbiksDQogICAgICAgICJzaGlfaG90IjogcG9zX2NvdW50ZXJzWyJzaGkiXS5tb3N0X2NvbW1vbih0b3BfbiksDQogICAgICAgICJnZV9ob3QiOiBwb3NfY291bnRlcnNbImdlIl0ubW9zdF9jb21tb24odG9wX24pLA0KICAgICAgICAiYmFpX2NvbGQiOiBwb3NfY291bnRlcnNbImJhaSJdLm1vc3RfY29tbW9uKClbLXRvcF9uOl1bOjotMV0sDQogICAgICAgICJzaGlfY29sZCI6IHBvc19jb3VudGVyc1sic2hpIl0ubW9zdF9jb21tb24oKVstdG9wX246XVs6Oi0xXSwNCiAgICAgICAgImdlX2NvbGQiOiBwb3NfY291bnRlcnNbImdlIl0ubW9zdF9jb21tb24oKVstdG9wX246XVs6Oi0xXQ0KICAgIH0NCg0KZGVmIG1pc3NpbmdfYW5hbHlzaXMocmVjb3Jkcyk6DQogICAgIiIi5b2T5YmN6YGX5ryP5YiG5p6QIC0g5ZCE5Y+356CB5aSa5LmF5rKh5Ye6IiIiDQogICAgdG90YWwgPSBsZW4ocmVjb3JkcykNCiAgICBsYXN0X3NlZW4gPSB7aTogTm9uZSBmb3IgaSBpbiByYW5nZSgxMCl9DQoNCiAgICBmb3IgaWR4LCByIGluIGVudW1lcmF0ZShyZWNvcmRzKToNCiAgICAgICAgZm9yIG4gaW4gclsibnVtcyJdOg0KICAgICAgICAgICAgaWYgbGFzdF9zZWVuW25dIGlzIE5vbmU6DQogICAgICAgICAgICAgICAgbGFzdF9zZWVuW25dID0gaWR4DQoNCiAgICBtaXNzaW5nID0ge30NCiAgICBmb3IgbiBpbiByYW5nZSgxMCk6DQogICAgICAgIGlmIGxhc3Rfc2VlbltuXSBpcyBOb25lOg0KICAgICAgICAgICAgbWlzc2luZ1tuXSA9IHRvdGFsDQogICAgICAgIGVsc2U6DQogICAgICAgICAgICBtaXNzaW5nW25dID0gbGFzdF9zZWVuW25dDQoNCiAgICByZXR1cm4gew0KICAgICAgICAibWlzc2luZ19wZXJpb2RzIjogbWlzc2luZywNCiAgICAgICAgIm1vc3Rfb3ZlcmR1ZSI6IHNvcnRlZChtaXNzaW5nLml0ZW1zKCksIGtleT1sYW1iZGEgeDogeFsxXSwgcmV2ZXJzZT1UcnVlKVs6NV0sDQogICAgICAgICJsZWFzdF9vdmVyZHVlIjogc29ydGVkKG1pc3NpbmcuaXRlbXMoKSwga2V5PWxhbWJkYSB4OiB4WzFdKVs6NV0NCiAgICB9DQoNCmRlZiBzdW1fdmFsdWVfYW5hbHlzaXMocmVjb3Jkcyk6DQogICAgIiIi5ZKM5YC85YiG5biD5YiG5p6QIiIiDQogICAgc3VtX2NvdW50ZXIgPSBDb3VudGVyKCkNCiAgICBmb3IgciBpbiByZWNvcmRzOg0KICAgICAgICBzdW1fY291bnRlcltyWyJzdW1fdmFsIl1dICs9IDENCg0KICAgIHJlY2VudF8xMDAgPSBbclsic3VtX3ZhbCJdIGZvciByIGluIHJlY29yZHNbOjEwMF1dDQogICAgYXZnX3N1bSA9IHN1bShyZWNlbnRfMTAwKSAvIGxlbihyZWNlbnRfMTAwKSBpZiByZWNlbnRfMTAwIGVsc2UgMA0KDQogICAgcmV0dXJuIHsNCiAgICAgICAgInN1bV9kaXN0cmlidXRpb24iOiBkaWN0KHNvcnRlZChzdW1fY291bnRlci5pdGVtcygpKSksDQogICAgICAgICJyZWNlbnRfMTAwX2F2ZyI6IHJvdW5kKGF2Z19zdW0sIDIpLA0KICAgICAgICAidGhlb3JldGljYWxfYXZnIjogMTMuNSwNCiAgICAgICAgInJhbmdlX3N1bW1hcnkiOiB7DQogICAgICAgICAgICAic21hbGwiOiAoMCwgOSksICJtZWRpdW0iOiAoMTAsIDE4KSwgImxhcmdlIjogKDE5LCAyNykNCiAgICAgICAgfSwNCiAgICAgICAgInJlY2VudF8xMDBfcmFuZ2UiOiB7DQogICAgICAgICAgICAic21hbGwiOiBzdW0oMSBmb3IgcyBpbiByZWNlbnRfMTAwIGlmIHMgPD0gOSksDQogICAgICAgICAgICAibWVkaXVtIjogc3VtKDEgZm9yIHMgaW4gcmVjZW50XzEwMCBpZiAxMCA8PSBzIDw9IDE4KSwNCiAgICAgICAgICAgICJsYXJnZSI6IHN1bSgxIGZvciBzIGluIHJlY2VudF8xMDAgaWYgcyA+PSAxOSkNCiAgICAgICAgfQ0KICAgIH0NCg0KZGVmIHNwYW5fYW5hbHlzaXMocmVjb3Jkcyk6DQogICAgIiIi6Leo5bqm5YiG5p6Q77yI5pyA5aSnLeacgOWwj++8iSIiIg0KICAgIHNwYW5zID0gW10NCiAgICBmb3IgciBpbiByZWNvcmRzOg0KICAgICAgICBuID0gclsibnVtcyJdDQogICAgICAgIHNwYW5zLmFwcGVuZChtYXgobikgLSBtaW4obikpDQoNCiAgICBzcGFuX2NvdW50ZXIgPSBDb3VudGVyKHNwYW5zKQ0KICAgIHJlY2VudF8xMDBfc3BhbnMgPSBzcGFuc1s6MTAwXQ0KDQogICAgcmV0dXJuIHsNCiAgICAgICAgInNwYW5fZGlzdHJpYnV0aW9uIjogZGljdChzb3J0ZWQoc3Bhbl9jb3VudGVyLml0ZW1zKCkpKSwNCiAgICAgICAgInJlY2VudF8xMDBfYXZnX3NwYW4iOiByb3VuZChzdW0ocmVjZW50XzEwMF9zcGFucykgLyBsZW4ocmVjZW50XzEwMF9zcGFucyksIDIpLA0KICAgICAgICAibWF4X3NwYW5fcG9zc2libGUiOiA5DQogICAgfQ0KDQpkZWYgdHlwZV9hbmFseXNpcyhyZWNvcmRzKToNCiAgICAiIiLlvaLmgIHliIbmnpDvvJrosbnlrZAv57uE5LiJL+e7hOWFreavlOS+iyIiIg0KICAgIHR5cGVfY291bnRlciA9IENvdW50ZXIoKQ0KICAgIGZvciByIGluIHJlY29yZHM6DQogICAgICAgIHR5cGVfY291bnRlcltyWyJ0eXBlIl1dICs9IDENCg0KICAgIHJlY2VudF8xMDAgPSBbclsidHlwZSJdIGZvciByIGluIHJlY29yZHNbOjEwMF1dDQogICAgcmVjZW50X3R5cGUgPSBDb3VudGVyKHJlY2VudF8xMDApDQoNCiAgICByZXR1cm4gew0KICAgICAgICAib3ZlcmFsbCI6IGRpY3QodHlwZV9jb3VudGVyKSwNCiAgICAgICAgInJlY2VudF8xMDAiOiBkaWN0KHJlY2VudF90eXBlKSwNCiAgICAgICAgInByb2JhYmlsaXR5Ijogew0KICAgICAgICAgICAgIuixueWtkOeQhuiuuuamgueOhyI6ICIxLzEwMCAoMSUpIiwNCiAgICAgICAgICAgICLnu4TkuInnkIborrrmpoLnjociOiAiMjcvMTAwICgyNyUpIiwNCiAgICAgICAgICAgICLnu4Tlha3nkIborrrmpoLnjociOiAiNzIvMTAwICg3MiUpIg0KICAgICAgICB9DQogICAgfQ0KDQoNCmRlZiBjaXJjdWl0X2JyZWFrZXIocmVjb3JkcywgdGFyZ2V0X3R5cGU9Iue7hOWFrSIpOg0KICAgICIiIg0KICAgIOeGlOaWreWIpOWumiB2NDogM+adoeinhOWImeWFqOmDqOaaguWBnOetieeUqOaIt+WGs+etlg0KICAgIOi/lOWbnjogew0KICAgICAgICAic3RvcCI6IGJvb2wsICAgICAgICAgICMg5piv5ZCm5pqC5YGc77yI5omA5pyJ54aU5pat6YO9PXRydWUsIOeUqOaIt+WGs+Wumu+8iQ0KICAgICAgICAicmVhc29uIjogc3RyLCAgICAgICAgICMg6Kem5Y+R5Y6f5ZugDQogICAgICAgICJzdWdnZXN0Ijogc3RyLCAgICAgICAgIyDnu5nnlKjmiLfnmoTlu7rorq4NCiAgICAgICAgInB1c2hfdHlwZSI6IHN0ciwgICAgICAjIOaOqOiNkOebruagh+W9ouaAgQ0KICAgICAgICAicHVzaF9jb3VudCI6IGludCwgICAgICMg5bu66K6u5o6o6I2Q5rOo5pWwDQogICAgICAgICJzaWduYWxfc3RyZW5ndGgiOiBzdHIgIyDkv6Hlj7flvLrluqYNCiAgICB9DQogICAgIiIiDQogICAgbiA9IGxlbihyZWNvcmRzKQ0KICAgIGlmIG4gPCAzOg0KICAgICAgICByZXR1cm4geyJzdG9wIjogRmFsc2UsICJyZWFzb24iOiAi5pWw5o2u5LiN6LazIiwgInN1Z2dlc3QiOiAiIiwNCiAgICAgICAgICAgICAgICAicHVzaF90eXBlIjogdGFyZ2V0X3R5cGUsICJwdXNoX2NvdW50IjogMTAsICJzaWduYWxfc3RyZW5ndGgiOiAi5byxIn0NCg0KICAgIHR5cGVzX2FsbCA9IFtyWyJ0eXBlIl0gZm9yIHIgaW4gcmVjb3Jkc10NCiAgICBzdW1zXzMgPSBbclsic3VtX3ZhbCJdIGZvciByIGluIHJlY29yZHNbOjNdXQ0KDQogICAgIyDlvZPliY3nu4Tlha3ov57lh7rplb/luqYNCiAgICB6bF9zdHJlYWsgPSAwDQogICAgZm9yIHIgaW4gcmVjb3JkczoNCiAgICAgICAgaWYgclsidHlwZSJdID09ICLnu4Tlha0iOg0KICAgICAgICAgICAgemxfc3RyZWFrICs9IDENCiAgICAgICAgZWxzZToNCiAgICAgICAgICAgIGJyZWFrDQoNCiAgICAjIOW9k+WJjei/nue7reWQjOW9ouaAge+8iOe7hOS4ieaIlue7hOWFre+8iQ0KICAgIHN0cmVha190eXBlID0gdHlwZXNfYWxsWzBdDQogICAgc3RyZWFrX2xlbiA9IDENCiAgICBmb3IgdCBpbiB0eXBlc19hbGxbMTpdOg0KICAgICAgICBpZiB0ID09IHN0cmVha190eXBlOg0KICAgICAgICAgICAgc3RyZWFrX2xlbiArPSAxDQogICAgICAgIGVsc2U6DQogICAgICAgICAgICBicmVhaw0KDQogICAgIyA9PT0g6KeE5YiZQTog57uE5YWt6L+e57utOOacnyDihpIg5pqC5YGcID09PQ0KICAgIGlmIHpsX3N0cmVhayA+PSA4Og0KICAgICAgICBwID0gMSAtICgwLjczMiAqKiB6bF9zdHJlYWspDQogICAgICAgIHJldHVybiB7InN0b3AiOiBUcnVlLA0KICAgICAgICAgICAgICAgICJyZWFzb24iOiBmIue7hOWFrei/nue7rXt6bF9zdHJlYWt95pyfIiwNCiAgICAgICAgICAgICAgICAic3VnZ2VzdCI6IGYi57uE5LiJ5qaC546H5bey6L6+e3AqMTAwOi4wZn0l77yM5bu66K6u5o6oMTDms6jnu4TkuInmkI/lm57lvZLjgILmmK/lkKbmjqjvvJ8iLA0KICAgICAgICAgICAgICAgICJwdXNoX3R5cGUiOiAi57uE5LiJIiwgInB1c2hfY291bnQiOiAxMCwgInNpZ25hbF9zdHJlbmd0aCI6ICLmnoHlvLoifQ0KDQogICAgIyA9PT0g6KeE5YiZQjog6L+e57utM+acn+WQjOW9ouaAgSDihpIg5pqC5YGc5bu66K6u5by65o6o5Y+N5ZCRID09PQ0KICAgIGlmIHN0cmVha19sZW4gPj0gMzoNCiAgICAgICAgcmV2ZXJzZSA9ICLnu4Tlha0iIGlmIHN0cmVha190eXBlID09ICLnu4TkuIkiIGVsc2UgIue7hOS4iSINCiAgICAgICAgcmV0dXJuIHsic3RvcCI6IFRydWUsDQogICAgICAgICAgICAgICAgInJlYXNvbiI6IGYi6L+e57ute3N0cmVha19sZW595pyfe3N0cmVha190eXBlfSIsDQogICAgICAgICAgICAgICAgInN1Z2dlc3QiOiBmIjPov557c3RyZWFrX3R5cGV95ZCO5b2i5oCB5YiH5o2i546HPjgwJe+8jOW7uuiuruaOqDEw5rOoe3JldmVyc2V944CC5piv5ZCm5o6o77yfIiwNCiAgICAgICAgICAgICAgICAicHVzaF90eXBlIjogcmV2ZXJzZSwgInB1c2hfY291bnQiOiAxMCwNCiAgICAgICAgICAgICAgICAic2lnbmFsX3N0cmVuZ3RoIjogIuaegeW8uiIgaWYgc3RyZWFrX2xlbiA+PSA0IGVsc2UgIuW8uiJ9DQoNCiAgICAjID09PSDop4TliJlDOiDov5Ez5pyf5ZKM5YC86L+e57ut5p6B56uvIOKGkiDmmoLlgZwgPT09DQogICAgaWYgYWxsKHMgPD0gNSBmb3IgcyBpbiBzdW1zXzMpOg0KICAgICAgICByZXR1cm4geyJzdG9wIjogVHJ1ZSwNCiAgICAgICAgICAgICAgICAicmVhc29uIjogZiLov5Ez5pyf5ZKM5YC86L+e57ut5p6B56uv5bCPKHtzdW1zXzN9KSIsDQogICAgICAgICAgICAgICAgInN1Z2dlc3QiOiAi5ZKM5YC85byC5bi46LWw5L2O77yM5Y+v6IO957un57ut5LiL6KGM44CC5bu66K6u6KeC5pyb5oiW5YeP6YeP44CC5piv5ZCm5o6o77yfIiwNCiAgICAgICAgICAgICAgICAicHVzaF90eXBlIjogdGFyZ2V0X3R5cGUsICJwdXNoX2NvdW50IjogMTAsICJzaWduYWxfc3RyZW5ndGgiOiAiIn0NCiAgICBpZiBhbGwocyA+PSAyMiBmb3IgcyBpbiBzdW1zXzMpOg0KICAgICAgICByZXR1cm4geyJzdG9wIjogVHJ1ZSwNCiAgICAgICAgICAgICAgICAicmVhc29uIjogZiLov5Ez5pyf5ZKM5YC86L+e57ut5p6B56uv5aSnKHtzdW1zXzN9KSIsDQogICAgICAgICAgICAgICAgInN1Z2dlc3QiOiAi5ZKM5YC85byC5bi46LWw6auY77yM5Y+v6IO95Z2H5YC85Zue5b2S44CC5bu66K6u5o6o5Z2H5YC86ZmE6L+RMTDms6jnu4Tlha3jgILmmK/lkKbmjqjvvJ8iLA0KICAgICAgICAgICAgICAgICJwdXNoX3R5cGUiOiB0YXJnZXRfdHlwZSwgInB1c2hfY291bnQiOiAxMCwgInNpZ25hbF9zdHJlbmd0aCI6ICIifQ0KDQogICAgIyA9PT0g5q2j5bi45oOF5Ya1OiDmr4/lpKnmjqjmu6ExMOazqOe7hOWFrSA9PT0NCiAgICByZXR1cm4geyJzdG9wIjogRmFsc2UsICJyZWFzb24iOiBmIuato+W4uOaOqOiNkCAo57uE5YWte3psX3N0cmVha33ov57vvIx7c3RyZWFrX2xlbn3ov557c3RyZWFrX3R5cGV9KSIsDQogICAgICAgICAgICAic3VnZ2VzdCI6ICIiLCAicHVzaF90eXBlIjogdGFyZ2V0X3R5cGUsICJwdXNoX2NvdW50IjogMTAsICJzaWduYWxfc3RyZW5ndGgiOiAi5LitIn0NCg0KDQpkZWYgZ2VuZXJhdGVfcmVjb21tZW5kYXRpb25zKHJlY29yZHMsIGluZm8sIGNvdW50PTEwKToNCiAgICAiIiINCiAgICDnlJ/miJDnu4Tlha3mjqjojZDvvIjnlKjkuo7oh6rliqjljJbku7vliqHvvIkNCiAgICDln7rkuo46IOmBl+a8j+WbnuihpS/ng63lj7fmkK3phY0v5ZKM5YC85Zue5b2SL+i3qOW6puWBj+WlvS/kvY3nva7ni6znq4sv5Y676YeNDQogICAgaW5mbzogY2lyY3VpdF9icmVha2VyIOi/lOWbnuWAvA0KICAgIOi/lOWbnjogW3sibnVtcyI6IFthLGIsY10sICJsb2dpYyI6ICIuLi4iLCAic3VtX3ZhbCI6IE4sICJzcGFuIjogTn0sIC4uLl0NCiAgICAiIiINCiAgICBpZiBpbmZvWyJzdG9wIl06DQogICAgICAgIHJldHVybiBbXQ0KDQogICAgbiA9IGxlbihyZWNvcmRzKQ0KICAgIGlmIG4gPCA0Og0KICAgICAgICByZXR1cm4gW10NCg0KICAgICMg6K6h566X6YGX5ryPDQogICAgbGFzdF9zZWVuID0ge30NCiAgICBmb3IgaWR4LCByIGluIGVudW1lcmF0ZShyZWNvcmRzKToNCiAgICAgICAgZm9yIG51bSBpbiByWyJudW1zIl06DQogICAgICAgICAgICBpZiBudW0gbm90IGluIGxhc3Rfc2VlbjoNCiAgICAgICAgICAgICAgICBsYXN0X3NlZW5bbnVtXSA9IGlkeA0KDQogICAgbWlzc2luZyA9IHt9DQogICAgZm9yIGkgaW4gcmFuZ2UoMTApOg0KICAgICAgICBtaXNzaW5nW2ldID0gbGFzdF9zZWVuLmdldChpLCBuKQ0KDQogICAgIyDorqHnrpfpopHnjocNCiAgICBmcmVxID0gQ291bnRlcigpDQogICAgZm9yIHIgaW4gcmVjb3JkczoNCiAgICAgICAgZm9yIG51bSBpbiByWyJudW1zIl06DQogICAgICAgICAgICBmcmVxW251bV0gKz0gMQ0KDQogICAgIyDlhrfng63mjpLluo8NCiAgICBjb2xkID0gc29ydGVkKHJhbmdlKDEwKSwga2V5PWxhbWJkYSB4OiAoLW1pc3NpbmdbeF0sIC1mcmVxW3hdKSkNCiAgICBob3QgPSBzb3J0ZWQocmFuZ2UoMTApLCBrZXk9bGFtYmRhIHg6ICgtZnJlcVt4XSwgbWlzc2luZ1t4XSkpDQoNCiAgICAjIOi/kTEw5pyf5ZKM5YC8DQogICAgcmVjZW50X3N1bXMgPSBbclsic3VtX3ZhbCJdIGZvciByIGluIHJlY29yZHNbOjEwXV0NCiAgICBhdmdfc3VtX3JlY2VudCA9IHN1bShyZWNlbnRfc3VtcykgLyBsZW4ocmVjZW50X3N1bXMpIGlmIHJlY2VudF9zdW1zIGVsc2UgMA0KDQogICAgIyDov5ExMOacn+i3qOW6pg0KICAgIHJlY2VudF9zcGFucyA9IFtdDQogICAgZm9yIHIgaW4gcmVjb3Jkc1s6MTBdOg0KICAgICAgICBuMiA9IHJbIm51bXMiXQ0KICAgICAgICByZWNlbnRfc3BhbnMuYXBwZW5kKG1heChuMikgLSBtaW4objIpKQ0KICAgIGF2Z19zcGFuID0gc3VtKHJlY2VudF9zcGFucykgLyBsZW4ocmVjZW50X3NwYW5zKSBpZiByZWNlbnRfc3BhbnMgZWxzZSAwDQogICAgbGFzdF9zcGFuID0gcmVjZW50X3NwYW5zWzBdIGlmIHJlY2VudF9zcGFucyBlbHNlIDANCg0KICAgIGNhbmRpZGF0ZXMgPSBbXQ0KICAgIHNlZW5fc2V0cyA9IHNldCgpDQoNCiAgICBkZWYgYWRkX2NhbmRpZGF0ZShudW1zLCBsb2dpYyk6DQogICAgICAgICMg56Gu5L+d5piv57uE5YWt77yIM+S4quaVsOWtl+WQhOS4jeebuOWQjO+8iQ0KICAgICAgICBpZiBsZW4oc2V0KG51bXMpKSA8IDM6DQogICAgICAgICAgICByZXR1cm4NCiAgICAgICAga2V5ID0gdHVwbGUoc29ydGVkKG51bXMpKQ0KICAgICAgICBpZiBrZXkgaW4gc2Vlbl9zZXRzOg0KICAgICAgICAgICAgcmV0dXJuDQogICAgICAgIHNlZW5fc2V0cy5hZGQoa2V5KQ0KICAgICAgICBzID0gc3VtKG51bXMpDQogICAgICAgIHNwID0gbWF4KG51bXMpIC0gbWluKG51bXMpDQogICAgICAgIGNhbmRpZGF0ZXMuYXBwZW5kKHsNCiAgICAgICAgICAgICJudW1zIjogc29ydGVkKG51bXMpLA0KICAgICAgICAgICAgImxvZ2ljIjogbG9naWMsDQogICAgICAgICAgICAic3VtX3ZhbCI6IHMsDQogICAgICAgICAgICAic3BhbiI6IHNwDQogICAgICAgIH0pDQoNCiAgICAjIOetlueVpTE6IOmBl+a8j+WbnuihpeaguOW/g++8iOacgOWGtzPlj7fnu4TlkIjvvIkNCiAgICBfY29sZCA9IGNvbGRbOl0NCiAgICBmb3IgXyBpbiByYW5nZSgyKToNCiAgICAgICAgYWRkX2NhbmRpZGF0ZShbX2NvbGRbMF0sIF9jb2xkWzFdLCBfY29sZFsyXV0sDQogICAgICAgICAgICAgICAgICAgICAgZiLpgZfmvI/lm57ooaXmoLjlv4M6IHtfY29sZFswXX0o57y6e21pc3NpbmdbX2NvbGRbMF1dfeacnykre19jb2xkWzFdfSjnvLp7bWlzc2luZ1tfY29sZFsxXV195pyfKSt7X2NvbGRbMl19KOe8unttaXNzaW5nW19jb2xkWzJdXX3mnJ8pIikNCiAgICAgICAgX2NvbGQgPSBfY29sZFszOl0gKyBfY29sZFs6M10NCg0KICAgICMg562W55WlMjog5Ya354Ot5pCt6YWNDQogICAgX2NvbGQyLCBfaG90ID0gY29sZFs6XSwgaG90WzpdDQogICAgZm9yIF8gaW4gcmFuZ2UoMik6DQogICAgICAgIGFkZF9jYW5kaWRhdGUoW19jb2xkMlswXSwgX2hvdFswXSwgX2hvdFsxXV0sDQogICAgICAgICAgICAgICAgICAgICAgZiLlhrfng63mkK3phY06IHtfY29sZDJbMF19KOWGtykre19ob3RbMF19KOeDrSkre19ob3RbMV19KOeDrSkiKQ0KICAgICAgICBfY29sZDIgPSBfY29sZDJbMTpdICsgX2NvbGQyWzoxXQ0KICAgICAgICBfaG90ID0gX2hvdFsyOl0gKyBfaG90WzoyXQ0KDQogICAgIyDnrZbnlaUzOiDlkozlgLzlm57lvZLvvIjnm67moIfmjqXov5HnkIborrrlnYflgLwxMy4177yJDQogICAgdGFyZ2V0X3N1bSA9IDE0IGlmIGF2Z19zdW1fcmVjZW50IDwgMTAgZWxzZSAxMSBpZiBhdmdfc3VtX3JlY2VudCA+IDE3IGVsc2UgMTMNCiAgICBfY29sZDMgPSBjb2xkWzpdDQogICAgZm9yIF8gaW4gcmFuZ2UoMik6DQogICAgICAgIGEgPSBfY29sZDNbMF0NCiAgICAgICAgZm9yIGIgaW4gcmFuZ2UoMTApOg0KICAgICAgICAgICAgaWYgYiA9PSBhOg0KICAgICAgICAgICAgICAgIGNvbnRpbnVlDQogICAgICAgICAgICBjID0gdGFyZ2V0X3N1bSAtIGEgLSBiDQogICAgICAgICAgICBpZiAwIDw9IGMgPD0gOSBhbmQgYyAhPSBhIGFuZCBjICE9IGI6DQogICAgICAgICAgICAgICAgYWRkX2NhbmRpZGF0ZShbYSwgYiwgY10sIGYi5ZKM5YC8e3RhcmdldF9zdW195Zue5b2SOiB7YX0re2J9K3tjfT17dGFyZ2V0X3N1bX0iKQ0KICAgICAgICAgICAgICAgIGJyZWFrDQogICAgICAgIF9jb2xkMyA9IF9jb2xkM1sxOl0gKyBfY29sZDNbOjFdDQogICAgICAgIHRhcmdldF9zdW0gPSB0YXJnZXRfc3VtICsgMSBpZiB0YXJnZXRfc3VtIDwgMTMgZWxzZSB0YXJnZXRfc3VtIC0gMQ0KDQogICAgIyDnrZbnlaU0OiDot6jluqbkv67mraMNCiAgICB0YXJnZXRfc3BhbiA9IG1heCgyLCBtaW4oOCwgaW50KGF2Z19zcGFuKSkpIGlmIGxhc3Rfc3BhbiA+PSA4IGVsc2UgbWluKDgsIG1heCgzLCBpbnQoYXZnX3NwYW4gKyAzKSkpDQogICAgX2NvbGQ0ID0gY29sZFs6XQ0KICAgIF9ob3Q0ID0gaG90WzpdDQogICAgZm9yIF8gaW4gcmFuZ2UoMik6DQogICAgICAgIGEgPSBfY29sZDRbMF0NCiAgICAgICAgYiA9IF9ob3Q0WzBdIGlmIF9ob3Q0WzBdICE9IGEgZWxzZSBfaG90NFsxXQ0KICAgICAgICBmb3IgYyBpbiByYW5nZSgxMCk6DQogICAgICAgICAgICBpZiBjICE9IGEgYW5kIGMgIT0gYiBhbmQgbWF4KGEsIGIsIGMpIC0gbWluKGEsIGIsIGMpID09IHRhcmdldF9zcGFuOg0KICAgICAgICAgICAgICAgIGFkZF9jYW5kaWRhdGUoW2EsIGIsIGNdLCBmIui3qHt0YXJnZXRfc3Bhbn3kv67mraM6IOi/keWdh+WAvHt0YXJnZXRfc3Bhbn3ot6giKQ0KICAgICAgICAgICAgICAgIGJyZWFrDQogICAgICAgIF9jb2xkNCA9IF9jb2xkNFsxOl0gKyBfY29sZDRbOjFdDQogICAgICAgIF9ob3Q0ID0gX2hvdDRbMTpdICsgX2hvdDRbOjFdDQogICAgICAgIHRhcmdldF9zcGFuID0gbWF4KDMsIHRhcmdldF9zcGFuIC0gMSkNCg0KICAgICMg562W55WlNTog5L2N572u54us56uL77yI55m+L+WNgS/kuKrlkITlj5bkvJjlj7fvvIkNCiAgICBwb3NfY291bnRlciA9IHsiYmFpIjogQ291bnRlcigpLCAic2hpIjogQ291bnRlcigpLCAiZ2UiOiBDb3VudGVyKCl9DQogICAgZm9yIHIgaW4gcmVjb3JkczoNCiAgICAgICAgcG9zX2NvdW50ZXJbImJhaSJdW3JbImJhaSJdXSArPSAxDQogICAgICAgIHBvc19jb3VudGVyWyJzaGkiXVtyWyJzaGkiXV0gKz0gMQ0KICAgICAgICBwb3NfY291bnRlclsiZ2UiXVtyWyJnZSJdXSArPSAxDQogICAgYmFpX3RvcCA9IFtuIGZvciBuLCBfIGluIHBvc19jb3VudGVyWyJiYWkiXS5tb3N0X2NvbW1vbig1KV0NCiAgICBzaGlfdG9wID0gW24gZm9yIG4sIF8gaW4gcG9zX2NvdW50ZXJbInNoaSJdLm1vc3RfY29tbW9uKDUpXQ0KICAgIGdlX3RvcCA9IFtuIGZvciBuLCBfIGluIHBvc19jb3VudGVyWyJnZSJdLm1vc3RfY29tbW9uKDUpXQ0KICAgIGZvciBpIGluIHJhbmdlKDIpOg0KICAgICAgICBhID0gYmFpX3RvcFswXQ0KICAgICAgICBiID0gc2hpX3RvcFttaW4oaSwgbGVuKHNoaV90b3ApIC0gMSldDQogICAgICAgIGMgPSBnZV90b3BbbWluKGkgKyAyLCBsZW4oZ2VfdG9wKSAtIDEpXQ0KICAgICAgICBpZiBsZW4oe2EsIGIsIGN9KSA9PSAzOg0KICAgICAgICAgICAgYWRkX2NhbmRpZGF0ZShbYSwgYiwgY10sIGYi5L2N572u54us56uLOiDnmb57YX0o54OtKSvljYF7Yn0o54OtKSvkuKp7Y30o54OtKSIpDQogICAgICAgIGJhaV90b3AgPSBiYWlfdG9wWzE6XSArIGJhaV90b3BbOjFdDQoNCiAgICAjIOetlueVpTY6IOihpeS9jeWhq+WFhSDigJQg5LiN6LazMTDms6jml7bnlKjpgZfmvI/lj7cr54Ot5Y+36ZqP5py657uE5ZCI6KGl5ruhDQogICAgIyDkvJjlhYjnuqc6IOWQq+i/h+WGt+WPtyA+IOWSjOWAvOmdoOi/keWdh+WAvCA+IOi3qOW6pumAguS4rQ0KICAgIGZpbGxfY2FuZGlkYXRlcyA9IFtdDQogICAgZm9yIGEgaW4gY29sZFs6Nl06DQogICAgICAgIGZvciBiIGluIGhvdFs6Nl06DQogICAgICAgICAgICBpZiBiID09IGE6DQogICAgICAgICAgICAgICAgY29udGludWUNCiAgICAgICAgICAgIGZvciBjIGluIHJhbmdlKDEwKToNCiAgICAgICAgICAgICAgICBpZiBjID09IGEgb3IgYyA9PSBiOg0KICAgICAgICAgICAgICAgICAgICBjb250aW51ZQ0KICAgICAgICAgICAgICAgIGtleSA9IHR1cGxlKHNvcnRlZChbYSwgYiwgY10pKQ0KICAgICAgICAgICAgICAgIGlmIGtleSBub3QgaW4gc2Vlbl9zZXRzOg0KICAgICAgICAgICAgICAgICAgICBzID0gc3VtKGtleSkNCiAgICAgICAgICAgICAgICAgICAgc3AgPSBtYXgoa2V5KSAtIG1pbihrZXkpDQogICAgICAgICAgICAgICAgICAgICMg5YGP5aW9OiDlkozlgLwxMC0xNijov5HlnYflgLwpLCDot6jluqYzLTcNCiAgICAgICAgICAgICAgICAgICAgc2NvcmUgPSAoMSBpZiAxMCA8PSBzIDw9IDE2IGVsc2UgMCkgKyAoMSBpZiAzIDw9IHNwIDw9IDcgZWxzZSAwKSArICgyIGlmIGEgaW4gY29sZFs6M10gZWxzZSAwKQ0KICAgICAgICAgICAgICAgICAgICBmaWxsX2NhbmRpZGF0ZXMuYXBwZW5kKChzY29yZSwgc29ydGVkKFthLCBiLCBjXSksIGtleSwgcywgc3ApKQ0KICAgIGZpbGxfY2FuZGlkYXRlcy5zb3J0KGtleT1sYW1iZGEgeDogLXhbMF0pDQogICAgZm9yIHNjb3JlLCBudW1zLCBrZXksIHMsIHNwIGluIGZpbGxfY2FuZGlkYXRlczoNCiAgICAgICAgaWYga2V5IG5vdCBpbiBzZWVuX3NldHM6DQogICAgICAgICAgICBzZWVuX3NldHMuYWRkKGtleSkNCiAgICAgICAgICAgIGNhbmRpZGF0ZXMuYXBwZW5kKHsNCiAgICAgICAgICAgICAgICAibnVtcyI6IG51bXMsDQogICAgICAgICAgICAgICAgImxvZ2ljIjogZiLooaXkvY06IHtudW1zWzBdfSjnvLp7bWlzc2luZ1tudW1zWzBdXX0pK3tudW1zWzFdfSjng60pK3tudW1zWzJdfSwg5ZKMe3N96Leoe3NwfSIsDQogICAgICAgICAgICAgICAgInN1bV92YWwiOiBzLA0KICAgICAgICAgICAgICAgICJzcGFuIjogc3ANCiAgICAgICAgICAgIH0pDQogICAgICAgICAgICBpZiBsZW4oY2FuZGlkYXRlcykgPj0gY291bnQ6DQogICAgICAgICAgICAgICAgYnJlYWsNCg0KICAgIHJldHVybiBjYW5kaWRhdGVzWzpjb3VudF0NCg0KDQpkZWYgZnVsbF9yZXBvcnQoKToNCiAgICAiIiLnlJ/miJDlrozmlbTliIbmnpDmiqXlkYoiIiINCiAgICByZWNvcmRzID0gbG9hZF9kYXRhKCkNCiAgICBpZiBub3QgcmVjb3JkczoNCiAgICAgICAgcmV0dXJuIE5vbmUNCg0KICAgIGNiID0gY2lyY3VpdF9icmVha2VyKHJlY29yZHMpDQogICAgcmVjcyA9IGdlbmVyYXRlX3JlY29tbWVuZGF0aW9ucyhyZWNvcmRzLCBjYikNCg0KICAgIHJlcG9ydCA9IHsNCiAgICAgICAgIuaVsOaNruamguiniCI6IHsNCiAgICAgICAgICAgICLmgLvmnJ/mlbAiOiBsZW4ocmVjb3JkcyksDQogICAgICAgICAgICAi5pWw5o2u6IyD5Zu0IjogZiJ7cmVjb3Jkc1stMV1bJ3FpaGFvJ119IH4ge3JlY29yZHNbMF1bJ3FpaGFvJ119IiwNCiAgICAgICAgICAgICLmnIDmlrDlvIDlpZYiOiByZWNvcmRzWzBdLA0KICAgICAgICAgICAgIuS4iuS4gOacnyI6IHJlY29yZHNbMV0gaWYgbGVuKHJlY29yZHMpID4gMSBlbHNlIE5vbmUNCiAgICAgICAgfSwNCiAgICAgICAgIumikeeOh+WIhuaekCI6IGZyZXF1ZW5jeV9hbmFseXNpcyhyZWNvcmRzKSwNCiAgICAgICAgIumBl+a8j+WIhuaekCI6IG1pc3NpbmdfYW5hbHlzaXMocmVjb3JkcyksDQogICAgICAgICLlkozlgLzliIbmnpAiOiBzdW1fdmFsdWVfYW5hbHlzaXMocmVjb3JkcyksDQogICAgICAgICLot6jluqbliIbmnpAiOiBzcGFuX2FuYWx5c2lzKHJlY29yZHMpLA0KICAgICAgICAi5b2i5oCB5YiG5p6QIjogdHlwZV9hbmFseXNpcyhyZWNvcmRzKSwNCiAgICAgICAgIueGlOaWreWIpOWumiI6IGNiLA0KICAgICAgICAi5o6o6I2Q5Y+356CBIjogcmVjcywNCiAgICAgICAgIuaOqOiNkOazqOaVsCI6IGxlbihyZWNzKQ0KICAgIH0NCg0KICAgIG9zLm1ha2VkaXJzKCJkYXRhIiwgZXhpc3Rfb2s9VHJ1ZSkNCiAgICB3aXRoIG9wZW4oImRhdGEvYW5hbHlzaXNfcmVwb3J0Lmpzb24iLCAidyIsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6DQogICAgICAgIGpzb24uZHVtcChyZXBvcnQsIGYsIGVuc3VyZV9hc2NpaT1GYWxzZSwgaW5kZW50PTIpDQoNCiAgICBwcmludCgi5YiG5p6Q5oql5ZGK5bey55Sf5oiQOiBkYXRhL2FuYWx5c2lzX3JlcG9ydC5qc29uIikNCiAgICByZXR1cm4gcmVwb3J0DQoNCmRlZiBwcmludF9zdW1tYXJ5KHJlcG9ydCk6DQogICAgIiIi5omT5Y2w5pGY6KaBIiIiDQogICAgaWYgbm90IHJlcG9ydDoNCiAgICAgICAgcHJpbnQoIuaXoOaVsOaNruWPr+WIhuaekCIpDQogICAgICAgIHJldHVybg0KDQogICAgZCA9IHJlcG9ydFsi5pWw5o2u5qaC6KeIIl0NCiAgICBmcmVxID0gcmVwb3J0WyLpopHnjofliIbmnpAiXQ0KICAgIG1pc3MgPSByZXBvcnRbIumBl+a8j+WIhuaekCJdDQogICAgcyA9IHJlcG9ydFsi5ZKM5YC85YiG5p6QIl0NCiAgICBjYiA9IHJlcG9ydC5nZXQoIueGlOaWreWIpOWumiIsIHt9KQ0KDQogICAgcHJpbnQoIlxuIiArICI9IiAqIDUwKQ0KICAgIHByaW50KGYiICDnpo/lvakzRCDmlbDmja7liIbmnpDmiqXlkYoiKQ0KICAgIHByaW50KGYiICDmlbDmja7ojIPlm7Q6IHtkWyfmlbDmja7ojIPlm7QnXX0gKOWFsXtkWyfmgLvmnJ/mlbAnXX3mnJ8pIikNCiAgICBwcmludCgiPSIgKiA1MCkNCg0KICAgIGxhdGVzdCA9IGRbIuacgOaWsOW8gOWlliJdDQogICAgcHJpbnQoZiJcbiAg5pyA5paw5byA5aWWOiB7bGF0ZXN0WydxaWhhbyddfSAtPiB7JyAnLmpvaW4obWFwKHN0ciwgbGF0ZXN0WydudW1zJ10pKX0gKHtsYXRlc3RbJ3R5cGUnXX0pIikNCg0KICAgIHByaW50KGYiXG4gIFvng63lj7cgVG9wNV0iKQ0KICAgIGZvciBuLCBjIGluIGZyZXFbInRvdGFsX2ZyZXEiXVs6NV06DQogICAgICAgIGJhciA9ICI9IiAqIG1pbihjIC8vIDEwLCAyMCkNCiAgICAgICAgcHJpbnQoZiIgICAg5Y+356CBe259OiB7Y33mrKEge2Jhcn0iKQ0KDQogICAgcHJpbnQoZiJcbiAgW+acgOWkp+mBl+a8j10iKQ0KICAgIGZvciBuLCBtIGluIG1pc3NbIm1vc3Rfb3ZlcmR1ZSJdOg0KICAgICAgICBwcmludChmIiAgICDlj7fnoIF7bn06IOW3sumBl+a8jyB7bX0g5pyfIikNCg0KICAgIHByaW50KGYiXG4gIFvov5ExMDDmnJ/lkozlgLxdIikNCiAgICBwcmludChmIiAgICDlubPlnYc6IHtzWydyZWNlbnRfMTAwX2F2ZyddfSAo55CG6K665Z2H5YC8OiB7c1sndGhlb3JldGljYWxfYXZnJ119KSIpDQogICAgcHJpbnQoZiIgICAg5bCP5Yy66Ze0OiB7c1sncmVjZW50XzEwMF9yYW5nZSddWydzbWFsbCddfeasoSIpDQogICAgcHJpbnQoZiIgICAg5Lit5Yy66Ze0OiB7c1sncmVjZW50XzEwMF9yYW5nZSddWydtZWRpdW0nXX3mrKEiKQ0KICAgIHByaW50KGYiICAgIOWkp+WMuumXtDoge3NbJ3JlY2VudF8xMDBfcmFuZ2UnXVsnbGFyZ2UnXX3mrKEiKQ0KDQogICAgdCA9IHJlcG9ydFsi5b2i5oCB5YiG5p6QIl0NCiAgICBwcmludChmIlxuICBb6L+RMTAw5pyf5b2i5oCBXSIpDQogICAgZm9yIGssIHYgaW4gdFsicmVjZW50XzEwMCJdLml0ZW1zKCk6DQogICAgICAgIHByaW50KGYiICAgIHtrfToge3Z95qyhIikNCg0KICAgIHByaW50KGYiXG4gIFvnhpTmlq3liKTlrpogdjRdIikNCiAgICBwcmludChmIiAgICDop6blj5E6IHsn8J+bkSDmmK8nIGlmIGNiLmdldCgnc3RvcCcpIGVsc2UgJ+KchSDlkKYnfSIpDQogICAgcHJpbnQoZiIgICAg5Y6f5ZugOiB7Y2IuZ2V0KCdyZWFzb24nLCAnTi9BJyl9IikNCiAgICBpZiBjYi5nZXQoJ3N1Z2dlc3QnKToNCiAgICAgICAgcHJpbnQoZiIgICAg4pqg77iPIOW7uuiurjoge2NiLmdldCgnc3VnZ2VzdCcpfSIpDQogICAgaWYgbm90IGNiLmdldCgnc3RvcCcpOg0KICAgICAgICBwcmludChmIiAgICDmjqjojZA6IHtjYi5nZXQoJ3B1c2hfdHlwZScsICcnKX0gw5cge2NiLmdldCgncHVzaF9jb3VudCcsIDApfSIpDQogICAgICAgIHByaW50KGYiICAgIOS/oeWPtzoge2NiLmdldCgnc2lnbmFsX3N0cmVuZ3RoJywgJycpfSIpDQoNCiAgICByZWNzID0gcmVwb3J0LmdldCgi5o6o6I2Q5Y+356CBIiwgW10pDQogICAgaWYgcmVjczoNCiAgICAgICAgcHJpbnQoZiJcbiAgW+aOqOiNkOWPt+eggV0gKHtsZW4ocmVjcyl95rOoKSIpDQogICAgICAgIGZvciBpLCByIGluIGVudW1lcmF0ZShyZWNzKToNCiAgICAgICAgICAgIHByaW50KGYiICAgIHtpKzF9LiB7JyAnLmpvaW4obWFwKHN0ciwgclsnbnVtcyddKSl9IHwg5ZKMe3JbJ3N1bV92YWwnXX0g6Leoe3JbJ3NwYW4nXX0gfCB7clsnbG9naWMnXX0iKQ0KICAgIHByaW50KCJcbiIgKyAiPSIgKiA1MCkNCg0KaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoNCiAgICByZXBvcnQgPSBmdWxsX3JlcG9ydCgpDQogICAgcHJpbnRfc3VtbWFyeShyZXBvcnQpDQo=
+"""
+福彩3D数据分析引擎
+统计：频率热冷号、遗漏值、和值分布、跨度、形态
+v4: 3条熔断规则全部暂停等用户决策 + 正常每天10注
+"""
+import json
+import os
+from collections import Counter, defaultdict
+
+DATA_FILE = "data/3d_history.json"
+
+def load_data():
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def frequency_analysis(records, top_n=5):
+    """每个位置上的号码频率 + 热冷号"""
+    pos_counters = {"bai": Counter(), "shi": Counter(), "ge": Counter()}
+    total_counter = Counter()
+
+    for r in records:
+        pos_counters["bai"][r["bai"]] += 1
+        pos_counters["shi"][r["shi"]] += 1
+        pos_counters["ge"][r["ge"]] += 1
+        for n in r["nums"]:
+            total_counter[n] += 1
+
+    return {
+        "total_freq": total_counter.most_common(),
+        "bai_hot": pos_counters["bai"].most_common(top_n),
+        "shi_hot": pos_counters["shi"].most_common(top_n),
+        "ge_hot": pos_counters["ge"].most_common(top_n),
+        "bai_cold": pos_counters["bai"].most_common()[-top_n:][::-1],
+        "shi_cold": pos_counters["shi"].most_common()[-top_n:][::-1],
+        "ge_cold": pos_counters["ge"].most_common()[-top_n:][::-1]
+    }
+
+def missing_analysis(records):
+    """当前遗漏分析 - 各号码多久没出"""
+    total = len(records)
+    last_seen = {i: None for i in range(10)}
+
+    for idx, r in enumerate(records):
+        for n in r["nums"]:
+            if last_seen[n] is None:
+                last_seen[n] = idx
+
+    missing = {}
+    for n in range(10):
+        if last_seen[n] is None:
+            missing[n] = total
+        else:
+            missing[n] = last_seen[n]
+
+    return {
+        "missing_periods": missing,
+        "most_overdue": sorted(missing.items(), key=lambda x: x[1], reverse=True)[:5],
+        "least_overdue": sorted(missing.items(), key=lambda x: x[1])[:5]
+    }
+
+def sum_value_analysis(records):
+    """和值分布分析"""
+    sum_counter = Counter()
+    for r in records:
+        sum_counter[r["sum_val"]] += 1
+
+    recent_100 = [r["sum_val"] for r in records[:100]]
+    avg_sum = sum(recent_100) / len(recent_100) if recent_100 else 0
+
+    return {
+        "sum_distribution": dict(sorted(sum_counter.items())),
+        "recent_100_avg": round(avg_sum, 2),
+        "theoretical_avg": 13.5,
+        "range_summary": {
+            "small": (0, 9), "medium": (10, 18), "large": (19, 27)
+        },
+        "recent_100_range": {
+            "small": sum(1 for s in recent_100 if s <= 9),
+            "medium": sum(1 for s in recent_100 if 10 <= s <= 18),
+            "large": sum(1 for s in recent_100 if s >= 19)
+        }
+    }
+
+def span_analysis(records):
+    """跨度分析（最大-最小）"""
+    spans = []
+    for r in records:
+        n = r["nums"]
+        spans.append(max(n) - min(n))
+
+    span_counter = Counter(spans)
+    recent_100_spans = spans[:100]
+
+    return {
+        "span_distribution": dict(sorted(span_counter.items())),
+        "recent_100_avg_span": round(sum(recent_100_spans) / len(recent_100_spans), 2),
+        "max_span_possible": 9
+    }
+
+def type_analysis(records):
+    """形态分析：豹子/组三/组六比例"""
+    type_counter = Counter()
+    for r in records:
+        type_counter[r["type"]] += 1
+
+    recent_100 = [r["type"] for r in records[:100]]
+    recent_type = Counter(recent_100)
+
+    return {
+        "overall": dict(type_counter),
+        "recent_100": dict(recent_type),
+        "probability": {
+            "豹子理论概率": "1/100 (1%)",
+            "组三理论概率": "27/100 (27%)",
+            "组六理论概率": "72/100 (72%)"
+        }
+    }
+
+def circuit_breaker(records, target_type="组六"):
+    """
+    熔断判定 v4: 3条规则全部暂停等用户决策
+    返回: {
+        "stop": bool,          # 是否暂停（所有熔断都=true, 用户决定）
+        "reason": str,         # 触发原因
+        "suggest": str,        # 给用户的建议
+        "push_type": str,      # 推荐目标形态
+        "push_count": int,     # 建议推荐注数
+        "signal_strength": str # 信号强度
+    }
+    """
+    n = len(records)
+    if n < 3:
+        return {"stop": False, "reason": "数据不足", "suggest": "",
+                "push_type": target_type, "push_count": 10, "signal_strength": "弱"}
+
+    types_all = [r["type"] for r in records]
+    sums_3 = [r["sum_val"] for r in records[:3]]
+
+    # 当前组六连出长度
+    zl_streak = 0
+    for r in records:
+        if r["type"] == "组六":
+            zl_streak += 1
+        else:
+            break
+
+    # 当前连续同形态（组三或组六）
+    streak_type = types_all[0]
+    streak_len = 1
+    for t in types_all[1:]:
+        if t == streak_type:
+            streak_len += 1
+        else:
+            break
+
+    # === 规则A: 组六连续8期 → 暂停 ===
+    if zl_streak >= 8:
+        p = 1 - (0.732 ** zl_streak)
+        return {"stop": True,
+                "reason": f"组六连续{zl_streak}期",
+                "suggest": f"组三概率已达{p*100:.0f}%，建议推10注组三搏回归。是否推？",
+                "push_type": "组三", "push_count": 10, "signal_strength": "极强"}
+
+    # === 规则B: 连续3期同形态 → 暂停建议强推反向 ===
+    if streak_len >= 3:
+        reverse = "组六" if streak_type == "组三" else "组三"
+        return {"stop": True,
+                "reason": f"连续{streak_len}期{streak_type}",
+                "suggest": f"3连{streak_type}后形态切换率>80%，建议推10注{reverse}。是否推？",
+                "push_type": reverse, "push_count": 10,
+                "signal_strength": "极强" if streak_len >= 4 else "强"}
+
+    # === 规则C: 近3期和值连续极端 → 暂停 ===
+    if all(s <= 5 for s in sums_3):
+        return {"stop": True,
+                "reason": f"近3期和值连续极端小({sums_3})",
+                "suggest": "和值异常走低，可能继续下行。建议观望或减量。是否推？",
+                "push_type": target_type, "push_count": 10, "signal_strength": ""}
+    if all(s >= 22 for s in sums_3):
+        return {"stop": True,
+                "reason": f"近3期和值连续极端大({sums_3})",
+                "suggest": "和值异常走高，可能均值回归。建议推均值附近10注组六。是否推？",
+                "push_type": target_type, "push_count": 10, "signal_strength": ""}
+
+    # === 正常情况: 每天推满10注组六 ===
+    return {"stop": False, "reason": f"正常推荐 (组六{zl_streak}连，{streak_len}连{streak_type})",
+            "suggest": "", "push_type": target_type, "push_count": 10, "signal_strength": "中"}
+
+def generate_recommendations(records, info, count=10):
+    """
+    生成组六推荐（用于自动化任务）
+    基于: 遗漏回补/热号搭配/和值回归/跨度偏好/位置独立/去重
+    info: circuit_breaker 返回值
+    返回: [{"nums": [a,b,c], "logic": "...", "sum_val": N, "span": N}, ...]
+    """
+    if info["stop"]:
+        return []
+
+    n = len(records)
+    if n < 4:
+        return []
+
+    # 计算遗漏
+    last_seen = {}
+    for idx, r in enumerate(records):
+        for num in r["nums"]:
+            if num not in last_seen:
+                last_seen[num] = idx
+
+    missing = {}
+    for i in range(10):
+        missing[i] = last_seen.get(i, n)
+
+    # 计算频率
+    freq = Counter()
+    for r in records:
+        for num in r["nums"]:
+            freq[num] += 1
+
+    # 冷热排序
+    cold = sorted(range(10), key=lambda x: (-missing[x], -freq[x]))
+    hot = sorted(range(10), key=lambda x: (-freq[x], missing[x]))
+
+    # 近10期和值
+    recent_sums = [r["sum_val"] for r in records[:10]]
+    avg_sum_recent = sum(recent_sums) / len(recent_sums) if recent_sums else 0
+
+    # 近10期跨度
+    recent_spans = []
+    for r in records[:10]:
+        n2 = r["nums"]
+        recent_spans.append(max(n2) - min(n2))
+    avg_span = sum(recent_spans) / len(recent_spans) if recent_spans else 0
+    last_span = recent_spans[0] if recent_spans else 0
+
+    candidates = []
+    seen_sets = set()
+
+    def add_candidate(nums, logic):
+        # 确保是组六（3个数字各不相同）
+        if len(set(nums)) < 3:
+            return
+        key = tuple(sorted(nums))
+        if key in seen_sets:
+            return
+        seen_sets.add(key)
+        s = sum(nums)
+        sp = max(nums) - min(nums)
+        candidates.append({
+            "nums": sorted(nums),
+            "logic": logic,
+            "sum_val": s,
+            "span": sp
+        })
+
+    # 策略1: 遗漏回补核心（最冷3号组合）
+    _cold = cold[:]
+    for _ in range(2):
+        add_candidate([_cold[0], _cold[1], _cold[2]],
+                      f"遗漏回补核心: {_cold[0]}(缺{missing[_cold[0]]}期)+{_cold[1]}(缺{missing[_cold[1]]}期)+{_cold[2]}(缺{missing[_cold[2]]}期)")
+        _cold = _cold[3:] + _cold[:3]
+
+    # 策略2: 冷热搭配
+    _cold2, _hot = cold[:], hot[:]
+    for _ in range(2):
+        add_candidate([_cold2[0], _hot[0], _hot[1]],
+                      f"冷热搭配: {_cold2[0]}(冷)+{_hot[0]}(热)+{_hot[1]}(热)")
+        _cold2 = _cold2[1:] + _cold2[:1]
+        _hot = _hot[2:] + _hot[:2]
+
+    # 策略3: 和值回归（目标接近理论均值13.5）
+    target_sum = 14 if avg_sum_recent < 10 else 11 if avg_sum_recent > 17 else 13
+    _cold3 = cold[:]
+    for _ in range(2):
+        a = _cold3[0]
+        for b in range(10):
+            if b == a:
+                continue
+            c = target_sum - a - b
+            if 0 <= c <= 9 and c != a and c != b:
+                add_candidate([a, b, c], f"和值{target_sum}回归: {a}+{b}+{c}={target_sum}")
+                break
+        _cold3 = _cold3[1:] + _cold3[:1]
+        target_sum = target_sum + 1 if target_sum < 13 else target_sum - 1
+
+    # 策略4: 跨度修正
+    target_span = max(2, min(8, int(avg_span))) if last_span >= 8 else min(8, max(3, int(avg_span + 3)))
+    _cold4 = cold[:]
+    _hot4 = hot[:]
+    for _ in range(2):
+        a = _cold4[0]
+        b = _hot4[0] if _hot4[0] != a else _hot4[1]
+        for c in range(10):
+            if c != a and c != b and max(a, b, c) - min(a, b, c) == target_span:
+                add_candidate([a, b, c], f"跨{target_span}修正: 近均值{target_span}跨")
+                break
+        _cold4 = _cold4[1:] + _cold4[:1]
+        _hot4 = _hot4[1:] + _hot4[:1]
+        target_span = max(3, target_span - 1)
+
+    # 策略5: 位置独立（百/十/个各取优号）
+    pos_counter = {"bai": Counter(), "shi": Counter(), "ge": Counter()}
+    for r in records:
+        pos_counter["bai"][r["bai"]] += 1
+        pos_counter["shi"][r["shi"]] += 1
+        pos_counter["ge"][r["ge"]] += 1
+    bai_top = [n for n, _ in pos_counter["bai"].most_common(5)]
+    shi_top = [n for n, _ in pos_counter["shi"].most_common(5)]
+    ge_top = [n for n, _ in pos_counter["ge"].most_common(5)]
+    for i in range(2):
+        a = bai_top[0]
+        b = shi_top[min(i, len(shi_top) - 1)]
+        c = ge_top[min(i + 2, len(ge_top) - 1)]
+        if len({a, b, c}) == 3:
+            add_candidate([a, b, c], f"位置独立: 百{a}(热)+十{b}(热)+个{c}(热)")
+        bai_top = bai_top[1:] + bai_top[:1]
+
+    # 策略6: 补位填充 — 不足10注时用遗漏号+热号随机组合补满
+    # 优先级: 含过冷号 > 和值靠近均值 > 跨度适中
+    fill_candidates = []
+    for a in cold[:6]:
+        for b in hot[:6]:
+            if b == a:
+                continue
+            for c in range(10):
+                if c == a or c == b:
+                    continue
+                key = tuple(sorted([a, b, c]))
+                if key not in seen_sets:
+                    s = sum(key)
+                    sp = max(key) - min(key)
+                    # 偏好: 和值10-16(近均值), 跨度3-7
+                    score = (1 if 10 <= s <= 16 else 0) + (1 if 3 <= sp <= 7 else 0) + (2 if a in cold[:3] else 0)
+                    fill_candidates.append((score, sorted([a, b, c]), key, s, sp))
+    fill_candidates.sort(key=lambda x: -x[0])
+    for score, nums, key, s, sp in fill_candidates:
+        if key not in seen_sets:
+            seen_sets.add(key)
+            candidates.append({
+                "nums": nums,
+                "logic": f"补位: {nums[0]}(缺{missing[nums[0]]})+{nums[1]}(热)+{nums[2]}, 和{s}跨{sp}",
+                "sum_val": s,
+                "span": sp
+            })
+            if len(candidates) >= count:
+                break
+
+    return candidates[:count]
+
+def full_report():
+    """生成完整分析报告"""
+    records = load_data()
+    if not records:
+        return None
+
+    cb = circuit_breaker(records)
+    recs = generate_recommendations(records, cb)
+
+    report = {
+        "数据概览": {
+            "总期数": len(records),
+            "数据范围": f"{records[-1]['qihao']} ~ {records[0]['qihao']}",
+            "最新开奖": records[0],
+            "上一期": records[1] if len(records) > 1 else None
+        },
+        "频率分析": frequency_analysis(records),
+        "遗漏分析": missing_analysis(records),
+        "和值分析": sum_value_analysis(records),
+        "跨度分析": span_analysis(records),
+        "形态分析": type_analysis(records),
+        "熔断判定": cb,
+        "推荐号码": recs,
+        "推荐注数": len(recs)
+    }
+
+    os.makedirs("data", exist_ok=True)
+    with open("data/analysis_report.json", "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+
+    print("分析报告已生成: data/analysis_report.json")
+    return report
+
+def print_summary(report):
+    """打印摘要"""
+    if not report:
+        print("无数据可分析")
+        return
+
+    d = report["数据概览"]
+    freq = report["频率分析"]
+    miss = report["遗漏分析"]
+    s = report["和值分析"]
+    cb = report.get("熔断判定", {})
+
+    print("\n" + "=" * 50)
+    print(f"  福彩3D 数据分析报告")
+    print(f"  数据范围: {d['数据范围']} (共{d['总期数']}期)")
+    print("=" * 50)
+
+    latest = d["最新开奖"]
+    print(f"\n  最新开奖: {latest['qihao']} -> {' '.join(map(str, latest['nums']))} ({latest['type']})")
+
+    print(f"\n  [热号 Top5]")
+    for n, c in freq["total_freq"][:5]:
+        bar = "=" * min(c // 10, 20)
+        print(f"    号码{n}: {c}次 {bar}")
+
+    print(f"\n  [最大遗漏]")
+    for n, m in miss["most_overdue"]:
+        print(f"    号码{n}: 已遗漏 {m} 期")
+
+    print(f"\n  [近100期和值]")
+    print(f"    平均: {s['recent_100_avg']} (理论均值: {s['theoretical_avg']})")
+    print(f"    小区间: {s['recent_100_range']['small']}次")
+    print(f"    中区间: {s['recent_100_range']['medium']}次")
+    print(f"    大区间: {s['recent_100_range']['large']}次")
+
+    t = report["形态分析"]
+    print(f"\n  [近100期形态]")
+    for k, v in t["recent_100"].items():
+        print(f"    {k}: {v}次")
+
+    print(f"\n  [熔断判定 v4]")
+    print(f"    触发: {'🛑 是' if cb.get('stop') else '✅ 否'}")
+    print(f"    原因: {cb.get('reason', 'N/A')}")
+    if cb.get('suggest'):
+        print(f"    ⚠️ 建议: {cb.get('suggest')}")
+    if not cb.get('stop'):
+        print(f"    推荐: {cb.get('push_type', '')} × {cb.get('push_count', 0)}")
+        print(f"    信号: {cb.get('signal_strength', '')}")
+
+    recs = report.get("推荐号码", [])
+    if recs:
+        print(f"\n  [推荐号码] ({len(recs)}注)")
+        for i, r in enumerate(recs):
+            print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
+    print("\n" + "=" * 50)
+
+if __name__ == "__main__":
+    report = full_report()
+    print_summary(report)

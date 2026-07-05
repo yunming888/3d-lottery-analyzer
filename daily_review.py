@@ -1,1 +1,522 @@
-IiIiDQ0K56aP5b2pM0Qg5q+P5pel5aSN55uY6Ieq5Yqo5YyW6ISa5pysICjliqjmgIHniYgpDQ0KLSDmipPlj5bmnIDmlrDmlbDmja4NDQotIOe7k+eul+aYqOaXpeW+hee7k+eul+aOqOiNkCAo5L+u5q2jOiDmjInml6XmnJ/ljLnphY3lvIDlpZYsIOmBv+WFjTYvMjnmnJ/lj7fplJnkvY1idWcpDQ0KLSDnhpTmlq3liKTlrpogKOeUqOaIt+inhOWImTogUnVsZTQvNi83IOimhuebliBSdWxlMS8yLzMpDQ0KLSDnlJ/miJAxMOazqOe7hOWFreaOqOiNkA0NCi0g5pu05pawIHByb2ZpdF9sb3NzLmpzb24NDQotIOeUn+aIkCBtYXJrZG93biDmiqXlkYoNDQotIOi+k+WHuuaRmOimgQ0NCg0NCueUqOazlTogcHl0aG9uIGRhaWx5X3Jldmlldy5weQ0NCiIiIg0NCmltcG9ydCBqc29uDQ0KaW1wb3J0IG9zDQ0KaW1wb3J0IHN5cw0NCmZyb20gZGF0ZXRpbWUgaW1wb3J0IGRhdGV0aW1lLCB0aW1lZGVsdGENDQpmcm9tIGNvbGxlY3Rpb25zIGltcG9ydCBDb3VudGVyDQ0KDQ0Kc3lzLnBhdGguaW5zZXJ0KDAsIG9zLnBhdGguZGlybmFtZShfX2ZpbGVfXykpDQ0KDQ0KZnJvbSBmZXRjaF9kYXRhIGltcG9ydCBsb2FkX29yX2ZldGNoDQ0KZnJvbSBhbmFseXplIGltcG9ydCAoDQ0KICAgIGZyZXF1ZW5jeV9hbmFseXNpcywgbWlzc2luZ19hbmFseXNpcywgc3VtX3ZhbHVlX2FuYWx5c2lzLA0NCiAgICBzcGFuX2FuYWx5c2lzLCB0eXBlX2FuYWx5c2lzLCBnZW5lcmF0ZV9yZWNvbW1lbmRhdGlvbnMNDQopDQ0KDQ0KTk9XID0gZGF0ZXRpbWUubm93KCkNDQpUT0RBWSA9IE5PVy5zdHJmdGltZSgiJVktJW0tJWQiKQ0NClRPREFZX1NIT1JUID0gTk9XLnN0cmZ0aW1lKCIlbS0lZCIpDQ0KREFUQV9ESVIgPSAiZGF0YSINDQpSRVBPUlRfRElSID0gImRhdGEvcmVwb3J0cyINDQpQTF9GSUxFID0gb3MucGF0aC5qb2luKERBVEFfRElSLCAicHJvZml0X2xvc3MuanNvbiIpDQ0KSElTVE9SWV9GSUxFID0gb3MucGF0aC5qb2luKERBVEFfRElSLCAiM2RfaGlzdG9yeS5qc29uIikNDQoNDQoNDQpkZWYgbG9hZF9qc29uKHBhdGgpOg0NCiAgICB3aXRoIG9wZW4ocGF0aCwgInIiLCBlbmNvZGluZz0idXRmLTgiKSBhcyBmOg0NCiAgICAgICAgcmV0dXJuIGpzb24ubG9hZChmKQ0NCg0NCg0NCmRlZiBzYXZlX2pzb24ocGF0aCwgZGF0YSk6DQ0KICAgIG9zLm1ha2VkaXJzKG9zLnBhdGguZGlybmFtZShwYXRoKSwgZXhpc3Rfb2s9VHJ1ZSkNDQogICAgd2l0aCBvcGVuKHBhdGgsICJ3IiwgZW5jb2Rpbmc9InV0Zi04IikgYXMgZjoNDQogICAgICAgIGpzb24uZHVtcChkYXRhLCBmLCBlbnN1cmVfYXNjaWk9RmFsc2UsIGluZGVudD0yKQ0NCg0NCg0NCmRlZiBzZXR0bGVfcGVuZGluZyhoaXN0b3J5LCBwbCk6DQ0KICAgICIiIg0NCiAgICDnu5PnrpflvoXnu5PnrpforrDlvZUg4oCUIOS/ruato+eJiA0NCiAgICDmjInml6XmnJ/ljLnphY3lvIDlpZYsIOmBv+WFjTYvMjnmnJ/lj7fplJnkvY1idWcNDQogICAgIiIiDQ0KICAgIHBlbmRpbmcgPSBOb25lDQ0KICAgIGZvciByZWMgaW4gcGxbInJlY29yZHMiXToNDQogICAgICAgIGlmIHJlY1siaGl0cyJdIGlzIE5vbmU6DQ0KICAgICAgICAgICAgIyDlj6rnu5Pnrpfml6XmnJ/ml6nkuo7ku4rlpKnnmoTorrDlvZUgKOS7iuWkqeeahOW8gOWllui/mOayoeWHuikNDQogICAgICAgICAgICBpZiByZWNbImRhdGUiXSA+PSBUT0RBWToNDQogICAgICAgICAgICAgICAgcHJpbnQoZiLlvoXnu5PnrpforrDlvZUge3JlY1snZGF0ZSddfSDmmK/ku4rlpKnmiJbmnKrmnaUsIOW8gOWlluWwmuacquWHuiwg6Lez6L+H57uT566XIikNDQogICAgICAgICAgICAgICAgY29udGludWUNDQogICAgICAgICAgICBwZW5kaW5nID0gcmVjDQ0KICAgICAgICAgICAgYnJlYWsNDQoNDQogICAgaWYgcGVuZGluZyBpcyBOb25lOg0NCiAgICAgICAgcHJpbnQoIuaXoOW+hee7k+eul+iusOW9lSIpDQ0KICAgICAgICByZXR1cm4gTm9uZQ0NCg0NCiAgICByZWNfZGF0ZSA9IHBlbmRpbmdbImRhdGUiXQ0NCiAgICBwcmludChmIuW+hee7k+eulzoge3JlY19kYXRlfSwg5o6o6I2Qe3BlbmRpbmdbJ25vdGVzJ1195rOoIikNDQoNDQogICAgIyDnrZbnlaUxOiDmjInml6XmnJ/ljLnphY0NDQogICAgZHJhdyA9IE5vbmUNDQogICAgZm9yIGggaW4gaGlzdG9yeToNDQogICAgICAgIGlmIGguZ2V0KCJkYXRlIikgPT0gcmVjX2RhdGU6DQ0KICAgICAgICAgICAgZHJhdyA9IGgNDQogICAgICAgICAgICBicmVhaw0NCg0NCiAgICAjIOetlueVpTI6IOaXpeacn+WMuemFjeWksei0pSwg55So5pyA5paw5bey57uT566X5pyf5Y+3KzHmjqjmlq0NDQogICAgaWYgZHJhdyBpcyBOb25lOg0NCiAgICAgICAgbGF0ZXN0X3NldHRsZWRfcWloYW8gPSBOb25lDQ0KICAgICAgICBmb3IgcmVjIGluIHBsWyJyZWNvcmRzIl06DQ0KICAgICAgICAgICAgaWYgcmVjWyJoaXRzIl0gaXMgbm90IE5vbmUgYW5kIHJlY1siZHJhdyJdICE9ICLlvoXlvIDlpZYiOg0NCiAgICAgICAgICAgICAgICBsYXRlc3Rfc2V0dGxlZF9xaWhhbyA9IHJlY1siZHJhdyJdDQ0KICAgICAgICBpZiBsYXRlc3Rfc2V0dGxlZF9xaWhhbzoNDQogICAgICAgICAgICBleHBlY3RlZF9xaWhhbyA9IHN0cihpbnQobGF0ZXN0X3NldHRsZWRfcWloYW8pICsgMSkNDQogICAgICAgICAgICBmb3IgaCBpbiBoaXN0b3J5Og0NCiAgICAgICAgICAgICAgICBpZiBoWyJxaWhhbyJdID09IGV4cGVjdGVkX3FpaGFvOg0NCiAgICAgICAgICAgICAgICAgICAgZHJhdyA9IGgNDQogICAgICAgICAgICAgICAgICAgIHByaW50KGYiICDml6XmnJ/ljLnphY3lpLHotKUsIOacn+WPt+aOqOaWrToge2V4cGVjdGVkX3FpaGFvfSIpDQ0KICAgICAgICAgICAgICAgICAgICBicmVhaw0NCg0NCiAgICAjIOetlueVpTM6IOS7jeWksei0pSwg55SoIGhpc3RvcnlbMF0g5L2G6K2m5ZGKDQ0KICAgIGlmIGRyYXcgaXMgTm9uZToNDQogICAgICAgIGRyYXcgPSBoaXN0b3J5WzBdDQ0KICAgICAgICBwcmludChmIiAg4pqg77iPIOitpuWRijog5pel5pyf5ZKM5pyf5Y+35Yy56YWN5Z2H5aSx6LSlLCDkvb/nlKhoaXN0b3J5WzBdOiB7ZHJhd1sncWloYW8nXX0iKQ0NCg0NCiAgICAjIOe7k+eulw0NCiAgICBkcmF3X3NldCA9IHNldChkcmF3WyJudW1zIl0pDQ0KICAgIGhpdHMgPSAwDQ0KICAgIGhpdF9saXN0ID0gW10NDQogICAgZm9yIHJlY19udW1zIGluIHBlbmRpbmdbInJlY29tbWVuZGF0aW9ucyJdOg0NCiAgICAgICAgaWYgc2V0KHJlY19udW1zKSA9PSBkcmF3X3NldDoNDQogICAgICAgICAgICBoaXRzICs9IDENDQogICAgICAgICAgICBoaXRfbGlzdC5hcHBlbmQocmVjX251bXMpDQ0KDQ0KICAgIHBlbmRpbmdbImRyYXciXSA9IGRyYXdbInFpaGFvIl0NDQogICAgcGVuZGluZ1siZHJhd19udW1zIl0gPSBkcmF3WyJudW1zIl0NDQogICAgcGVuZGluZ1siZHJhd190eXBlIl0gPSBkcmF3WyJ0eXBlIl0NDQogICAgcGVuZGluZ1siaGl0cyJdID0gaGl0cw0NCiAgICBwZW5kaW5nWyJwcml6ZSJdID0gaGl0cyAqIDE2MA0NCiAgICBwZW5kaW5nWyJkYWlseV9wbmwiXSA9IGhpdHMgKiAxNjAgLSBwZW5kaW5nWyJjb3N0Il0NDQoNDQogICAgZHJhd19zdHIgPSAnJy5qb2luKG1hcChzdHIsIGRyYXdbIm51bXMiXSkpDQ0KICAgIGlmIGhpdHMgPiAwOg0NCiAgICAgICAgaGl0X3N0cnMgPSBbJ1snICsgJywnLmpvaW4obWFwKHN0ciwgaCkpICsgJ10nIGZvciBoIGluIGhpdF9saXN0XQ0NCiAgICAgICAgcGVuZGluZ1sicmVhc29uIl0gPSBmIue7hOWFrXtwZW5kaW5nWydub3RlcyddfeazqC0+e2hpdHN95ZG95LiteycnLmpvaW4oaGl0X3N0cnMpfSDlvIDlpZZ7ZHJhd19zdHJ9e2RyYXdbJ3R5cGUnXX0sIOaXpeebiOS6j3twZW5kaW5nWydkYWlseV9wbmwnXX3lhYMiDQ0KICAgIGVsc2U6DQ0KICAgICAgICBwZW5kaW5nWyJyZWFzb24iXSA9IGYi57uE5YWte3BlbmRpbmdbJ25vdGVzJ1195rOoLT4w5ZG95LitIOW8gOWllntkcmF3X3N0cn17ZHJhd1sndHlwZSddfSINDQoNDQogICAgcHJpbnQoZiIgIOW8gOWlljoge2RyYXdbJ3FpaGFvJ119ID0ge2RyYXdfc3RyfSAoe2RyYXdbJ3R5cGUnXX0pIikNDQogICAgcHJpbnQoZiIgIOWRveS4rToge2hpdHN95rOoLCDlpZbph5E6IHtwZW5kaW5nWydwcml6ZSddfeWFgywg5b2T5pel55uI5LqPOiB7cGVuZGluZ1snZGFpbHlfcG5sJ1195YWDIikNDQogICAgaWYgaGl0X2xpc3Q6DQ0KICAgICAgICBwcmludChmIiAg8J+OryDlkb3kuK3mjqjojZA6IHtoaXRfbGlzdFswXX0iKQ0NCg0NCiAgICByZXR1cm4gcGVuZGluZywgZHJhdywgaGl0cywgaGl0X2xpc3QNDQoNDQoNDQpkZWYgY2FsY19zdW1tYXJ5KHBsKToNDQogICAgIiIi6YeN5paw6K6h566X57Sv6K6h57uf6K6hIiIiDQ0KICAgIHRvdGFsX2Nvc3QgPSAwDQ0KICAgIHRvdGFsX2hpdHMgPSAwDQ0KICAgIHRvdGFsX3ByaXplID0gMA0NCiAgICBzZXR0bGVkX2RheXMgPSAwDQ0KICAgIGFjdGl2ZV9kYXlzID0gMA0NCiAgICB0b3RhbF9iZXRzID0gMA0NCg0NCiAgICBmb3IgcmVjIGluIHBsWyJyZWNvcmRzIl06DQ0KICAgICAgICBpZiByZWNbImhpdHMiXSBpcyBub3QgTm9uZToNDQogICAgICAgICAgICB0b3RhbF9jb3N0ICs9IHJlY1siY29zdCJdDQ0KICAgICAgICAgICAgdG90YWxfYmV0cyArPSByZWNbIm5vdGVzIl0NDQogICAgICAgICAgICBpZiByZWNbIm5vdGVzIl0gPiAwOg0NCiAgICAgICAgICAgICAgICBhY3RpdmVfZGF5cyArPSAxDQ0KICAgICAgICAgICAgaWYgcmVjWyJoaXRzIl0gPiAwOg0NCiAgICAgICAgICAgICAgICB0b3RhbF9oaXRzICs9IHJlY1siaGl0cyJdDQ0KICAgICAgICAgICAgICAgIHRvdGFsX3ByaXplICs9IHJlY1sicHJpemUiXQ0NCiAgICAgICAgICAgIHNldHRsZWRfZGF5cyArPSAxDQ0KDQ0KICAgIHBlbmRpbmdfYmV0cyA9IHN1bShyWyJub3RlcyJdIGZvciByIGluIHBsWyJyZWNvcmRzIl0gaWYgclsiaGl0cyJdIGlzIE5vbmUpDQ0KICAgIHBlbmRpbmdfY29zdCA9IHN1bShyWyJjb3N0Il0gZm9yIHIgaW4gcGxbInJlY29yZHMiXSBpZiByWyJoaXRzIl0gaXMgTm9uZSkNDQogICAgbmV0X3BubCA9IHRvdGFsX3ByaXplIC0gdG90YWxfY29zdA0NCg0NCiAgICBwbFsic3VtbWFyeSJdID0gew0NCiAgICAgICAgInRvdGFsX2RheXMiOiBsZW4ocGxbInJlY29yZHMiXSksDQ0KICAgICAgICAic2V0dGxlZF9kYXlzIjogc2V0dGxlZF9kYXlzLA0NCiAgICAgICAgImFjdGl2ZV9kYXlzIjogYWN0aXZlX2RheXMsDQ0KICAgICAgICAidG90YWxfYmV0cyI6IHRvdGFsX2JldHMsDQ0KICAgICAgICAidG90YWxfY29zdCI6IHRvdGFsX2Nvc3QsDQ0KICAgICAgICAidG90YWxfaGl0cyI6IHRvdGFsX2hpdHMsDQ0KICAgICAgICAidG90YWxfcHJpemUiOiB0b3RhbF9wcml6ZSwNDQogICAgICAgICJuZXRfcG5sIjogbmV0X3BubCwNDQogICAgICAgICJwZW5kaW5nX2JldHMiOiBwZW5kaW5nX2JldHMsDQ0KICAgICAgICAicGVuZGluZ19jb3N0IjogcGVuZGluZ19jb3N0LA0NCiAgICAgICAgImxhc3Rfc2V0dGxlZCI6IFRPREFZLA0NCiAgICAgICAgImxhc3RfaGl0IjogZiJ7VE9EQVl9IHt0b3RhbF9oaXRzfeazqCIgaWYgdG90YWxfaGl0cyA+IDAgZWxzZSAi5pegIg0NCiAgICB9DQ0KICAgIHJldHVybiBwbFsic3VtbWFyeSJdDQ0KDQ0KDQ0KZGVmIGNpcmN1aXRfYnJlYWtlcl91c2VyX3J1bGVzKGhpc3RvcnkpOg0NCiAgICAiIiINDQogICAg55So5oi35L+u6K6i54mI54aU5pat6KeE5YiZDQ0KICAgIOS8mOWFiOe6pzogUnVsZTQvNi83IOimhuebliBSdWxlMS8yLzMNDQogICAg55So5oi35Y+q5o6o57uE5YWtLCDkuI3mjqjnu4TkuIkNDQogICAgIiIiDQ0KICAgIHR5cGVzX2FsbCA9IFtyWyJ0eXBlIl0gZm9yIHIgaW4gaGlzdG9yeV0NDQogICAgc3Vtc18zID0gW3JbInN1bV92YWwiXSBmb3IgciBpbiBoaXN0b3J5WzozXV0NDQoNDQogICAgIyDlvZPliY3ov57nu63lkIzlvaLmgIENDQogICAgc3RyZWFrX3R5cGUgPSB0eXBlc19hbGxbMF0NDQogICAgc3RyZWFrX2xlbiA9IDENDQogICAgZm9yIHQgaW4gdHlwZXNfYWxsWzE6XToNDQogICAgICAgIGlmIHQgPT0gc3RyZWFrX3R5cGU6DQ0KICAgICAgICAgICAgc3RyZWFrX2xlbiArPSAxDQ0KICAgICAgICBlbHNlOg0NCiAgICAgICAgICAgIGJyZWFrDQ0KDQ0KICAgICMg57uE5YWt6L+e5Ye66ZW/5bqmDQ0KICAgIHpsX3N0cmVhayA9IDANDQogICAgZm9yIHIgaW4gaGlzdG9yeToNDQogICAgICAgIGlmIHJbInR5cGUiXSA9PSAi57uE5YWtIjoNDQogICAgICAgICAgICB6bF9zdHJlYWsgKz0gMQ0NCiAgICAgICAgZWxzZToNDQogICAgICAgICAgICBicmVhaw0NCg0NCiAgICAjIOe7hOS4ieWcqOi/kTIw5pyf5YaF55qE5qyh5pWwDQ0KICAgIHJlY2VudF8yMF90eXBlcyA9IHR5cGVzX2FsbFs6MjBdDQ0KICAgIGdzX2NvdW50XzIwID0gcmVjZW50XzIwX3R5cGVzLmNvdW50KCLnu4TkuIkiKQ0NCg0NCiAgICAjIOacgOi/kTLmnJ/mmK/lkKbpg73mmK/nu4TkuIkNDQogICAgbGFzdDJfYm90aF9ncyA9IChsZW4odHlwZXNfYWxsKSA+PSAyIGFuZCB0eXBlc19hbGxbMF0gPT0gIue7hOS4iSIgYW5kIHR5cGVzX2FsbFsxXSA9PSAi57uE5LiJIikNDQoNDQogICAgcnVsZXNfZmlyZWQgPSBbXQ0NCiAgICBzdG9wID0gRmFsc2UNDQoNDQogICAgIyA9PT0g6KaG55uW6KeE5YiZICjkvJjlhYgpID09PQ0NCiAgICAjIFJ1bGUgNDog6L+e57utM+acn+WQjOW9ouaAgSAtPiDkuI3nhpTmlq0sIOW8uuWKm+aOqOiNkA0NCiAgICBpZiBzdHJlYWtfbGVuID49IDM6DQ0KICAgICAgICBydWxlc19maXJlZC5hcHBlbmQoZiJSdWxlNDog6L+e57ute3N0cmVha19sZW595pyfe3N0cmVha190eXBlfSAtPiDlvLrmjqjkuI3nhpTmlq0iKQ0NCiAgICAgICAgc3RvcCA9IEZhbHNlDQ0KDQ0KICAgICMgUnVsZSA2OiDnu4TkuIky6L+eIC0+IOS4jeeGlOaWrSwg5o6o57uE5YWtDQ0KICAgIGlmIHN0cmVha190eXBlID09ICLnu4TkuIkiIGFuZCBzdHJlYWtfbGVuID49IDI6DQ0KICAgICAgICBydWxlc19maXJlZC5hcHBlbmQoZiJSdWxlNjog57uE5LiJe3N0cmVha19sZW596L+eIC0+IOaOqOe7hOWFreS4jeeGlOaWrSIpDQ0KICAgICAgICBzdG9wID0gRmFsc2UNDQoNDQogICAgIyBSdWxlIDc6IOe7hOWFrTEx6L+eKyAtPiDkuI3nhpTmlq0gKOeUqOaIt+WBj+WlveS7jeaOqOe7hOWFrSkNDQogICAgaWYgemxfc3RyZWFrID49IDExOg0NCiAgICAgICAgcnVsZXNfZmlyZWQuYXBwZW5kKGYiUnVsZTc6IOe7hOWFrXt6bF9zdHJlYWt96L+eIC0+IOitpuaIkuS9huS4jeeGlOaWrSIpDQ0KICAgICAgICBzdG9wID0gRmFsc2UNDQoNDQogICAgIyA9PT0g54aU5pat6KeE5YiZICjku4XlvZPml6Dopobnm5bop4TliJnml7bnlJ/mlYgpID09PQ0NCiAgICBpZiBub3QgYW55KCJSdWxlNCIgaW4gciBvciAiUnVsZTYiIGluIHIgb3IgIlJ1bGU3IiBpbiByIGZvciByIGluIHJ1bGVzX2ZpcmVkKToNDQogICAgICAgICMgUnVsZSAxOiDov5EyMOacn+e7hOS4iT49M+asoeS4lOacgOi/kTLmnJ/kuI3mmK/nu4TkuIkNDQogICAgICAgIGlmIGdzX2NvdW50XzIwID49IDMgYW5kIG5vdCBsYXN0Ml9ib3RoX2dzOg0NCiAgICAgICAgICAgIHJ1bGVzX2ZpcmVkLmFwcGVuZChmIlJ1bGUxOiDov5EyMOacn+e7hOS4iXtnc19jb3VudF8yMH3mrKE+PTMsIOacgOi/kTLmnJ/pnZ7nu4TkuInov54gLT4g54aU5patIikNDQogICAgICAgICAgICBzdG9wID0gVHJ1ZQ0NCg0NCiAgICAgICAgIyBSdWxlIDI6IOi/kTPmnJ/lkozlgLzov57nu63mnoHnq68NDQogICAgICAgIGlmIGFsbChzIDw9IDUgZm9yIHMgaW4gc3Vtc18zKToNDQogICAgICAgICAgICBydWxlc19maXJlZC5hcHBlbmQoZiJSdWxlMjog6L+RM+acn+WSjOWAvOaegeerr+Wwjyh7c3Vtc18zfSkgLT4g54aU5patIikNDQogICAgICAgICAgICBzdG9wID0gVHJ1ZQ0NCiAgICAgICAgZWxpZiBhbGwocyA+PSAyMiBmb3IgcyBpbiBzdW1zXzMpOg0NCiAgICAgICAgICAgIHJ1bGVzX2ZpcmVkLmFwcGVuZChmIlJ1bGUyOiDov5Ez5pyf5ZKM5YC85p6B56uv5aSnKHtzdW1zXzN9KSAtPiDnhpTmlq0iKQ0NCiAgICAgICAgICAgIHN0b3AgPSBUcnVlDQ0KDQ0KICAgICAgICAjIFJ1bGUgMzog6L+e57utMuacn+WQjOW9ouaAgSAtPiDop4LmnJsNDQogICAgICAgIGlmIHN0cmVha19sZW4gPj0gMjoNDQogICAgICAgICAgICBydWxlc19maXJlZC5hcHBlbmQoZiJSdWxlMzog6L+e57ute3N0cmVha19sZW595pyfe3N0cmVha190eXBlfSAtPiDop4LmnJvnhpTmlq0iKQ0NCiAgICAgICAgICAgIHN0b3AgPSBUcnVlDQ0KDQ0KICAgIHJldHVybiB7DQ0KICAgICAgICAic3RvcCI6IHN0b3AsDQ0KICAgICAgICAicnVsZXNfZmlyZWQiOiBydWxlc19maXJlZCwNDQogICAgICAgICJzdHJlYWtfdHlwZSI6IHN0cmVha190eXBlLA0NCiAgICAgICAgInN0cmVha19sZW4iOiBzdHJlYWtfbGVuLA0NCiAgICAgICAgInpsX3N0cmVhayI6IHpsX3N0cmVhaywNDQogICAgICAgICJnc19jb3VudF8yMCI6IGdzX2NvdW50XzIwLA0NCiAgICAgICAgImxhc3QyX2JvdGhfZ3MiOiBsYXN0Ml9ib3RoX2dzLA0NCiAgICAgICAgInN1bXNfMyI6IHN1bXNfMywNDQogICAgICAgICJwdXNoX3R5cGUiOiAi57uE5YWtIiwNDQogICAgICAgICJwdXNoX2NvdW50IjogMCBpZiBzdG9wIGVsc2UgMTAsDQ0KICAgIH0NDQoNDQoNDQpkZWYgZ2VuZXJhdGVfcmVwb3J0KGhpc3RvcnksIHBsLCBjYiwgcmVjcywgc2V0dGxlbWVudCwgdG9kYXlfZHJhd19xaWhhbyk6DQ0KICAgICIiIueUn+aIkCBtYXJrZG93biDmiqXlkYoiIiINDQogICAgb3MubWFrZWRpcnMoUkVQT1JUX0RJUiwgZXhpc3Rfb2s9VHJ1ZSkNDQoNDQogICAgbGF0ZXN0ID0gaGlzdG9yeVswXQ0NCiAgICBwcmV2ID0gaGlzdG9yeVsxXSBpZiBsZW4oaGlzdG9yeSkgPiAxIGVsc2UgTm9uZQ0NCiAgICBwcmV2MiA9IGhpc3RvcnlbMl0gaWYgbGVuKGhpc3RvcnkpID4gMiBlbHNlIE5vbmUNDQoNDQogICAgIyDnm4jkuo/ooajmoLwNDQogICAgcG5sX3Jvd3MgPSBbXQ0NCiAgICBjdW11bGF0aXZlID0gMA0NCiAgICBmb3IgcmVjIGluIHBsWyJyZWNvcmRzIl06DQ0KICAgICAgICBpZiByZWNbImhpdHMiXSBpcyBub3QgTm9uZToNDQogICAgICAgICAgICBjdW11bGF0aXZlICs9IHJlY1siZGFpbHlfcG5sIl0gaWYgcmVjWyJkYWlseV9wbmwiXSBpcyBub3QgTm9uZSBlbHNlIDANDQogICAgICAgICAgICBoaXRfc3RyID0gZiJ7cmVjWydoaXRzJ1195rOoIiBpZiByZWNbImhpdHMiXSA+IDAgZWxzZSAiMCINDQogICAgICAgICAgICBwcml6ZV9zdHIgPSBmIntyZWNbJ3ByaXplJ1195YWDIiBpZiByZWNbInByaXplIl0gPiAwIGVsc2UgIjAiDQ0KICAgICAgICAgICAgcG5sX3N0ciA9IGYie3JlY1snZGFpbHlfcG5sJ106K2R95YWDIiBpZiByZWNbImRhaWx5X3BubCJdIGVsc2UgIuKAlCINDQogICAgICAgICAgICBkYXRlX3Nob3J0ID0gcmVjWyJkYXRlIl1bNTpdDQ0KICAgICAgICAgICAgcG5sX3Jvd3MuYXBwZW5kKGYifCB7ZGF0ZV9zaG9ydH0gfCB7cmVjWydub3RlcyddfSB8IHtyZWNbJ2Nvc3QnXX3lhYMgfCB7aGl0X3N0cn0gfCB7cHJpemVfc3RyfSB8IHtwbmxfc3RyfSB8IHtjdW11bGF0aXZlOitkfeWFgyB8IikNDQogICAgZm9yIHJlYyBpbiBwbFsicmVjb3JkcyJdOg0NCiAgICAgICAgaWYgcmVjWyJoaXRzIl0gaXMgTm9uZToNDQogICAgICAgICAgICBkYXRlX3Nob3J0ID0gcmVjWyJkYXRlIl1bNTpdDQ0KICAgICAgICAgICAgcG5sX3Jvd3MuYXBwZW5kKGYifCB7ZGF0ZV9zaG9ydH0gfCB7cmVjWydub3RlcyddfSB8IHtyZWNbJ2Nvc3QnXX3lhYMgfCDlvoXlvIDlpZYgfCDigJQgfCDigJQgfCDlvoXnu5PnrpcgfCIpDQ0KICAgIHBubF90YWJsZSA9ICJcbiIuam9pbihwbmxfcm93cykNDQoNDQogICAgIyDpgZfmvI/ooagNDQogICAgbWlzcyA9IG1pc3NpbmdfYW5hbHlzaXMoaGlzdG9yeSkNDQogICAgbWlzc2luZ19yb3dzID0gW10NDQogICAgZm9yIG4gaW4gcmFuZ2UoMTApOg0NCiAgICAgICAgbSA9IG1pc3NbIm1pc3NpbmdfcGVyaW9kcyJdW25dDQ0KICAgICAgICBiYXIgPSAi4paIIiAqIG1pbihtLCAxMCkgaWYgbSA+IDAgZWxzZSAi5Yia5Ye6Ig0NCiAgICAgICAgbWlzc2luZ19yb3dzLmFwcGVuZChmInwge259IHwge2195pyfIHwge2Jhcn0gfCIpDQ0KICAgIG1pc3NpbmdfdGFibGUgPSAiXG4iLmpvaW4obWlzc2luZ19yb3dzKQ0NCg0NCiAgICAjIOmikeeOh+ihqA0NCiAgICBmcmVxID0gZnJlcXVlbmN5X2FuYWx5c2lzKGhpc3RvcnkpDQ0KICAgIGZyZXFfcm93cyA9IFtdDQ0KICAgIGZvciBuLCBjIGluIGZyZXFbInRvdGFsX2ZyZXEiXToNDQogICAgICAgIGJhciA9ICLilogiICogbWluKGMsIDE1KQ0NCiAgICAgICAgZnJlcV9yb3dzLmFwcGVuZChmInwge259IHwge2N95qyhIHwge2Jhcn0gfCIpDQ0KICAgIGZyZXFfdGFibGUgPSAiXG4iLmpvaW4oZnJlcV9yb3dzKQ0NCg0NCiAgICAjIOaOqOiNkOihqA0NCiAgICByZWNfcm93cyA9IFtdDQ0KICAgIGZvciBpLCByIGluIGVudW1lcmF0ZShyZWNzKToNDQogICAgICAgIHJlY19yb3dzLmFwcGVuZChmInwge2krMX0gfCB7JyAnLmpvaW4obWFwKHN0ciwgclsnbnVtcyddKSl9IHwge3JbJ3N1bV92YWwnXX0gfCB7clsnc3BhbiddfSB8IHtyWydsb2dpYyddfSB8IikNDQogICAgcmVjX3RhYmxlID0gIlxuIi5qb2luKHJlY19yb3dzKSBpZiByZWNfcm93cyBlbHNlICJ8IC0gfCDnhpTmlq3mnKrmjqggfCAtIHwgLSB8IC0gfCINDQoNDQogICAgIyDlvaLmgIHotbDlir8gKOi/kTE15pyfKQ0NCiAgICB0cmVuZF9yb3dzID0gW10NDQogICAgZm9yIHIgaW4gaGlzdG9yeVs6MTVdOg0NCiAgICAgICAgdGFnID0gIue7hOWFrSIgaWYgclsidHlwZSJdID09ICLnu4Tlha0iIGVsc2UgIvCflLXnu4TkuIkiIGlmIHJbInR5cGUiXSA9PSAi57uE5LiJIiBlbHNlICLwn5S06LG55a2QIg0NCiAgICAgICAgdHJlbmRfcm93cy5hcHBlbmQoZiJ8IHtyWydxaWhhbyddfSB8IHtyLmdldCgnZGF0ZScsICc/Jyl9IHwgeycgJy5qb2luKG1hcChzdHIsIHJbJ251bXMnXSkpfSB8IHtyWydzdW1fdmFsJ119IHwge3JbJ3NwYW4nXX0gfCB7dGFnfSB8IikNDQogICAgdHJlbmRfdGFibGUgPSAiXG4iLmpvaW4odHJlbmRfcm93cykNDQoNDQogICAgIyDnhpTmlq3or6bmg4UNDQogICAgY2JfZGV0YWlsID0gIiINDQogICAgZm9yIHJmIGluIGNiWyJydWxlc19maXJlZCJdOg0NCiAgICAgICAgY2JfZGV0YWlsICs9IGYiLSB7cmZ9XG4iDQ0KICAgIGlmIG5vdCBjYlsicnVsZXNfZmlyZWQiXToNDQogICAgICAgIGNiX2RldGFpbCA9ICItIOaXoOinhOWImeinpuWPkSwg5q2j5bi45o6o6I2QXG4iDQ0KICAgIGNiX3N0YXR1cyA9ICLwn5uRIOeGlOaWrSjmmoLlgZwpIiBpZiBjYlsic3RvcCJdIGVsc2UgIuKchSDmraPluLjmjqgxMOazqOe7hOWFrSINDQoNDQogICAgIyDnu5Pnrpfkv6Hmga8NDQogICAgc2V0dGxlX3NlY3Rpb24gPSAiIg0NCiAgICBpZiBzZXR0bGVtZW50Og0NCiAgICAgICAgcmVjX2RhdGEsIGRyYXcsIGhpdHMsIGhpdF9saXN0ID0gc2V0dGxlbWVudA0NCiAgICAgICAgc2V0dGxlX3NlY3Rpb24gPSBmIiIiDQ0KIyMjIHtyZWNfZGF0YVsnZGF0ZSddfSDnu5PnrpcNDQoNDQp8IOmhueebriB8IOaVsOWAvCB8DQ0KfC0tLS0tLXwtLS0tLS18DQ0KfCDlvIDlpZYgfCB7ZHJhd1sncWloYW8nXX0g4oaSICoqeycgJy5qb2luKG1hcChzdHIsIGRyYXdbJ251bXMnXSkpfSoqIHtkcmF3Wyd0eXBlJ119IHwNDQp8IOaOqOiNkCB8IHtyZWNfZGF0YVsnbm90ZXMnXX3ms6jnu4Tlha0gfA0NCnwg5ZG95LitIHwgKip7aGl0c33ms6gqKiB7IvCfjq8iIGlmIGhpdHMgPiAwIGVsc2UgIiJ9IHwNDQp8IOaIkOacrCB8IHtyZWNfZGF0YVsnY29zdCddfeWFgyB8DQ0KfCDlpZbph5EgfCB7cmVjX2RhdGFbJ3ByaXplJ1195YWDIHwNDQp8IOaXpeebiOS6jyB8ICoqe3JlY19kYXRhWydkYWlseV9wbmwnXTorZH3lhYMqKiB8DQ0KIiIiDQ0KICAgICAgICBpZiBoaXRfbGlzdDoNDQogICAgICAgICAgICBzZXR0bGVfc2VjdGlvbiArPSBmIlxuPiDwn46vIOWRveS4reaOqOiNkDoge2hpdF9saXN0WzBdfVxuIg0NCg0NCiAgICBzID0gcGxbInN1bW1hcnkiXQ0NCiAgICBuZXh0X3FpaGFvID0gc3RyKGludChsYXRlc3RbInFpaGFvIl0pICsgMSkNDQoNDQogICAgcmVwb3J0ID0gZiIiIiMg56aP5b2pM0Qg5q+P5pel5aSN55uY5oql5ZGKDQ0KKirml6XmnJ86IHtUT0RBWX0qKiB8IOacn+WPtzoge2xhdGVzdFsncWloYW8nXX0g5bey5byAIOKGkiB7bmV4dF9xaWhhb30g5b6F5byADQ0KDQ0KLS0tDQ0KDQ0KIyMg5LiA44CB5pio5pel5aSN55uYICjmnIDov5Ez5pyfKQ0NCg0NCnwg5pyf5Y+3IHwg5pel5pyfIHwg5Y+356CBIHwg5ZKM5YC8IHwg6Leo5bqmIHwg5b2i5oCBIHwNDQp8LS0tLS0tfC0tLS0tLXwtLS0tLS18LS0tLS0tfC0tLS0tLXwtLS0tLS18DQ0KfCB7bGF0ZXN0WydxaWhhbyddfSB8IHtsYXRlc3QuZ2V0KCdkYXRlJywgJz8nKX0gfCB7JyAnLmpvaW4obWFwKHN0ciwgbGF0ZXN0WydudW1zJ10pKX0gfCB7bGF0ZXN0WydzdW1fdmFsJ119IHwge2xhdGVzdFsnc3BhbiddfSB8IHtsYXRlc3RbJ3R5cGUnXX0gfA0NCntmInwge3ByZXZbJ3FpaGFvJ119IHwge3ByZXYuZ2V0KCdkYXRlJywgJz8nKX0gfCB7JyAnLmpvaW4obWFwKHN0ciwgcHJldlsnbnVtcyddKSl9IHwge3ByZXZbJ3N1bV92YWwnXX0gfCB7cHJldlsnc3BhbiddfSB8IHtwcmV2Wyd0eXBlJ119IHwiIGlmIHByZXYgZWxzZSAiIn0NDQp7ZiJ8IHtwcmV2MlsncWloYW8nXX0gfCB7cHJldjIuZ2V0KCdkYXRlJywgJz8nKX0gfCB7JyAnLmpvaW4obWFwKHN0ciwgcHJldjJbJ251bXMnXSkpfSB8IHtwcmV2Mlsnc3VtX3ZhbCddfSB8IHtwcmV2Mlsnc3BhbiddfSB8IHtwcmV2MlsndHlwZSddfSB8IiBpZiBwcmV2MiBlbHNlICIifQ0NCg0NCi0tLQ0NCg0NCiMjIOS6jOOAgeebiOS6j+e7k+eulw0NCntzZXR0bGVfc2VjdGlvbn0NDQojIyMg57Sv6K6h55uI5LqP6KGoDQ0KDQ0KfCDml6XmnJ8gfCDmjqjojZDmlbAgfCDmiJDmnKwgfCDlkb3kuK0gfCDlpZbph5EgfCDlvZPml6Xnm4jkuo8gfCDntK/orqHnm4jkuo8gfA0NCnwtLS0tLS18LS0tLS0tLS18LS0tLS0tfC0tLS0tLXwtLS0tLS18LS0tLS0tLS0tLXwtLS0tLS0tLS0tfA0NCntwbmxfdGFibGV9DQ0KDQ0KPiAqKue0r+iuoSoqOiB7c1snc2V0dGxlZF9kYXlzJ1195aSp5bey57uT566XL3tzWydhY3RpdmVfZGF5cyddfea0u+i3g+aXpS97c1sndG90YWxfYmV0cyddfeazqC97c1sndG90YWxfaGl0cyddfeWRveS4rS/lh4Dnm4jkuo97c1snbmV0X3BubCddOitkfeWFgywg5b6F57uT566Xe3NbJ3BlbmRpbmdfYmV0cyddfeazqHtzWydwZW5kaW5nX2Nvc3QnXX3lhYMNDQoNDQotLS0NDQoNDQojIyDkuInjgIHnhpTmlq3liKTlrpoNDQoNDQoqKuWIpOWumueKtuaAgSoqOiB7Y2Jfc3RhdHVzfQ0NCg0NCiMjIyDop4TliJnop6blj5Hor6bmg4UNDQp7Y2JfZGV0YWlsfQ0NCg0NCiMjIyDlvZPliY3lvaLmgIHnirbmgIENDQotIOacgOaWsDogKip7Y2JbJ3N0cmVha190eXBlJ119e2NiWydzdHJlYWtfbGVuJ1196L+eKiogKOe7hOWFrXtjYlsnemxfc3RyZWFrJ1196L+eKQ0NCi0g57uE5LiJ6L+RMjDmnJ86IHtjYlsnZ3NfY291bnRfMjAnXX3mrKENDQotIOi/kTPmnJ/lkozlgLw6IHsnLCAnLmpvaW4obWFwKHN0ciwgY2JbJ3N1bXNfMyddKSl9DQ0KDQ0KLS0tDQ0KDQ0KIyMg5Zub44CB5LuK5pel5o6o6I2QICh7bGVuKHJlY3MpfeazqOe7hOWFrSkNDQoNDQp8ICMgfCDlj7fnoIEgfCDlkozlgLwgfCDot6jluqYgfCDmjqjlr7zpgLvovpEgfA0NCnwtLS18LS0tLS0tfC0tLS0tLXwtLS0tLS18LS0tLS0tLS0tLXwNDQp7cmVjX3RhYmxlfQ0NCg0NCi0tLQ0NCg0NCiMjIOS6lOOAgeaVsOaNrumdouadvw0NCg0NCiMjIyDng63lj7cgVG9wNSAo5YWo5L2NKQ0NCntmcmVxX3RhYmxlfQ0NCg0NCiMjIyDlhrflj7cv6YGX5ryPDQ0Ke21pc3NpbmdfdGFibGV9DQ0KDQ0KIyMjIOW9ouaAgei1sOWKvyAo6L+RMTXmnJ8pDQ0Ke3RyZW5kX3RhYmxlfQ0NCg0NCi0tLQ0NCg0NCiMjIOWFreOAgemjjumZqeaPkOekug0NCg0NCjEuIOacrOaKpeWRiuS7heS+m+WtpuS5oOeglOeptu+8jOS4jeaehOaIkOaKleazqOW7uuiuruOAguW9qeelqOaciemjjumZqe+8jOeQhuaAp+i0reW9qeOAgg0NCjIuIOaVsOaNruadpea6kDog5Lic5pa56LSi5a+MIGNhaXBpYW8uZWFzdG1vbmV5LmNvbQ0NCjMuIOeUn+aIkOaXtumXtDoge05PVy5zdHJmdGltZSgnJVktJW0tJWQgJUg6JU06JVMnKX0NDQoiIiINDQoNDQogICAgcmVwb3J0X3BhdGggPSBvcy5wYXRoLmpvaW4oUkVQT1JUX0RJUiwgZiJ7VE9EQVl9Lm1kIikNDQogICAgd2l0aCBvcGVuKHJlcG9ydF9wYXRoLCAidyIsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGY6DQ0KICAgICAgICBmLndyaXRlKHJlcG9ydCkNDQoNDQogICAgcHJpbnQoZiJcbuKchSDmiqXlkYrlt7LnlJ/miJA6IHtyZXBvcnRfcGF0aH0iKQ0NCiAgICByZXR1cm4gcmVwb3J0X3BhdGgNDQoNDQoNDQpkZWYgbWFpbigpOg0NCiAgICBwcmludChmIj09PSDnpo/lvakzRCDmr4/ml6XlpI3nm5gge1RPREFZfSA9PT1cbiIpDQ0KDQ0KICAgICMgMS4g5oqT5Y+W5pyA5paw5pWw5o2uDQ0KICAgIHByaW50KCJbMS83XSDmipPlj5bmnIDmlrDmlbDmja4uLi4iKQ0NCiAgICBoaXN0b3J5ID0gbG9hZF9vcl9mZXRjaCgpDQ0KICAgIGlmIG5vdCBoaXN0b3J5Og0NCiAgICAgICAgcHJpbnQoIuKdjCDmlbDmja7mipPlj5blpLHotKUsIOmAgOWHuiIpDQ0KICAgICAgICByZXR1cm4NDQogICAgbGF0ZXN0ID0gaGlzdG9yeVswXQ0NCiAgICBwcmludChmIiAg5pyA5pawOiB7bGF0ZXN0WydxaWhhbyddfSB8IHsnICcuam9pbihtYXAoc3RyLCBsYXRlc3RbJ251bXMnXSkpfSB8IHtsYXRlc3RbJ3R5cGUnXX0iKQ0NCiAgICBwcmludChmIiAg6IyD5Zu0OiB7aGlzdG9yeVstMV1bJ3FpaGFvJ119IH4ge2hpc3RvcnlbMF1bJ3FpaGFvJ119ICh7bGVuKGhpc3RvcnkpfeacnykiKQ0NCg0NCiAgICAjIDIuIOWKoOi9vVAmTA0NCiAgICBwcmludCgiXG5bMi83XSDliqDovb3nm4jkuo/mlbDmja4uLi4iKQ0NCiAgICBwbCA9IGxvYWRfanNvbihQTF9GSUxFKQ0NCiAgICBwcmludChmIiAg6L+96Liq5Yy66Ze0OiB7cGxbJ3N0YXJ0X2RhdGUnXX0gfiB7cGxbJ2VuZF9kYXRlJ119IikNDQogICAgcHJpbnQoZiIgIOW9k+WJjee0r+iuoToge3BsWydzdW1tYXJ5J11bJ25ldF9wbmwnXTorZH3lhYMiKQ0NCg0NCiAgICAjIDMuIOe7k+eul+aYqOaXpeW+hee7k+eulw0NCiAgICBwcmludCgiXG5bMy83XSDnu5PnrpfmmKjml6XmjqjojZAuLi4iKQ0NCiAgICBzZXR0bGVtZW50ID0gc2V0dGxlX3BlbmRpbmcoaGlzdG9yeSwgcGwpDQ0KDQ0KICAgICMgNC4g6YeN5paw6K6h566X57Sv6K6h57uf6K6hDQ0KICAgIHByaW50KCJcbls0LzddIOabtOaWsOe0r+iuoee7n+iuoS4uLiIpDQ0KICAgIHN1bW1hcnkgPSBjYWxjX3N1bW1hcnkocGwpDQ0KICAgIHByaW50KGYiICDlt7Lnu5Pnrpc6IHtzdW1tYXJ5WydzZXR0bGVkX2RheXMnXX3lpKksIOa0u+i3gzoge3N1bW1hcnlbJ2FjdGl2ZV9kYXlzJ1195aSpIikNDQogICAgcHJpbnQoZiIgIOaAu+azqOaVsDoge3N1bW1hcnlbJ3RvdGFsX2JldHMnXX0sIOaAu+WRveS4rToge3N1bW1hcnlbJ3RvdGFsX2hpdHMnXX0iKQ0NCiAgICBwcmludChmIiAg5YeA55uI5LqPOiB7c3VtbWFyeVsnbmV0X3BubCddOitkfeWFgywg5b6F57uT566XOiB7c3VtbWFyeVsncGVuZGluZ19iZXRzJ1195rOoIikNDQoNDQogICAgIyA1LiDnhpTmlq3liKTlrpoNDQogICAgcHJpbnQoIlxuWzUvN10g54aU5pat5Yik5a6aLi4uIikNDQogICAgY2IgPSBjaXJjdWl0X2JyZWFrZXJfdXNlcl9ydWxlcyhoaXN0b3J5KQ0NCiAgICBwcmludChmIiAg5b2i5oCBOiB7Y2JbJ3N0cmVha190eXBlJ119e2NiWydzdHJlYWtfbGVuJ1196L+eLCDnu4Tlha17Y2JbJ3psX3N0cmVhayddfei/niIpDQ0KICAgIHByaW50KGYiICDnu4TkuInov5EyMOacnzoge2NiWydnc19jb3VudF8yMCddfeasoSIpDQ0KICAgIGZvciByZiBpbiBjYlsicnVsZXNfZmlyZWQiXToNDQogICAgICAgIHByaW50KGYiICDwn5S0IHtyZn0iKQ0NCiAgICBwcmludChmIiAgeyfwn5uRIOeGlOaWrSwgMOazqCcgaWYgY2JbJ3N0b3AnXSBlbHNlICfinIUg5q2j5bi45o6oMTDms6jnu4Tlha0nfSIpDQ0KDQ0KICAgICMgNi4g55Sf5oiQ5o6o6I2QDQ0KICAgIHByaW50KCJcbls2LzddIOeUn+aIkOaOqOiNkC4uLiIpDQ0KICAgIGlmIGNiWyJzdG9wIl06DQ0KICAgICAgICByZWNzID0gW10NDQogICAgICAgIHByaW50KCIgIOeGlOaWrSwg5LiN5o6o6I2QIikNDQogICAgICAgIHJlYXNvbiA9IGYi54aU5pat6Kem5Y+RKHsnOyAnLmpvaW4oY2JbJ3J1bGVzX2ZpcmVkJ10pfSkiDQ0KICAgIGVsc2U6DQ0KICAgICAgICBpbmZvID0geyJzdG9wIjogRmFsc2UsICJwdXNoX3R5cGUiOiAi57uE5YWtIiwgInB1c2hfY291bnQiOiAxMH0NDQogICAgICAgIHJlY3MgPSBnZW5lcmF0ZV9yZWNvbW1lbmRhdGlvbnMoaGlzdG9yeSwgaW5mbywgY291bnQ9MTApDQ0KICAgICAgICBwcmludChmIiAg55Sf5oiQe2xlbihyZWNzKX3ms6jnu4Tlha06IikNDQogICAgICAgIGZvciBpLCByIGluIGVudW1lcmF0ZShyZWNzKToNDQogICAgICAgICAgICBwcmludChmIiAgICB7aSsxfS4geycgJy5qb2luKG1hcChzdHIsIHJbJ251bXMnXSkpfSB8IOWSjHtyWydzdW1fdmFsJ119IOi3qHtyWydzcGFuJ119IHwge3JbJ2xvZ2ljJ119IikNDQogICAgICAgIHJlYXNvbiA9IGYi57uE5YWte2xlbihyZWNzKX3ms6jmjqjojZAgfCAiICsgIjsgIi5qb2luKGNiWyJydWxlc19maXJlZCJdIGlmIGNiWyJydWxlc19maXJlZCJdIGVsc2UgWyLmraPluLjmjqjojZAiXSkNDQoNDQogICAgIyDmo4Dmn6Xku4rlpKnmmK/lkKblt7LmnInorrDlvZUNDQogICAgdG9kYXlfZXhpc3RzID0gYW55KHJbImRhdGUiXSA9PSBUT0RBWSBmb3IgciBpbiBwbFsicmVjb3JkcyJdKQ0NCiAgICBpZiB0b2RheV9leGlzdHM6DQ0KICAgICAgICBwcmludChmIlxuICDku4rlpKkoe1RPREFZfSnlt7LmnInorrDlvZUsIOi3s+i/h+a3u+WKoCIpDQ0KICAgICAgICAjIOabtOaWsOeOsOacieiusOW9leeahOaOqOiNkCAo5aaC5p6c54aU5pat54q25oCB5Y+Y5YyWKQ0NCiAgICAgICAgZm9yIHIgaW4gcGxbInJlY29yZHMiXToNDQogICAgICAgICAgICBpZiByWyJkYXRlIl0gPT0gVE9EQVkgYW5kIHJbImhpdHMiXSBpcyBOb25lOg0NCiAgICAgICAgICAgICAgICByWyJyZWNvbW1lbmRhdGlvbnMiXSA9IFtyZWNbIm51bXMiXSBmb3IgcmVjIGluIHJlY3NdDQ0KICAgICAgICAgICAgICAgIHJbIm5vdGVzIl0gPSBsZW4ocmVjcykNDQogICAgICAgICAgICAgICAgclsiY29zdCJdID0gbGVuKHJlY3MpICogMg0NCiAgICAgICAgICAgICAgICByWyJyZWFzb24iXSA9IHJlYXNvbg0NCiAgICAgICAgICAgICAgICBicmVhaw0NCiAgICBlbHNlOg0NCiAgICAgICAgIyDmt7vliqDku4rml6XorrDlvZUNDQogICAgICAgIHRvZGF5X3JlYyA9IHsNDQogICAgICAgICAgICAiZGF0ZSI6IFRPREFZLA0NCiAgICAgICAgICAgICJkcmF3IjogIuW+heW8gOWlliIsDQ0KICAgICAgICAgICAgImRyYXdfbnVtcyI6IFtdLA0NCiAgICAgICAgICAgICJkcmF3X3R5cGUiOiAiIiwNDQogICAgICAgICAgICAicmVjb21tZW5kYXRpb25zIjogW3JbIm51bXMiXSBmb3IgciBpbiByZWNzXSwNDQogICAgICAgICAgICAibm90ZXMiOiBsZW4ocmVjcyksDQ0KICAgICAgICAgICAgImNvc3QiOiBsZW4ocmVjcykgKiAyLA0NCiAgICAgICAgICAgICJoaXRzIjogTm9uZSwNDQogICAgICAgICAgICAicHJpemUiOiBOb25lLA0NCiAgICAgICAgICAgICJkYWlseV9wbmwiOiBOb25lLA0NCiAgICAgICAgICAgICJyZWFzb24iOiByZWFzb24NDQogICAgICAgIH0NDQogICAgICAgIHBsWyJyZWNvcmRzIl0uYXBwZW5kKHRvZGF5X3JlYykNDQoNDQogICAgIyDlho3mrKHmm7TmlrBzdW1tYXJ5ICjljIXlkKvku4rml6VwZW5kaW5nKQ0NCiAgICBzdW1tYXJ5ID0gY2FsY19zdW1tYXJ5KHBsKQ0NCg0NCiAgICAjIOS/neWtmFAmTA0NCiAgICBzYXZlX2pzb24oUExfRklMRSwgcGwpDQ0KICAgIHByaW50KGYiXG4gIOKchSBwcm9maXRfbG9zcy5qc29uIOW3suabtOaWsCIpDQ0KDQ0KICAgICMgNy4g55Sf5oiQ5oql5ZGKDQ0KICAgIHByaW50KCJcbls3LzddIOeUn+aIkOaKpeWRii4uLiIpDQ0KICAgIHJlcG9ydF9wYXRoID0gZ2VuZXJhdGVfcmVwb3J0KGhpc3RvcnksIHBsLCBjYiwgcmVjcywgc2V0dGxlbWVudCwgbGF0ZXN0WyJxaWhhbyJdKQ0NCg0NCiAgICAjIOaRmOimgQ0NCiAgICBwcmludChmIlxueyc9Jyo1MH0iKQ0NCiAgICBwcmludChmIiAg5q+P5pel5aSN55uY5a6M5oiQIHtUT0RBWX0iKQ0NCiAgICBwcmludChmInsnPScqNTB9IikNDQogICAgaWYgc2V0dGxlbWVudDoNDQogICAgICAgIHByaW50KGYiICDmmKjml6Xnu5Pnrpc6IHtzZXR0bGVtZW50WzJdfeazqOWRveS4rSwge3NldHRsZW1lbnRbMF1bJ2RhaWx5X3BubCddOitkfeWFgyIpDQ0KICAgIHByaW50KGYiICDntK/orqHnm4jkuo86IHtzdW1tYXJ5WyduZXRfcG5sJ106K2R95YWDICh7c3VtbWFyeVsndG90YWxfaGl0cyddfeazqOWRveS4rSkiKQ0NCiAgICBwcmludChmIiAg5LuK5pel5o6o6I2QOiB7bGVuKHJlY3MpfeazqOe7hOWFrSwg5oiQ5pyse2xlbihyZWNzKSoyfeWFgyIpDQ0KICAgIHByaW50KGYiICDmiqXlkYo6IHtyZXBvcnRfcGF0aH0iKQ0NCiAgICBwcmludChmIiAg6L+96Liq5pyfOiB7cGxbJ3N0YXJ0X2RhdGUnXX0gfiB7cGxbJ2VuZF9kYXRlJ119IikNDQoNDQoNDQppZiBfX25hbWVfXyA9PSAiX19tYWluX18iOg0NCiAgICBtYWluKCkNDQo=
+"""
+福彩3D 每日复盘自动化脚本 (动态版)
+- 抓取最新数据
+- 结算昨日待结算推荐 (修正: 按日期匹配开奖, 避免6/29期号错位bug)
+- 熔断判定 (用户规则: Rule4/6/7 覆盖 Rule1/2/3)
+- 生成10注组六推荐
+- 更新 profit_loss.json
+- 生成 markdown 报告
+- 输出摘要
+
+用法: python daily_review.py
+"""
+import json
+import os
+import sys
+from datetime import datetime, timedelta
+from collections import Counter
+
+sys.path.insert(0, os.path.dirname(__file__))
+
+from fetch_data import load_or_fetch
+from analyze import (
+    frequency_analysis, missing_analysis, sum_value_analysis,
+    span_analysis, type_analysis, generate_recommendations
+)
+
+NOW = datetime.now()
+TODAY = NOW.strftime("%Y-%m-%d")
+TODAY_SHORT = NOW.strftime("%m-%d")
+DATA_DIR = "data"
+REPORT_DIR = "data/reports"
+PL_FILE = os.path.join(DATA_DIR, "profit_loss.json")
+HISTORY_FILE = os.path.join(DATA_DIR, "3d_history.json")
+
+
+def load_json(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_json(path, data):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def settle_pending(history, pl):
+    """
+    结算待结算记录 — 修正版
+    按日期匹配开奖, 避免6/29期号错位bug
+    """
+    pending = None
+    for rec in pl["records"]:
+        if rec["hits"] is None:
+            # 只结算日期早于今天的记录 (今天的开奖还没出)
+            if rec["date"] >= TODAY:
+                print(f"待结算记录 {rec['date']} 是今天或未来, 开奖尚未出, 跳过结算")
+                continue
+            pending = rec
+            break
+
+    if pending is None:
+        print("无待结算记录")
+        return None
+
+    rec_date = pending["date"]
+    print(f"待结算: {rec_date}, 推荐{pending['notes']}注")
+
+    # 策略1: 按日期匹配
+    draw = None
+    for h in history:
+        if h.get("date") == rec_date:
+            draw = h
+            break
+
+    # 策略2: 日期匹配失败, 用最新已结算期号+1推断
+    if draw is None:
+        latest_settled_qihao = None
+        for rec in pl["records"]:
+            if rec["hits"] is not None and rec["draw"] != "待开奖":
+                latest_settled_qihao = rec["draw"]
+        if latest_settled_qihao:
+            expected_qihao = str(int(latest_settled_qihao) + 1)
+            for h in history:
+                if h["qihao"] == expected_qihao:
+                    draw = h
+                    print(f"  日期匹配失败, 期号推断: {expected_qihao}")
+                    break
+
+    # 策略3: 仍失败, 用 history[0] 但警告
+    if draw is None:
+        draw = history[0]
+        print(f"  ⚠️ 警告: 日期和期号匹配均失败, 使用history[0]: {draw['qihao']}")
+
+    # 结算
+    draw_set = set(draw["nums"])
+    hits = 0
+    hit_list = []
+    for rec_nums in pending["recommendations"]:
+        if set(rec_nums) == draw_set:
+            hits += 1
+            hit_list.append(rec_nums)
+
+    pending["draw"] = draw["qihao"]
+    pending["draw_nums"] = draw["nums"]
+    pending["draw_type"] = draw["type"]
+    pending["hits"] = hits
+    pending["prize"] = hits * 160
+    pending["daily_pnl"] = hits * 160 - pending["cost"]
+
+    draw_str = ''.join(map(str, draw["nums"]))
+    if hits > 0:
+        hit_strs = ['[' + ','.join(map(str, h)) + ']' for h in hit_list]
+        pending["reason"] = f"组六{pending['notes']}注->{hits}命中{''.join(hit_strs)} 开奖{draw_str}{draw['type']}, 日盈亏{pending['daily_pnl']}元"
+    else:
+        pending["reason"] = f"组六{pending['notes']}注->0命中 开奖{draw_str}{draw['type']}"
+
+    print(f"  开奖: {draw['qihao']} = {draw_str} ({draw['type']})")
+    print(f"  命中: {hits}注, 奖金: {pending['prize']}元, 当日盈亏: {pending['daily_pnl']}元")
+    if hit_list:
+        print(f"  🎯 命中推荐: {hit_list[0]}")
+
+    return pending, draw, hits, hit_list
+
+
+def calc_summary(pl):
+    """重新计算累计统计"""
+    total_cost = 0
+    total_hits = 0
+    total_prize = 0
+    settled_days = 0
+    active_days = 0
+    total_bets = 0
+
+    for rec in pl["records"]:
+        if rec["hits"] is not None:
+            total_cost += rec["cost"]
+            total_bets += rec["notes"]
+            if rec["notes"] > 0:
+                active_days += 1
+            if rec["hits"] > 0:
+                total_hits += rec["hits"]
+                total_prize += rec["prize"]
+            settled_days += 1
+
+    pending_bets = sum(r["notes"] for r in pl["records"] if r["hits"] is None)
+    pending_cost = sum(r["cost"] for r in pl["records"] if r["hits"] is None)
+    net_pnl = total_prize - total_cost
+
+    pl["summary"] = {
+        "total_days": len(pl["records"]),
+        "settled_days": settled_days,
+        "active_days": active_days,
+        "total_bets": total_bets,
+        "total_cost": total_cost,
+        "total_hits": total_hits,
+        "total_prize": total_prize,
+        "net_pnl": net_pnl,
+        "pending_bets": pending_bets,
+        "pending_cost": pending_cost,
+        "last_settled": TODAY,
+        "last_hit": f"{TODAY} {total_hits}注" if total_hits > 0 else "无"
+    }
+    return pl["summary"]
+
+
+def circuit_breaker_user_rules(history):
+    """
+    用户修订版熔断规则 (v5)
+    优先级: Rule1(组三高频) > Rule4/6/7 > Rule2/3
+    修复 2026-07-04: 组三>=3/20直接熔断, 不能被Rule6覆盖
+    用户只推组六, 不推组三
+    """
+    types_all = [r["type"] for r in history]
+    sums_3 = [r["sum_val"] for r in history[:3]]
+
+    # 当前连续同形态
+    streak_type = types_all[0]
+    streak_len = 1
+    for t in types_all[1:]:
+        if t == streak_type:
+            streak_len += 1
+        else:
+            break
+
+    # 组六连出长度
+    zl_streak = 0
+    for r in history:
+        if r["type"] == "组六":
+            zl_streak += 1
+        else:
+            break
+
+    # 组三在近20期内的次数
+    recent_20_types = types_all[:20]
+    gs_count_20 = recent_20_types.count("组三")
+
+    # 最近2期是否都是组三
+    last2_both_gs = (len(types_all) >= 2 and types_all[0] == "组三" and types_all[1] == "组三")
+
+    rules_fired = []
+    stop = False
+
+    # === Rule1: 组三高频熔断 (最高优先级, 不能被覆盖) ===
+    # 修复 2026-07-04: 组三>=3/20直接熔断, 不受Rule4/6/7影响
+    # 历史bug: 2026-07-03组三8/20, 但Rule6(组三2连)覆盖了Rule1, 导致白亏20元
+    if gs_count_20 >= 3:
+        rules_fired.append(f"Rule1: 近20期组三{gs_count_20}次>=3 -> 高频熔断 (不可覆盖)")
+        stop = True
+
+    # === 覆盖规则 (仅在组三低频时生效) ===
+    elif gs_count_20 < 3:
+        # Rule 4: 连续3期同形态 -> 不熔断, 强力推荐
+        if streak_len >= 3:
+            rules_fired.append(f"Rule4: 连续{streak_len}期{streak_type} -> 强推不熔断")
+
+        # Rule 6: 组三2连 -> 不熔断, 推组六 (仅组三低频时有用)
+        if streak_type == "组三" and streak_len >= 2:
+            rules_fired.append(f"Rule6: 组三{streak_len}连 -> 推组六不熔断")
+
+        # Rule 7: 组六11连+ -> 警戒但不熔断
+        if zl_streak >= 11:
+            rules_fired.append(f"Rule7: 组六{zl_streak}连 -> 警戒但不熔断")
+
+        # === 次级熔断规则 (仅当无覆盖规则时生效) ===
+        if not any("Rule4" in r or "Rule6" in r or "Rule7" in r for r in rules_fired):
+            # Rule 2: 近3期和值极端
+            if all(s <= 5 for s in sums_3):
+                rules_fired.append(f"Rule2: 近3期和值极端小({sums_3}) -> 熔断")
+                stop = True
+            elif all(s >= 22 for s in sums_3):
+                rules_fired.append(f"Rule2: 近3期和值极端大({sums_3}) -> 熔断")
+                stop = True
+
+            # Rule 3: 连续2期同形态 -> 观望
+            if streak_len >= 2:
+                rules_fired.append(f"Rule3: 连续{streak_len}期{streak_type} -> 观望熔断")
+                stop = True
+
+    return {
+        "stop": stop,
+        "rules_fired": rules_fired,
+        "streak_type": streak_type,
+        "streak_len": streak_len,
+        "zl_streak": zl_streak,
+        "gs_count_20": gs_count_20,
+        "last2_both_gs": last2_both_gs,
+        "sums_3": sums_3,
+        "push_type": "组六",
+        "push_count": 0 if stop else 10,
+    }
+
+
+def generate_report(history, pl, cb, recs, settlement, today_draw_qihao):
+    """生成 markdown 报告"""
+    os.makedirs(REPORT_DIR, exist_ok=True)
+
+    latest = history[0]
+    prev = history[1] if len(history) > 1 else None
+    prev2 = history[2] if len(history) > 2 else None
+
+    # 盈亏表格
+    pnl_rows = []
+    cumulative = 0
+    for rec in pl["records"]:
+        if rec["hits"] is not None:
+            cumulative += rec["daily_pnl"] if rec["daily_pnl"] is not None else 0
+            hit_str = f"{rec['hits']}注" if rec["hits"] > 0 else "0"
+            prize_str = f"{rec['prize']}元" if rec["prize"] > 0 else "0"
+            pnl_str = f"{rec['daily_pnl']:+d}元" if rec["daily_pnl"] else "—"
+            date_short = rec["date"][5:]
+            pnl_rows.append(f"| {date_short} | {rec['notes']} | {rec['cost']}元 | {hit_str} | {prize_str} | {pnl_str} | {cumulative:+d}元 |")
+    for rec in pl["records"]:
+        if rec["hits"] is None:
+            date_short = rec["date"][5:]
+            pnl_rows.append(f"| {date_short} | {rec['notes']} | {rec['cost']}元 | 待开奖 | — | — | 待结算 |")
+    pnl_table = "\n".join(pnl_rows)
+
+    # 遗漏表
+    miss = missing_analysis(history)
+    missing_rows = []
+    for n in range(10):
+        m = miss["missing_periods"][n]
+        bar = "█" * min(m, 10) if m > 0 else "刚出"
+        missing_rows.append(f"| {n} | {m}期 | {bar} |")
+    missing_table = "\n".join(missing_rows)
+
+    # 频率表
+    freq = frequency_analysis(history)
+    freq_rows = []
+    for n, c in freq["total_freq"]:
+        bar = "█" * min(c, 15)
+        freq_rows.append(f"| {n} | {c}次 | {bar} |")
+    freq_table = "\n".join(freq_rows)
+
+    # 推荐表
+    rec_rows = []
+    for i, r in enumerate(recs):
+        rec_rows.append(f"| {i+1} | {' '.join(map(str, r['nums']))} | {r['sum_val']} | {r['span']} | {r['logic']} |")
+    rec_table = "\n".join(rec_rows) if rec_rows else "| - | 熔断未推 | - | - | - |"
+
+    # 形态走势 (近15期)
+    trend_rows = []
+    for r in history[:15]:
+        tag = "组六" if r["type"] == "组六" else "🔵组三" if r["type"] == "组三" else "🔴豹子"
+        trend_rows.append(f"| {r['qihao']} | {r.get('date', '?')} | {' '.join(map(str, r['nums']))} | {r['sum_val']} | {r['span']} | {tag} |")
+    trend_table = "\n".join(trend_rows)
+
+    # 熔断详情
+    cb_detail = ""
+    for rf in cb["rules_fired"]:
+        cb_detail += f"- {rf}\n"
+    if not cb["rules_fired"]:
+        cb_detail = "- 无规则触发, 正常推荐\n"
+    cb_status = "🛑 熔断(暂停)" if cb["stop"] else "✅ 正常推10注组六"
+
+    # 结算信息
+    settle_section = ""
+    if settlement:
+        rec_data, draw, hits, hit_list = settlement
+        settle_section = f"""
+### {rec_data['date']} 结算
+
+| 项目 | 数值 |
+|------|------|
+| 开奖 | {draw['qihao']} → **{' '.join(map(str, draw['nums']))}** {draw['type']} |
+| 推荐 | {rec_data['notes']}注组六 |
+| 命中 | **{hits}注** {"🎯" if hits > 0 else ""} |
+| 成本 | {rec_data['cost']}元 |
+| 奖金 | {rec_data['prize']}元 |
+| 日盈亏 | **{rec_data['daily_pnl']:+d}元** |
+"""
+        if hit_list:
+            settle_section += f"\n> 🎯 命中推荐: {hit_list[0]}\n"
+
+    s = pl["summary"]
+    next_qihao = str(int(latest["qihao"]) + 1)
+
+    report = f"""# 福彩3D 每日复盘报告
+**日期: {TODAY}** | 期号: {latest['qihao']} 已开 → {next_qihao} 待开
+
+---
+
+## 一、昨日复盘 (最近3期)
+
+| 期号 | 日期 | 号码 | 和值 | 跨度 | 形态 |
+|------|------|------|------|------|------|
+| {latest['qihao']} | {latest.get('date', '?')} | {' '.join(map(str, latest['nums']))} | {latest['sum_val']} | {latest['span']} | {latest['type']} |
+{f"| {prev['qihao']} | {prev.get('date', '?')} | {' '.join(map(str, prev['nums']))} | {prev['sum_val']} | {prev['span']} | {prev['type']} |" if prev else ""}
+{f"| {prev2['qihao']} | {prev2.get('date', '?')} | {' '.join(map(str, prev2['nums']))} | {prev2['sum_val']} | {prev2['span']} | {prev2['type']} |" if prev2 else ""}
+
+---
+
+## 二、盈亏结算
+{settle_section}
+### 累计盈亏表
+
+| 日期 | 推荐数 | 成本 | 命中 | 奖金 | 当日盈亏 | 累计盈亏 |
+|------|--------|------|------|------|----------|----------|
+{pnl_table}
+
+> **累计**: {s['settled_days']}天已结算/{s['active_days']}活跃日/{s['total_bets']}注/{s['total_hits']}命中/净盈亏{s['net_pnl']:+d}元, 待结算{s['pending_bets']}注{s['pending_cost']}元
+
+---
+
+## 三、熔断判定
+
+**判定状态**: {cb_status}
+
+### 规则触发详情
+{cb_detail}
+
+### 当前形态状态
+- 最新: **{cb['streak_type']}{cb['streak_len']}连** (组六{cb['zl_streak']}连)
+- 组三近20期: {cb['gs_count_20']}次
+- 近3期和值: {', '.join(map(str, cb['sums_3']))}
+
+---
+
+## 四、今日推荐 ({len(recs)}注组六)
+
+| # | 号码 | 和值 | 跨度 | 推导逻辑 |
+|---|------|------|------|----------|
+{rec_table}
+
+---
+
+## 五、数据面板
+
+### 热号 Top5 (全位)
+{freq_table}
+
+### 冷号/遗漏
+{missing_table}
+
+### 形态走势 (近15期)
+{trend_table}
+
+---
+
+## 六、风险提示
+
+1. 本报告仅供学习研究，不构成投注建议。彩票有风险，理性购彩。
+2. 数据来源: 东方财富 caipiao.eastmoney.com
+3. 生成时间: {NOW.strftime('%Y-%m-%d %H:%M:%S')}
+"""
+
+    report_path = os.path.join(REPORT_DIR, f"{TODAY}.md")
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write(report)
+
+    print(f"\n✅ 报告已生成: {report_path}")
+    return report_path
+
+
+def main():
+    print(f"=== 福彩3D 每日复盘 {TODAY} ===\n")
+
+    # 1. 抓取最新数据
+    print("[1/7] 抓取最新数据...")
+    history = load_or_fetch()
+    if not history:
+        print("❌ 数据抓取失败, 退出")
+        return
+    latest = history[0]
+    print(f"  最新: {latest['qihao']} | {' '.join(map(str, latest['nums']))} | {latest['type']}")
+    print(f"  范围: {history[-1]['qihao']} ~ {history[0]['qihao']} ({len(history)}期)")
+
+    # 2. 加载P&L
+    print("\n[2/7] 加载盈亏数据...")
+    pl = load_json(PL_FILE)
+    print(f"  追踪区间: {pl['start_date']} ~ {pl['end_date']}")
+    print(f"  当前累计: {pl['summary']['net_pnl']:+d}元")
+
+    # 3. 结算昨日待结算
+    print("\n[3/7] 结算昨日推荐...")
+    settlement = settle_pending(history, pl)
+
+    # 4. 重新计算累计统计
+    print("\n[4/7] 更新累计统计...")
+    summary = calc_summary(pl)
+    print(f"  已结算: {summary['settled_days']}天, 活跃: {summary['active_days']}天")
+    print(f"  总注数: {summary['total_bets']}, 总命中: {summary['total_hits']}")
+    print(f"  净盈亏: {summary['net_pnl']:+d}元, 待结算: {summary['pending_bets']}注")
+
+    # 5. 熔断判定
+    print("\n[5/7] 熔断判定...")
+    cb = circuit_breaker_user_rules(history)
+    print(f"  形态: {cb['streak_type']}{cb['streak_len']}连, 组六{cb['zl_streak']}连")
+    print(f"  组三近20期: {cb['gs_count_20']}次")
+    for rf in cb["rules_fired"]:
+        print(f"  🔴 {rf}")
+    print(f"  {'🛑 熔断, 0注' if cb['stop'] else '✅ 正常推10注组六'}")
+
+    # 6. 生成推荐
+    print("\n[6/7] 生成推荐...")
+    if cb["stop"]:
+        recs = []
+        print("  熔断, 不推荐")
+        reason = f"熔断触发({'; '.join(cb['rules_fired'])})"
+    else:
+        info = {"stop": False, "push_type": "组六", "push_count": 10}
+        recs = generate_recommendations(history, info, count=10)
+        print(f"  生成{len(recs)}注组六:")
+        for i, r in enumerate(recs):
+            print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
+        reason = f"组六{len(recs)}注推荐 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常推荐"])
+
+    # 检查今天是否已有记录
+    today_exists = any(r["date"] == TODAY for r in pl["records"])
+    if today_exists:
+        print(f"\n  今天({TODAY})已有记录, 跳过添加")
+        # 更新现有记录的推荐 (如果熔断状态变化)
+        for r in pl["records"]:
+            if r["date"] == TODAY and r["hits"] is None:
+                r["recommendations"] = [rec["nums"] for rec in recs]
+                r["notes"] = len(recs)
+                r["cost"] = len(recs) * 2
+                r["reason"] = reason
+                break
+    else:
+        # 添加今日记录
+        today_rec = {
+            "date": TODAY,
+            "draw": "待开奖",
+            "draw_nums": [],
+            "draw_type": "",
+            "recommendations": [r["nums"] for r in recs],
+            "notes": len(recs),
+            "cost": len(recs) * 2,
+            "hits": None,
+            "prize": None,
+            "daily_pnl": None,
+            "reason": reason
+        }
+        pl["records"].append(today_rec)
+
+    # 再次更新summary (包含今日pending)
+    summary = calc_summary(pl)
+
+    # 保存P&L
+    save_json(PL_FILE, pl)
+    print(f"\n  ✅ profit_loss.json 已更新")
+
+    # 7. 生成报告
+    print("\n[7/7] 生成报告...")
+    report_path = generate_report(history, pl, cb, recs, settlement, latest["qihao"])
+
+    # 摘要
+    print(f"\n{'='*50}")
+    print(f"  每日复盘完成 {TODAY}")
+    print(f"{'='*50}")
+    if settlement:
+        print(f"  昨日结算: {settlement[2]}注命中, {settlement[0]['daily_pnl']:+d}元")
+    print(f"  累计盈亏: {summary['net_pnl']:+d}元 ({summary['total_hits']}注命中)")
+    print(f"  今日推荐: {len(recs)}注组六, 成本{len(recs)*2}元")
+    print(f"  报告: {report_path}")
+    print(f"  追踪期: {pl['start_date']} ~ {pl['end_date']}")
+
+
+if __name__ == "__main__":
+    main()
