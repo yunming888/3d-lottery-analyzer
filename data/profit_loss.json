@@ -1123,7 +1123,7 @@
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "熔断触发(Rule1: 近20期组三7次>=3 -> 高频熔断 (不可覆盖))"
+      "reason": "熔断触发(Rule1: 近30期组三11次>=10 -> 高频熔断 (不可覆盖))"
     }
   ],
   "summary": {

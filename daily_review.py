@@ -166,9 +166,9 @@ def calc_summary(pl):
 
 def circuit_breaker_user_rules(history):
     """
-    用户修订版熔断规则 (v5)
+    用户修订版熔断规则 (v6)
     优先级: Rule1(组三高频) > Rule4/6/7 > Rule2/3
-    修复 2026-07-04: 组三>=3/20直接熔断, 不能被Rule6覆盖
+    修复 2026-07-06: 组三>=10/30才熔断 (原>=3/20太敏感, 期望值5.4/20几乎天天触发)
     用户只推组六, 不推组三
     """
     types_all = [r["type"] for r in history]
@@ -191,9 +191,9 @@ def circuit_breaker_user_rules(history):
         else:
             break
 
-    # 组三在近20期内的次数
-    recent_20_types = types_all[:20]
-    gs_count_20 = recent_20_types.count("组三")
+    # 组三在近30期内的次数
+    recent_30_types = types_all[:30]
+    gs_count_30 = recent_30_types.count("组三")
 
     # 最近2期是否都是组三
     last2_both_gs = (len(types_all) >= 2 and types_all[0] == "组三" and types_all[1] == "组三")
@@ -202,14 +202,14 @@ def circuit_breaker_user_rules(history):
     stop = False
 
     # === Rule1: 组三高频熔断 (最高优先级, 不能被覆盖) ===
-    # 修复 2026-07-04: 组三>=3/20直接熔断, 不受Rule4/6/7影响
-    # 历史bug: 2026-07-03组三8/20, 但Rule6(组三2连)覆盖了Rule1, 导致白亏20元
-    if gs_count_20 >= 3:
-        rules_fired.append(f"Rule1: 近20期组三{gs_count_20}次>=3 -> 高频熔断 (不可覆盖)")
+    # 修复 2026-07-06: 改为近30期组三>=10才熔断 (原>=3/20太敏感)
+    # 理论组三概率27%, 30期期望约8次, >=10次(33%+)才算真正高频
+    if gs_count_30 >= 10:
+        rules_fired.append(f"Rule1: 近30期组三{gs_count_30}次>=10 -> 高频熔断 (不可覆盖)")
         stop = True
 
     # === 覆盖规则 (仅在组三低频时生效) ===
-    elif gs_count_20 < 3:
+    elif gs_count_30 < 10:
         # Rule 4: 连续3期同形态 -> 不熔断, 强力推荐
         if streak_len >= 3:
             rules_fired.append(f"Rule4: 连续{streak_len}期{streak_type} -> 强推不熔断")
@@ -243,7 +243,7 @@ def circuit_breaker_user_rules(history):
         "streak_type": streak_type,
         "streak_len": streak_len,
         "zl_streak": zl_streak,
-        "gs_count_20": gs_count_20,
+        "gs_count_30": gs_count_30,
         "last2_both_gs": last2_both_gs,
         "sums_3": sums_3,
         "push_type": "组六",
@@ -372,7 +372,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao):
 
 ### 当前形态状态
 - 最新: **{cb['streak_type']}{cb['streak_len']}连** (组六{cb['zl_streak']}连)
-- 组三近20期: {cb['gs_count_20']}次
+- 组三近30期: {cb['gs_count_30']}次
 - 近3期和值: {', '.join(map(str, cb['sums_3']))}
 
 ---
@@ -447,7 +447,7 @@ def main():
     print("\n[5/7] 熔断判定...")
     cb = circuit_breaker_user_rules(history)
     print(f"  形态: {cb['streak_type']}{cb['streak_len']}连, 组六{cb['zl_streak']}连")
-    print(f"  组三近20期: {cb['gs_count_20']}次")
+    print(f"  组三近30期: {cb['gs_count_30']}次")
     for rf in cb["rules_fired"]:
         print(f"  🔴 {rf}")
     print(f"  {'🛑 熔断, 0注' if cb['stop'] else '✅ 正常推10注组六'}")
