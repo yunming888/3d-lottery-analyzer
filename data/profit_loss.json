@@ -1114,30 +1114,149 @@
     },
     {
       "date": "2026-07-06",
+      "draw": "2026177",
+      "draw_nums": [
+        8,
+        0,
+        8
+      ],
+      "draw_type": "组三",
+      "recommendations": [
+        [
+          0,
+          3,
+          5
+        ],
+        [
+          4,
+          7,
+          8
+        ],
+        [
+          0,
+          2,
+          7
+        ],
+        [
+          3,
+          6,
+          8
+        ],
+        [
+          0,
+          4,
+          9
+        ],
+        [
+          0,
+          3,
+          9
+        ],
+        [
+          1,
+          3,
+          7
+        ],
+        [
+          2,
+          4,
+          5
+        ],
+        [
+          3,
+          6,
+          9
+        ],
+        [
+          0,
+          3,
+          7
+        ]
+      ],
+      "notes": 10,
+      "cost": 20,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -20,
+      "reason": "组六10注->0命中 开奖808组三"
+    },
+    {
+      "date": "2026-07-07",
       "draw": "待开奖",
       "draw_nums": [],
       "draw_type": "",
-      "recommendations": [],
-      "notes": 0,
-      "cost": 0,
+      "recommendations": [
+        [
+          3,
+          5,
+          7
+        ],
+        [
+          1,
+          2,
+          4
+        ],
+        [
+          2,
+          3,
+          8
+        ],
+        [
+          5,
+          6,
+          7
+        ],
+        [
+          1,
+          3,
+          9
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          2,
+          3,
+          5
+        ],
+        [
+          2,
+          4,
+          5
+        ],
+        [
+          3,
+          6,
+          9
+        ],
+        [
+          1,
+          3,
+          8
+        ]
+      ],
+      "notes": 10,
+      "cost": 20,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "熔断触发(Rule1: 近30期组三11次>=10 -> 高频熔断 (不可覆盖))"
+      "reason": "组六10注推荐 | Rule1(已禁用): 近30期组三12次>=10, 仅记录不熔断"
     }
   ],
   "summary": {
-    "total_days": 25,
-    "settled_days": 24,
-    "active_days": 14,
-    "total_bets": 137,
-    "total_cost": 274,
+    "total_days": 26,
+    "settled_days": 25,
+    "active_days": 15,
+    "total_bets": 147,
+    "total_cost": 294,
     "total_hits": 2,
     "total_prize": 320,
-    "net_pnl": 46,
-    "pending_bets": 0,
-    "pending_cost": 0,
-    "last_settled": "2026-07-06",
-    "last_hit": "2026-07-06 2注"
+    "net_pnl": 26,
+    "pending_bets": 10,
+    "pending_cost": 20,
+    "last_settled": "2026-07-07",
+    "last_hit": "2026-07-07 2注"
   }
 }

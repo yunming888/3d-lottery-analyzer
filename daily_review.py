@@ -166,9 +166,9 @@ def calc_summary(pl):
 
 def circuit_breaker_user_rules(history):
     """
-    用户修订版熔断规则 (v6)
-    优先级: Rule1(组三高频) > Rule4/6/7 > Rule2/3
-    修复 2026-07-06: 组三>=10/30才熔断 (原>=3/20太敏感, 期望值5.4/20几乎天天触发)
+    用户修订版熔断规则 (v7)
+    Rule1已禁用, 靠Rule2(和值极端)/Rule3(连续同形态)管
+    覆盖规则: Rule4/6/7 不熔断
     用户只推组六, 不推组三
     """
     types_all = [r["type"] for r in history]
@@ -201,41 +201,39 @@ def circuit_breaker_user_rules(history):
     rules_fired = []
     stop = False
 
-    # === Rule1: 组三高频熔断 (最高优先级, 不能被覆盖) ===
-    # 修复 2026-07-06: 改为近30期组三>=10才熔断 (原>=3/20太敏感)
-    # 理论组三概率27%, 30期期望约8次, >=10次(33%+)才算真正高频
+    # === Rule1: 组三高频熔断 — 已禁用 (2026-07-06) ===
+    # 原逻辑: 近30期组三>=10次则熔断, 但组三频率波动大, 用户决定靠Rule2/3管
+    # 仅记录组三频率供参考, 不触发熔断
     if gs_count_30 >= 10:
-        rules_fired.append(f"Rule1: 近30期组三{gs_count_30}次>=10 -> 高频熔断 (不可覆盖)")
-        stop = True
+        rules_fired.append(f"Rule1(已禁用): 近30期组三{gs_count_30}次>=10, 仅记录不熔断")
 
-    # === 覆盖规则 (仅在组三低频时生效) ===
-    elif gs_count_30 < 10:
-        # Rule 4: 连续3期同形态 -> 不熔断, 强力推荐
-        if streak_len >= 3:
-            rules_fired.append(f"Rule4: 连续{streak_len}期{streak_type} -> 强推不熔断")
+    # === 覆盖规则 (始终生效) ===
+    # Rule 4: 连续3期同形态 -> 不熔断, 强力推荐
+    if streak_len >= 3:
+        rules_fired.append(f"Rule4: 连续{streak_len}期{streak_type} -> 强推不熔断")
 
-        # Rule 6: 组三2连 -> 不熔断, 推组六 (仅组三低频时有用)
-        if streak_type == "组三" and streak_len >= 2:
-            rules_fired.append(f"Rule6: 组三{streak_len}连 -> 推组六不熔断")
+    # Rule 6: 组三2连 -> 不熔断, 推组六
+    if streak_type == "组三" and streak_len >= 2:
+        rules_fired.append(f"Rule6: 组三{streak_len}连 -> 推组六不熔断")
 
-        # Rule 7: 组六11连+ -> 警戒但不熔断
-        if zl_streak >= 11:
-            rules_fired.append(f"Rule7: 组六{zl_streak}连 -> 警戒但不熔断")
+    # Rule 7: 组六11连+ -> 警戒但不熔断
+    if zl_streak >= 11:
+        rules_fired.append(f"Rule7: 组六{zl_streak}连 -> 警戒但不熔断")
 
-        # === 次级熔断规则 (仅当无覆盖规则时生效) ===
-        if not any("Rule4" in r or "Rule6" in r or "Rule7" in r for r in rules_fired):
-            # Rule 2: 近3期和值极端
-            if all(s <= 5 for s in sums_3):
-                rules_fired.append(f"Rule2: 近3期和值极端小({sums_3}) -> 熔断")
-                stop = True
-            elif all(s >= 22 for s in sums_3):
-                rules_fired.append(f"Rule2: 近3期和值极端大({sums_3}) -> 熔断")
-                stop = True
+    # === 次级熔断规则 (仅当无覆盖规则时生效) ===
+    if not any("Rule4" in r or "Rule6" in r or "Rule7" in r for r in rules_fired):
+        # Rule 2: 近3期和值极端
+        if all(s <= 5 for s in sums_3):
+            rules_fired.append(f"Rule2: 近3期和值极端小({sums_3}) -> 熔断")
+            stop = True
+        elif all(s >= 22 for s in sums_3):
+            rules_fired.append(f"Rule2: 近3期和值极端大({sums_3}) -> 熔断")
+            stop = True
 
-            # Rule 3: 连续2期同形态 -> 观望
-            if streak_len >= 2:
-                rules_fired.append(f"Rule3: 连续{streak_len}期{streak_type} -> 观望熔断")
-                stop = True
+        # Rule 3: 连续2期同形态 -> 观望
+        if streak_len >= 2:
+            rules_fired.append(f"Rule3: 连续{streak_len}期{streak_type} -> 观望熔断")
+            stop = True
 
     return {
         "stop": stop,
