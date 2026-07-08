@@ -1250,9 +1250,13 @@
     },
     {
       "date": "2026-07-08",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026179",
+      "draw_nums": [
+        9,
+        9,
+        3
+      ],
+      "draw_type": "组三",
       "recommendations": [
         [
           3,
@@ -1307,24 +1311,88 @@
       ],
       "notes": 10,
       "cost": 20,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -20,
+      "reason": "组六10注->0命中 开奖993组三"
+    },
+    {
+      "date": "2026-07-09",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          4,
+          5,
+          7
+        ],
+        [
+          0,
+          1,
+          8
+        ],
+        [
+          2,
+          5,
+          6
+        ],
+        [
+          0,
+          5,
+          8
+        ],
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          2,
+          5,
+          9
+        ],
+        [
+          1,
+          6,
+          7
+        ],
+        [
+          4,
+          5,
+          9
+        ],
+        [
+          2,
+          3,
+          5
+        ],
+        [
+          2,
+          4,
+          5
+        ]
+      ],
+      "notes": 10,
+      "cost": 20,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "组六10注推荐 | Rule1(已禁用): 近30期组三13次>=10, 仅记录不熔断; Rule6: 组三2连 -> 推组六不熔断"
+      "reason": "组六10注推荐 | Rule1(已禁用): 近30期组三13次>=10, 仅记录不熔断; Rule4: 连续3期组三 -> 强推不熔断; Rule6: 组三3连 -> 推组六不熔断"
     }
   ],
   "summary": {
-    "total_days": 27,
-    "settled_days": 26,
-    "active_days": 16,
-    "total_bets": 157,
-    "total_cost": 314,
+    "total_days": 28,
+    "settled_days": 27,
+    "active_days": 17,
+    "total_bets": 167,
+    "total_cost": 334,
     "total_hits": 2,
     "total_prize": 320,
-    "net_pnl": 6,
+    "net_pnl": -14,
     "pending_bets": 10,
     "pending_cost": 20,
-    "last_settled": "2026-07-08",
-    "last_hit": "2026-07-08 2注"
+    "last_settled": "2026-07-09",
+    "last_hit": "2026-07-09 2注"
   }
 }
