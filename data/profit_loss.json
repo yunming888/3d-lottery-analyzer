@@ -1726,9 +1726,13 @@
     },
     {
       "date": "2026-07-15",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026186",
+      "draw_nums": [
+        0,
+        4,
+        5
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           1,
@@ -1783,24 +1787,88 @@
       ],
       "notes": 10,
       "cost": 20,
+      "hits": 1,
+      "prize": 160,
+      "daily_pnl": 140,
+      "reason": "组六10注→1命中[[0, 4, 5]] 开奖045组六, 日盈亏+140元"
+    },
+    {
+      "date": "2026-07-16",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          1,
+          6,
+          8
+        ],
+        [
+          1,
+          2,
+          8
+        ],
+        [
+          1,
+          6,
+          7
+        ],
+        [
+          1,
+          3,
+          8
+        ],
+        [
+          2,
+          6,
+          8
+        ],
+        [
+          1,
+          6,
+          9
+        ],
+        [
+          1,
+          8,
+          9
+        ],
+        [
+          1,
+          2,
+          6
+        ],
+        [
+          3,
+          6,
+          8
+        ],
+        [
+          1,
+          7,
+          8
+        ]
+      ],
+      "notes": 10,
+      "cost": 20,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "Rule4优先(组六3连=强推), 10注组六, 锚点4(缺10期)"
+      "reason": "Rule4优先(组六4连=强推), 10注组六, 锚点1(缺5期)+8(缺5期)+6(缺4期)"
     }
   ],
   "summary": {
-    "total_days": 34,
-    "settled_days": 33,
-    "active_days": 24,
-    "total_bets": 227,
-    "total_cost": 454,
-    "total_hits": 2,
-    "total_prize": 320,
-    "net_pnl": -134,
+    "total_days": 35,
+    "settled_days": 34,
+    "active_days": 25,
+    "total_bets": 237,
+    "total_cost": 474,
+    "total_hits": 3,
+    "total_prize": 480,
+    "net_pnl": 6,
     "pending_bets": 10,
     "pending_cost": 20,
-    "last_settled": "2026-07-14",
-    "last_hit": "6/26 [1,3,6]→631 | 6/29 [0,5,8]→805"
+    "last_settled": "2026-07-15",
+    "last_hit": "6/26 [1,3,6]→631 | 6/29 [0,5,8]→805 | 7/15 [0,4,5]→045"
   }
 }
