@@ -1794,9 +1794,13 @@
     },
     {
       "date": "2026-07-16",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026187",
+      "draw_nums": [
+        0,
+        2,
+        3
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           1,
@@ -1851,24 +1855,87 @@
       ],
       "notes": 10,
       "cost": 20,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -20,
+      "reason": "组六10注->0命中 开奖023组六, 日盈亏-20元"
+    },
+    {
+      "date": "2026-07-17",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          1,
+          4,
+          8
+        ],
+        [
+          1,
+          5,
+          8
+        ],
+        [
+          0,
+          1,
+          8
+        ],
+        [
+          0,
+          6,
+          8
+        ],
+        [
+          2,
+          5,
+          8
+        ],
+        [
+          3,
+          6,
+          7
+        ],
+        [
+          4,
+          6,
+          8
+        ],
+        [
+          0,
+          5,
+          6
+        ],
+        [
+          1,
+          4,
+          5
+        ],
+        [
+          5,
+          7,
+          8
+        ]
+      ],
+      "notes": 10,
+      "cost": 20,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "Rule4优先(组六4连=强推), 10注组六, 锚点1(缺5期)+8(缺5期)+6(缺4期)"
+      "reason": "Rule4优先(组六5连=强推), 10注组六, 核心锚点1(缺6)+8(缺6)+6(缺5)"
     }
   ],
   "summary": {
-    "total_days": 35,
-    "settled_days": 34,
+    "total_days": 36,
+    "settled_days": 35,
     "active_days": 25,
-    "total_bets": 237,
-    "total_cost": 474,
-    "total_hits": 3,
+    "total_bets": 247,
+    "total_cost": 494,
     "total_prize": 480,
-    "net_pnl": 6,
-    "pending_bets": 10,
+    "net_pnl": -14,
+    "pending_notes": 10,
     "pending_cost": 20,
-    "last_settled": "2026-07-15",
+    "last_settled": "2026-07-16",
     "last_hit": "6/26 [1,3,6]→631 | 6/29 [0,5,8]→805 | 7/15 [0,4,5]→045"
   }
 }
