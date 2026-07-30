@@ -105,15 +105,18 @@ def settle_pending(history, pl):
     pending["draw_nums"] = draw["nums"]
     pending["draw_type"] = draw["type"]
     pending["hits"] = hits
-    pending["prize"] = hits * 160
-    pending["daily_pnl"] = hits * 160 - pending["cost"]
+    # 动态奖金: 组三320 / 组六160 / 豹子1040
+    per = 320 if draw["type"] == "组三" else 160 if draw["type"] == "组六" else 1040
+    pending["prize"] = hits * per
+    pending["daily_pnl"] = hits * per - pending["cost"]
 
     draw_str = ''.join(map(str, draw["nums"]))
+    ptype = draw["type"]
     if hits > 0:
         hit_strs = ['[' + ','.join(map(str, h)) + ']' for h in hit_list]
-        pending["reason"] = f"组六{pending['notes']}注->{hits}命中{''.join(hit_strs)} 开奖{draw_str}{draw['type']}, 日盈亏{pending['daily_pnl']}元"
+        pending["reason"] = f"{ptype}{pending['notes']}注->{hits}命中{''.join(hit_strs)} 开奖{draw_str}{draw['type']}, 日盈亏{pending['daily_pnl']}元"
     else:
-        pending["reason"] = f"组六{pending['notes']}注->0命中 开奖{draw_str}{draw['type']}"
+        pending["reason"] = f"{ptype}{pending['notes']}注->0命中 开奖{draw_str}{draw['type']}"
 
     print(f"  开奖: {draw['qihao']} = {draw_str} ({draw['type']})")
     print(f"  命中: {hits}注, 奖金: {pending['prize']}元, 当日盈亏: {pending['daily_pnl']}元")
@@ -166,10 +169,12 @@ def calc_summary(pl):
 
 def circuit_breaker_user_rules(history):
     """
-    用户修订版熔断规则 (v7)
-    Rule1已禁用, 靠Rule2(和值极端)/Rule3(连续同形态)管
-    覆盖规则: Rule4/6/7 不熔断
-    用户只推组六, 不推组三
+    形态自适应熔断规则 (v8)
+    Rule4/6/7 覆盖 Rule1/2/3
+    核心改动: 不再死守组六, 按近期形态分布动态切换
+      - 组三密集期 -> 主推组三(奖金320, 正EV)
+      - 组六期 -> 轻仓组六(降负EV损耗)
+    Rule3(连续同形态) 由硬熔断改为"观望降仓"(不空仓错失机会)
     """
     types_all = [r["type"] for r in history]
     sums_3 = [r["sum_val"] for r in history[:3]]
@@ -191,6 +196,14 @@ def circuit_breaker_user_rules(history):
         else:
             break
 
+    # 组三连出长度
+    gs_streak = 0
+    for r in history:
+        if r["type"] == "组三":
+            gs_streak += 1
+        else:
+            break
+
     # 组三在近30期内的次数
     recent_30_types = types_all[:30]
     gs_count_30 = recent_30_types.count("组三")
@@ -200,9 +213,9 @@ def circuit_breaker_user_rules(history):
 
     rules_fired = []
     stop = False
+    reduce = False  # 观望降仓标记
 
     # === Rule1: 组三高频熔断 — 已禁用 (2026-07-06) ===
-    # 原逻辑: 近30期组三>=10次则熔断, 但组三频率波动大, 用户决定靠Rule2/3管
     # 仅记录组三频率供参考, 不触发熔断
     if gs_count_30 >= 10:
         rules_fired.append(f"Rule1(已禁用): 近30期组三{gs_count_30}次>=10, 仅记录不熔断")
@@ -222,7 +235,7 @@ def circuit_breaker_user_rules(history):
 
     # === 次级熔断规则 (仅当无覆盖规则时生效) ===
     if not any("Rule4" in r or "Rule6" in r or "Rule7" in r for r in rules_fired):
-        # Rule 2: 近3期和值极端
+        # Rule 2: 近3期和值极端 -> 强信号, 熔断不参与
         if all(s <= 5 for s in sums_3):
             rules_fired.append(f"Rule2: 近3期和值极端小({sums_3}) -> 熔断")
             stop = True
@@ -230,10 +243,40 @@ def circuit_breaker_user_rules(history):
             rules_fired.append(f"Rule2: 近3期和值极端大({sums_3}) -> 熔断")
             stop = True
 
-        # Rule 3: 连续2期同形态 -> 观望
+        # Rule 3: 连续2期同形态 -> 观望降仓(不硬停, 避免错失机会)
         if streak_len >= 2:
-            rules_fired.append(f"Rule3: 连续{streak_len}期{streak_type} -> 观望熔断")
-            stop = True
+            rules_fired.append(f"Rule3: 连续{streak_len}期{streak_type} -> 观望降仓")
+            reduce = True
+
+    # === 形态自适应决策 (v8 核心) ===
+    gs10 = types_all[:10].count("组三")
+    gs20 = types_all[:20].count("组三")
+
+    if stop:
+        # 和值极端熔断, 不参与
+        push_type = "组六"
+        push_count = 0
+    else:
+        if gs10 >= 4:
+            # 近10期组三>=4(>=40%, 明显高于理论27%) -> 主推组三(奖金320)
+            push_type = "组三"
+            push_count = 10
+            rules_fired.append(f"形态自适应: 组三密集(近10期{gs10}/近20期{gs20}) -> 主推组三(奖金320)")
+        elif zl_streak >= 4:
+            # 组六强连 -> 轻仓组六降损耗
+            push_type = "组六"
+            push_count = 5
+            rules_fired.append(f"形态自适应: 组六{zl_streak}连 -> 轻仓组六5注降损耗")
+        else:
+            # 常态 -> 组六轻仓(避免无脑满仓负EV)
+            push_type = "组六"
+            push_count = 5
+            rules_fired.append(f"形态自适应: 常态 -> 组六5注降损耗(负EV控成本)")
+
+        # 观望降仓: 实推注数减半(保底3注)
+        if reduce:
+            push_count = max(3, push_count // 2)
+            rules_fired.append(f"形态自适应: 触发降仓, 实推{push_count}注")
 
     return {
         "stop": stop,
@@ -244,8 +287,8 @@ def circuit_breaker_user_rules(history):
         "gs_count_30": gs_count_30,
         "last2_both_gs": last2_both_gs,
         "sums_3": sums_3,
-        "push_type": "组六",
-        "push_count": 0 if stop else 10,
+        "push_type": push_type,
+        "push_count": push_count,
     }
 
 
@@ -310,7 +353,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao):
         cb_detail += f"- {rf}\n"
     if not cb["rules_fired"]:
         cb_detail = "- 无规则触发, 正常推荐\n"
-    cb_status = "🛑 熔断(暂停)" if cb["stop"] else "✅ 正常推10注组六"
+    cb_status = "🛑 熔断(暂停)" if cb["stop"] else f"✅ 推{cb['push_count']}注{cb['push_type']}"
 
     # 结算信息
     settle_section = ""
@@ -375,7 +418,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao):
 
 ---
 
-## 四、今日推荐 ({len(recs)}注组六)
+## 四、今日推荐 ({len(recs)}注{cb['push_type']})
 
 | # | 号码 | 和值 | 跨度 | 推导逻辑 |
 |---|------|------|------|----------|
@@ -448,7 +491,8 @@ def main():
     print(f"  组三近30期: {cb['gs_count_30']}次")
     for rf in cb["rules_fired"]:
         print(f"  🔴 {rf}")
-    print(f"  {'🛑 熔断, 0注' if cb['stop'] else '✅ 正常推10注组六'}")
+    status = "🛑 熔断, 0注" if cb["stop"] else f"✅ 推{cb['push_count']}注{cb['push_type']}"
+    print(f"  {status}")
 
     # 6. 生成推荐
     print("\n[6/7] 生成推荐...")
@@ -457,12 +501,12 @@ def main():
         print("  熔断, 不推荐")
         reason = f"熔断触发({'; '.join(cb['rules_fired'])})"
     else:
-        info = {"stop": False, "push_type": "组六", "push_count": 10}
-        recs = generate_recommendations(history, info, count=10)
-        print(f"  生成{len(recs)}注组六:")
+        info = {"stop": False, "push_type": cb["push_type"], "push_count": cb["push_count"]}
+        recs = generate_recommendations(history, info, count=cb["push_count"])
+        print(f"  生成{len(recs)}注{cb['push_type']}:")
         for i, r in enumerate(recs):
             print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
-        reason = f"组六{len(recs)}注推荐 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常推荐"])
+        reason = f"{cb['push_type']}{len(recs)}注推荐 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常推荐"])
 
     # 检查今天是否已有记录
     today_exists = any(r["date"] == TODAY for r in pl["records"])

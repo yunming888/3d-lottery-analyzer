@@ -188,14 +188,15 @@ def circuit_breaker(records, target_type="组六"):
 
 def generate_recommendations(records, info, count=10):
     """
-    生成组六推荐（用于自动化任务）
-    基于: 遗漏回补/热号搭配/和值回归/跨度偏好/位置独立/去重
-    info: circuit_breaker 返回值
-    返回: [{"nums": [a,b,c], "logic": "...", "sum_val": N, "span": N}, ...]
+    形态自适应选号（用于自动化任务）
+    info: {"stop": bool, "push_type": "组六"/"组三", "push_count": int}
+    组三: 组合90种, 单注奖金320 (正EV); 组六: 组合120种, 单注奖金160 (负EV)
+    返回: [{"nums": [...], "logic": "...", "sum_val": N, "span": N}, ...]
     """
-    if info["stop"]:
+    if info.get("stop"):
         return []
 
+    push_type = info.get("push_type", "组六")
     n = len(records)
     if n < 4:
         return []
@@ -207,9 +208,7 @@ def generate_recommendations(records, info, count=10):
             if num not in last_seen:
                 last_seen[num] = idx
 
-    missing = {}
-    for i in range(10):
-        missing[i] = last_seen.get(i, n)
+    missing = {i: last_seen.get(i, n) for i in range(10)}
 
     # 计算频率
     freq = Counter()
@@ -221,23 +220,23 @@ def generate_recommendations(records, info, count=10):
     cold = sorted(range(10), key=lambda x: (-missing[x], -freq[x]))
     hot = sorted(range(10), key=lambda x: (-freq[x], missing[x]))
 
-    # 近10期和值
+    # 近10期和值/跨度
     recent_sums = [r["sum_val"] for r in records[:10]]
-    avg_sum_recent = sum(recent_sums) / len(recent_sums) if recent_sums else 0
+    avg_sum = sum(recent_sums) / len(recent_sums) if recent_sums else 13.5
+    recent_spans = [max(r["nums"]) - min(r["nums"]) for r in records[:10]]
+    avg_span = sum(recent_spans) / len(recent_spans) if recent_spans else 5
 
-    # 近10期跨度
-    recent_spans = []
-    for r in records[:10]:
-        n2 = r["nums"]
-        recent_spans.append(max(n2) - min(n2))
-    avg_span = sum(recent_spans) / len(recent_spans) if recent_spans else 0
-    last_span = recent_spans[0] if recent_spans else 0
+    if push_type == "组三":
+        return _gen_zusan(records, cold, hot, missing, freq, avg_sum, avg_span, count)
+    return _gen_zuliu(records, cold, hot, missing, freq, avg_sum, avg_span, count)
 
+
+def _gen_zuliu(records, cold, hot, missing, freq, avg_sum, avg_span, count):
+    """组六选号（原逻辑，3数字互不相同）"""
     candidates = []
     seen_sets = set()
 
     def add_candidate(nums, logic):
-        # 确保是组六（3个数字各不相同）
         if len(set(nums)) < 3:
             return
         key = tuple(sorted(nums))
@@ -246,12 +245,7 @@ def generate_recommendations(records, info, count=10):
         seen_sets.add(key)
         s = sum(nums)
         sp = max(nums) - min(nums)
-        candidates.append({
-            "nums": sorted(nums),
-            "logic": logic,
-            "sum_val": s,
-            "span": sp
-        })
+        candidates.append({"nums": sorted(nums), "logic": logic, "sum_val": s, "span": sp})
 
     # 策略1: 遗漏回补核心（最冷3号组合）
     _cold = cold[:]
@@ -269,7 +263,7 @@ def generate_recommendations(records, info, count=10):
         _hot = _hot[2:] + _hot[:2]
 
     # 策略3: 和值回归（目标接近理论均值13.5）
-    target_sum = 14 if avg_sum_recent < 10 else 11 if avg_sum_recent > 17 else 13
+    target_sum = 14 if avg_sum < 10 else 11 if avg_sum > 17 else 13
     _cold3 = cold[:]
     for _ in range(2):
         a = _cold3[0]
@@ -284,7 +278,7 @@ def generate_recommendations(records, info, count=10):
         target_sum = target_sum + 1 if target_sum < 13 else target_sum - 1
 
     # 策略4: 跨度修正
-    target_span = max(2, min(8, int(avg_span))) if last_span >= 8 else min(8, max(3, int(avg_span + 3)))
+    target_span = max(2, min(8, int(avg_span))) if avg_span >= 8 else min(8, max(3, int(avg_span + 3)))
     _cold4 = cold[:]
     _hot4 = hot[:]
     for _ in range(2):
@@ -315,8 +309,7 @@ def generate_recommendations(records, info, count=10):
             add_candidate([a, b, c], f"位置独立: 百{a}(热)+十{b}(热)+个{c}(热)")
         bai_top = bai_top[1:] + bai_top[:1]
 
-    # 策略6: 补位填充 — 不足10注时用遗漏号+热号随机组合补满
-    # 优先级: 含过冷号 > 和值靠近均值 > 跨度适中
+    # 策略6: 补位填充
     fill_candidates = []
     for a in cold[:6]:
         for b in hot[:6]:
@@ -329,7 +322,6 @@ def generate_recommendations(records, info, count=10):
                 if key not in seen_sets:
                     s = sum(key)
                     sp = max(key) - min(key)
-                    # 偏好: 和值10-16(近均值), 跨度3-7
                     score = (1 if 10 <= s <= 16 else 0) + (1 if 3 <= sp <= 7 else 0) + (2 if a in cold[:3] else 0)
                     fill_candidates.append((score, sorted([a, b, c]), key, s, sp))
     fill_candidates.sort(key=lambda x: -x[0])
@@ -339,9 +331,64 @@ def generate_recommendations(records, info, count=10):
             candidates.append({
                 "nums": nums,
                 "logic": f"补位: {nums[0]}(缺{missing[nums[0]]})+{nums[1]}(热)+{nums[2]}, 和{s}跨{sp}",
-                "sum_val": s,
-                "span": sp
+                "sum_val": s, "span": sp
             })
+            if len(candidates) >= count:
+                break
+
+    return candidates[:count]
+
+
+def _gen_zusan(records, cold, hot, missing, freq, avg_sum, avg_span, count):
+    """
+    组三选号（正EV玩法）：一个重复号 d + 一个单号 s, 号码 [d,d,s], 共90种
+    重复号优先冷号(回补)与热号(延续); 单号优先热号; 约束和值8-20, 跨度1-7
+    """
+    candidates = []
+    seen = set()
+
+    def add(d, s, logic):
+        if d == s:
+            return
+        nums = sorted([d, d, s])
+        key = tuple(nums)
+        if key in seen:
+            return
+        seen.add(key)
+        candidates.append({"nums": nums, "logic": logic, "sum_val": 2 * d + s, "span": abs(d - s)})
+
+    # 重复号候选: 冷号优先(易重复回补) + 热号(延续)
+    dup_cands = []
+    for x in cold[:5]:
+        if x not in dup_cands:
+            dup_cands.append(x)
+    for x in hot[:3]:
+        if x not in dup_cands:
+            dup_cands.append(x)
+    single_cands = hot[:8]
+
+    for d in dup_cands:
+        for s in single_cands:
+            if s == d:
+                continue
+            sv = 2 * d + s
+            if not (8 <= sv <= 20):
+                continue
+            if abs(d - s) < 1:
+                continue
+            add(d, s, f"组三: 重号{d}(缺{missing[d]}期/热{freq[d]})+单号{s}(热{freq[s]}), 和{sv}跨{abs(d - s)}")
+        if len(candidates) >= count:
+            break
+
+    # 不足则放宽约束补全
+    if len(candidates) < count:
+        for d in dup_cands:
+            for s in range(10):
+                if s == d:
+                    continue
+                add(d, s, f"组三补位: 重{d}+单{s}")
+                if len(candidates) >= count:
+                    break
             if len(candidates) >= count:
                 break
 

@@ -9,6 +9,7 @@
 ## 技术备忘
 - git push 经常因网络问题失败, 用 GitHub API (Python requests) 推送替代
 - GitHub token 存在 daily_review.py 的自动化任务指令中
+- 微信推送(automation push_to_wechat): 自动化回复禁止调用 present_files(微信不渲染文件卡片→空白), 改为纯文本自包含输出
 - 数据源: 东方财富, 抓取脚本 fetch_data.py
 - 每日7点自动执行 (automation-1782775804842)
 
