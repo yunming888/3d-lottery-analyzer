@@ -11,6 +11,12 @@
 - 报告: data/reports/2026-08-03.md 已生成
 - GitHub推送: 成功 (git pull --rebase 无更新, git push af54e20..6c7943f)
 
+### 同日代码修复 (用户请求纠正休市判断逻辑)
+- 根因: 东方财富页面自 2026199 起过期, 旧逻辑 `last_draw==current` 把"数据没更新"误判成"休市", 导致 08-01~08-03 误记休市(已纠正为"数据未更新")
+- 新增 `trading_day.py`(is_trading_day + expected_qihao_for_date) 与 `data/holidays.json`(2026 春节/国庆)
+- daily_review.py 休市判定改为: 仅官方休市期判休市; 交易日但数据期号落后→标记"数据滞后", 绝不误判休市
+- 提交 104fd68 已推送; 真正恢复需换能抓 200+ 的实时数据源
+
 ---
 
 # 2026-08-02

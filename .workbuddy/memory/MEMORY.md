@@ -7,12 +7,18 @@
 - 用户只推组六, 不推组三
 
 ## 技术备忘
-- git push 经常因网络问题失败, 用 GitHub API (Python requests) 推送替代
-- GitHub token 存在 daily_review.py 的自动化任务指令中
+- git push: 统一用 `git pull --rebase` + `git push origin master`; Python API 兜底已废弃(token 失效)
 - 微信推送(automation push_to_wechat): 自动化回复禁止调用 present_files(微信不渲染文件卡片→空白), 改为纯文本自包含输出
-- 数据源: 东方财富, 抓取脚本 fetch_data.py
+- 数据源: 东方财富(fetch_data.py) **自 2026199(2026-07-28) 起页面过期卡住, 抓不到 200+**; 500.com/163.com 补缺源对 200+ 同样失效; lottost/gsflcp 为 JS 渲染无法直接 requests。需换可靠源才能真正恢复数据。
 - 每日7点自动执行 (automation-1782775804842)
 
+## 休市判断 (2026-08-03 重构)
+- 福彩3D **天天开奖、全年无休**, 周末照常开; 仅财政部公告的官方休市期停开: 春节(2026-02-14~02-23, 10天)、国庆(2026-10-01~10-04, 4天)。
+- ❌ 旧逻辑(已废弃): `is_suspension = (last_draw_qihao == current_latest)` —— 期号没变就判休市, 在「抓取源过期/早晨未开奖/抓取失败」时全误判。
+- ✅ 新逻辑: `trading_day.is_trading_day(date)` 按日历判定真休市; 交易日但本地数据期号落后预期(`expected_qihao_for_date` 推算)→ 标记「数据滞后」, **绝不误判休市**, 也不编造待开奖记录。
+- 休市日列表: `data/holidays.json`(每年需按官方公告更新)。
+- 07-31 有3注待结算(押200), 待数据源恢复后按期号精确匹配结算。
+
 ## 追踪期
-- 2026-06-13 ~ 2026-07-31
-- profit_loss.json end_date = 2026-07-31
+- 2026-06-13 ~ 2026-08-31
+- profit_loss.json end_date = 2026-08-31
