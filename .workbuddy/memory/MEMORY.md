@@ -9,7 +9,7 @@
 ## 技术备忘
 - git push: 统一用 `git pull --rebase` + `git push origin master`; Python API 兜底已废弃(token 失效)
 - 微信推送(automation push_to_wechat): 自动化回复禁止调用 present_files(微信不渲染文件卡片→空白), 改为纯文本自包含输出
-- 数据源: 东方财富(fetch_data.py) **自 2026199(2026-07-28) 起页面过期卡住, 抓不到 200+**; 500.com/163.com 补缺源对 200+ 同样失效; lottost/gsflcp 为 JS 渲染无法直接 requests。需换可靠源才能真正恢复数据。
+- 数据源: **已切换为 huiniao 官方镜像** `http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit=30` (fetch_data.py `fetch_huiniao`, 免鉴权, ~5分钟同步, 含 200+, 返回 `data.data.list[].{code,day,one,two,three}`)。东方财富兜底仍保留但已过期卡在 2026199。huiniao 实测最新 2026204(2026-08-02), 2026205 每晚21:15开。
 - 每日7点自动执行 (automation-1782775804842)
 
 ## 休市判断 (2026-08-03 重构)
@@ -17,7 +17,7 @@
 - ❌ 旧逻辑(已废弃): `is_suspension = (last_draw_qihao == current_latest)` —— 期号没变就判休市, 在「抓取源过期/早晨未开奖/抓取失败」时全误判。
 - ✅ 新逻辑: `trading_day.is_trading_day(date)` 按日历判定真休市; 交易日但本地数据期号落后预期(`expected_qihao_for_date` 推算)→ 标记「数据滞后」, **绝不误判休市**, 也不编造待开奖记录。
 - 休市日列表: `data/holidays.json`(每年需按官方公告更新)。
-- 07-31 有3注待结算(押200), 待数据源恢复后按期号精确匹配结算。
+- 07-31 那3注曾因数据过期误记 target=2026200(=07-29已开), 已修正为真实下一期 **2026202(2026-07-31开, 988 组三)**; 命中0/盈亏-6 不变(推组六 vs 组三必输)。结算逻辑现已按期号精确匹配, 数据新鲜时 target=latest+1 正确。
 
 ## 追踪期
 - 2026-06-13 ~ 2026-08-31
