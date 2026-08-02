@@ -210,6 +210,46 @@ def fetch_500com(qihao):
 
     }
 
+def fetch_huiniao(limit=30):
+    """
+    主数据源: api.huiniao.top (中福彩官方数据镜像, 免鉴权, 约5分钟同步)
+    返回最近 limit 期福彩3D开奖, JSON 结构: data.list[].{code,day,one,two,three}
+    """
+    url = f"http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit={limit}"
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        resp.encoding = "utf-8"
+        j = resp.json()
+        if j.get("code") != 1:
+            print(f"  huiniao 返回异常: {j.get('info')}")
+            return []
+        records = []
+        # 结构: data.data.list (data 内含 last 与 data.list 两层)
+        for it in j.get("data", {}).get("data", {}).get("list", []):
+            bai, shi, ge = int(it["one"]), int(it["two"]), int(it["three"])
+            nums = [bai, shi, ge]
+            if bai == shi == ge:
+                lot_type = "豹子"
+            elif bai == shi or shi == ge or bai == ge:
+                lot_type = "组三"
+            else:
+                lot_type = "组六"
+            records.append({
+                "qihao": str(it["code"]),
+                "date": it["day"],
+                "bai": bai, "shi": shi, "ge": ge,
+                "nums": nums,
+                "sum_val": sum(nums),
+                "span": max(nums) - min(nums),
+                "type": lot_type,
+                "_source": "huiniao",
+            })
+        return records
+    except Exception as e:
+        print(f"  huiniao 抓取失败: {e}")
+        return []
+
+
 def detect_gaps(records):
 
     """检测本地数据中的期号缺口"""
@@ -332,25 +372,37 @@ def load_data():
 
 def load_or_fetch():
 
-    # Step 1: 东财抓最新5期
+    # Step 1: 主源 huiniao (官方数据镜像, 免鉴权, 含 200+)
 
-    new_records = fetch_eastmoney()
+    new_records = fetch_huiniao(limit=30)
 
     if new_records:
 
         records = merge_and_save(new_records)
 
-        print(f"东方财富: {len(new_records)} 期新数据, 本地共 {len(records)} 期")
+        print(f"huiniao: {len(new_records)} 期新数据, 本地共 {len(records)} 期")
 
     else:
 
-        records = load_data()
+        # 兜底: 东方财富
 
-        if records:
+        new_records = fetch_eastmoney()
 
-            print(f"使用本地缓存: {len(records)} 期")
+        if new_records:
 
-    # Step 2: 检测并补全缺口
+            records = merge_and_save(new_records)
+
+            print(f"东方财富: {len(new_records)} 期新数据, 本地共 {len(records)} 期")
+
+        else:
+
+            records = load_data()
+
+            if records:
+
+                print(f"使用本地缓存: {len(records)} 期")
+
+    # Step 2: 检测并补全缺口 (huiniao 缺失时尝试 500.com)
 
     records, filled = fill_gaps(records)
 

@@ -1,5 +1,85 @@
 [
   {
+    "qihao": "2026204",
+    "date": "2026-08-02",
+    "bai": 9,
+    "shi": 7,
+    "ge": 8,
+    "nums": [
+      9,
+      7,
+      8
+    ],
+    "sum_val": 24,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026203",
+    "date": "2026-08-01",
+    "bai": 4,
+    "shi": 3,
+    "ge": 5,
+    "nums": [
+      4,
+      3,
+      5
+    ],
+    "sum_val": 12,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026202",
+    "date": "2026-07-31",
+    "bai": 9,
+    "shi": 8,
+    "ge": 8,
+    "nums": [
+      9,
+      8,
+      8
+    ],
+    "sum_val": 25,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026201",
+    "date": "2026-07-30",
+    "bai": 3,
+    "shi": 2,
+    "ge": 1,
+    "nums": [
+      3,
+      2,
+      1
+    ],
+    "sum_val": 6,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026200",
+    "date": "2026-07-29",
+    "bai": 9,
+    "shi": 1,
+    "ge": 2,
+    "nums": [
+      9,
+      1,
+      2
+    ],
+    "sum_val": 12,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
     "qihao": "2026199",
     "date": "2026-07-28",
     "bai": 5,
@@ -12,7 +92,8 @@
     ],
     "sum_val": 15,
     "span": 8,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026198",
@@ -27,7 +108,8 @@
     ],
     "sum_val": 19,
     "span": 3,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026197",
@@ -42,7 +124,8 @@
     ],
     "sum_val": 7,
     "span": 1,
-    "type": "组三"
+    "type": "组三",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026196",
@@ -57,7 +140,8 @@
     ],
     "sum_val": 14,
     "span": 8,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026195",
@@ -72,7 +156,8 @@
     ],
     "sum_val": 14,
     "span": 5,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026194",
@@ -87,7 +172,8 @@
     ],
     "sum_val": 13,
     "span": 6,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026193",
@@ -102,7 +188,8 @@
     ],
     "sum_val": 11,
     "span": 3,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026192",
@@ -117,7 +204,8 @@
     ],
     "sum_val": 11,
     "span": 3,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026191",
@@ -132,7 +220,8 @@
     ],
     "sum_val": 15,
     "span": 9,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026190",
@@ -147,7 +236,8 @@
     ],
     "sum_val": 8,
     "span": 6,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026189",
@@ -162,7 +252,8 @@
     ],
     "sum_val": 18,
     "span": 3,
-    "type": "组三"
+    "type": "组三",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026188",
@@ -177,7 +268,8 @@
     ],
     "sum_val": 24,
     "span": 3,
-    "type": "组三"
+    "type": "组三",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026187",
@@ -192,7 +284,8 @@
     ],
     "sum_val": 5,
     "span": 3,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026186",
@@ -207,7 +300,8 @@
     ],
     "sum_val": 9,
     "span": 5,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026185",
@@ -222,7 +316,8 @@
     ],
     "sum_val": 19,
     "span": 6,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026184",
@@ -237,7 +332,8 @@
     ],
     "sum_val": 11,
     "span": 9,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026183",
@@ -252,7 +348,8 @@
     ],
     "sum_val": 14,
     "span": 7,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026182",
@@ -267,7 +364,8 @@
     ],
     "sum_val": 14,
     "span": 4,
-    "type": "组三"
+    "type": "组三",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026181",
@@ -282,7 +380,8 @@
     ],
     "sum_val": 17,
     "span": 7,
-    "type": "组三"
+    "type": "组三",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026180",
@@ -297,7 +396,8 @@
     ],
     "sum_val": 7,
     "span": 5,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026179",
@@ -312,7 +412,8 @@
     ],
     "sum_val": 21,
     "span": 6,
-    "type": "组三"
+    "type": "组三",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026178",
@@ -327,7 +428,8 @@
     ],
     "sum_val": 14,
     "span": 4,
-    "type": "组三"
+    "type": "组三",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026177",
@@ -342,7 +444,8 @@
     ],
     "sum_val": 16,
     "span": 8,
-    "type": "组三"
+    "type": "组三",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026176",
@@ -357,7 +460,8 @@
     ],
     "sum_val": 17,
     "span": 7,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026175",
@@ -372,7 +476,8 @@
     ],
     "sum_val": 7,
     "span": 3,
-    "type": "组六"
+    "type": "组六",
+    "_source": "huiniao"
   },
   {
     "qihao": "2026174",

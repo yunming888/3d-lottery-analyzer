@@ -83,8 +83,10 @@ def settle_pending(history, pl):
     draw = None
     target = pending.get("target_qihao")
     if target:
+        tq = str(target)
         for h in history:
-            if h["qihao"] == target:
+            # 兼容 target_qihao 为 3位(200) 或 7位(2026200) 两种写法
+            if h["qihao"] == tq or h["qihao"].endswith(tq):
                 draw = h
                 break
         if draw is None:
@@ -514,9 +516,16 @@ def main():
         if anchor_date is not None:
             try:
                 expected_qh = expected_qihao_for_date(today_dt, anchor_qihao, anchor_date)
-                if int(current_latest) < expected_qh:
+                gap = expected_qh - int(current_latest)
+                if gap > 1:
+                    # 落后超过1期 => 抓取源严重过期(如东方财富卡在199), 不误判休市
                     data_stale = True
-                    print(f"  ⚠️ 数据滞后: 本地最新 {current_latest} < 预期 {expected_qh}, 抓取源可能过期, 不判休市")
+                    print(f"  ⚠️ 数据严重滞后: 本地最新 {current_latest} 落后预期 {expected_qh} ({gap}期), 抓取源可能过期, 不判休市")
+                elif gap == 1:
+                    # 恰好落后1期 => 今日开奖尚未出(晚间21:15才开), 属正常, 仍可基于昨日数据推荐下一期
+                    print(f"  ✅ 数据正常(今日 {expected_qh} 尚未开奖, 基于最新 {current_latest} 推荐)")
+                else:
+                    print(f"  ✅ 数据已含今日/更新, 最新 {current_latest}")
             except ValueError:
                 pass
     is_suspension = is_holiday
@@ -582,15 +591,8 @@ def main():
     if is_suspension or data_stale:
         target_qihao = None
     else:
-        target_qihao = None
-        if pl["records"]:
-            prev = pl["records"][-1]
-            if prev.get("target_qihao"):
-                target_qihao = str(int(prev["target_qihao"]) + 1)
-            elif prev.get("draw") not in (None, "待开奖"):
-                target_qihao = str(int(prev["draw"]) + 1)
-        if target_qihao is None:
-            target_qihao = str(int(latest["qihao"]) + 1)
+        # 目标 = 最新已开期号 + 1 (下期). 直接用 history[0], 避免依赖 prev 记录状态字符串(休市/数据未更新等)
+        target_qihao = str(int(history[0]["qihao"]) + 1)
 
     # 检查今天是否已有记录
     today_exists = any(r["date"] == TODAY for r in pl["records"])
