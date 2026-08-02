@@ -13,6 +13,7 @@
 import json
 import os
 import sys
+import argparse
 from datetime import datetime, timedelta
 from collections import Counter
 
@@ -24,7 +25,18 @@ from analyze import (
     span_analysis, type_analysis, generate_recommendations
 )
 
-NOW = datetime.now()
+# 支持 --date YYYY-MM-DD 回溯运行 (用于补跑历史日期)
+parser = argparse.ArgumentParser()
+parser.add_argument("--date", help="回溯日期 YYYY-MM-DD (默认今天)")
+_args, _ = parser.parse_known_args()
+if getattr(_args, "date", None):
+    try:
+        NOW = datetime.strptime(_args.date, "%Y-%m-%d")
+    except ValueError:
+        print(f"⚠️ 无效日期 {_args.date}, 使用今天")
+        NOW = datetime.now()
+else:
+    NOW = datetime.now()
 TODAY = NOW.strftime("%Y-%m-%d")
 TODAY_SHORT = NOW.strftime("%m-%d")
 DATA_DIR = "data"
@@ -66,31 +78,34 @@ def settle_pending(history, pl):
     rec_date = pending["date"]
     print(f"待结算: {rec_date}, 推荐{pending['notes']}注")
 
-    # 策略1: 按日期匹配
+    # 策略1 (主): 按目标期号精确匹配 — 最可靠, 不受 date 缺失/偏移影响
     draw = None
-    for h in history:
-        if h.get("date") == rec_date:
-            draw = h
-            break
+    target = pending.get("target_qihao")
+    if target:
+        for h in history:
+            if h["qihao"] == target:
+                draw = h
+                break
+        if draw is None:
+            # 目标期号尚未抓到 -> 暂缓结算, 下期再试, 绝不用错号
+            print(f"  ⏸ 目标期号 {target} 尚未抓到, 暂缓结算(下期再试), 不污染数据")
+            return None
+        else:
+            print(f"  按期号匹配: {target}")
 
-    # 策略2: 日期匹配失败, 用最新已结算期号+1推断
+    # 策略2 (兜底): 目标期号缺失时, 按非空 date 匹配
     if draw is None:
-        latest_settled_qihao = None
-        for rec in pl["records"]:
-            if rec["hits"] is not None and rec["draw"] != "待开奖":
-                latest_settled_qihao = rec["draw"]
-        if latest_settled_qihao:
-            expected_qihao = str(int(latest_settled_qihao) + 1)
-            for h in history:
-                if h["qihao"] == expected_qihao:
-                    draw = h
-                    print(f"  日期匹配失败, 期号推断: {expected_qihao}")
-                    break
+        for h in history:
+            if h.get("date") and h["date"] == rec_date:
+                draw = h
+                break
+        if draw is not None:
+            print(f"  按日期匹配(无目标期号): {draw['qihao']}")
 
-    # 策略3: 仍失败, 用 history[0] 但警告
+    # 策略3: 仍失败 -> 暂缓, 不再使用 history[0] (曾导致错配)
     if draw is None:
-        draw = history[0]
-        print(f"  ⚠️ 警告: 日期和期号匹配均失败, 使用history[0]: {draw['qihao']}")
+        print(f"  ⚠️ 无法确定 {rec_date} 的开奖期号(无目标期号且日期缺失), 暂缓结算")
+        return None
 
     # 结算
     draw_set = set(draw["nums"])
@@ -338,7 +353,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao):
     rec_rows = []
     for i, r in enumerate(recs):
         rec_rows.append(f"| {i+1} | {' '.join(map(str, r['nums']))} | {r['sum_val']} | {r['span']} | {r['logic']} |")
-    rec_table = "\n".join(rec_rows) if rec_rows else "| - | 熔断未推 | - | - | - |"
+    rec_table = "\n".join(rec_rows) if rec_rows else "| - | 休市/熔断未推 | - | - | - |"
 
     # 形态走势 (近15期)
     trend_rows = []
@@ -353,7 +368,12 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao):
         cb_detail += f"- {rf}\n"
     if not cb["rules_fired"]:
         cb_detail = "- 无规则触发, 正常推荐\n"
-    cb_status = "🛑 熔断(暂停)" if cb["stop"] else f"✅ 推{cb['push_count']}注{cb['push_type']}"
+    if any("休市" in rf for rf in cb["rules_fired"]):
+        cb_status = "⏸ 休市(无新开奖)"
+    elif cb["stop"]:
+        cb_status = "🛑 熔断(暂停)"
+    else:
+        cb_status = f"✅ 推{cb['push_count']}注{cb['push_type']}"
 
     # 结算信息
     settle_section = ""
@@ -473,6 +493,15 @@ def main():
     print(f"  追踪区间: {pl['start_date']} ~ {pl['end_date']}")
     print(f"  当前累计: {pl['summary']['net_pnl']:+d}元")
 
+    # 2.5 休市检测: 最新期号较上次无变化 => 无新开奖(休市)
+    last_draw = pl.get("last_draw_qihao")
+    current_latest = history[0]["qihao"]
+    is_suspension = (last_draw is not None and last_draw == current_latest)
+    if is_suspension:
+        print(f"  ⏸ 休市检测: 最新期号仍为 {current_latest} (与上次一致), 判定为无新开奖")
+    else:
+        pl["last_draw_qihao"] = current_latest
+
     # 3. 结算昨日待结算
     print("\n[3/7] 结算昨日推荐...")
     settlement = settle_pending(history, pl)
@@ -484,57 +513,93 @@ def main():
     print(f"  总注数: {summary['total_bets']}, 总命中: {summary['total_hits']}")
     print(f"  净盈亏: {summary['net_pnl']:+d}元, 待结算: {summary['pending_bets']}注")
 
-    # 5. 熔断判定
-    print("\n[5/7] 熔断判定...")
-    cb = circuit_breaker_user_rules(history)
-    print(f"  形态: {cb['streak_type']}{cb['streak_len']}连, 组六{cb['zl_streak']}连")
-    print(f"  组三近30期: {cb['gs_count_30']}次")
-    for rf in cb["rules_fired"]:
-        print(f"  🔴 {rf}")
-    status = "🛑 熔断, 0注" if cb["stop"] else f"✅ 推{cb['push_count']}注{cb['push_type']}"
-    print(f"  {status}")
-
-    # 6. 生成推荐
-    print("\n[6/7] 生成推荐...")
-    if cb["stop"]:
+    # 5. 熔断判定 + 6. 生成推荐 (休市时跳过)
+    if is_suspension:
+        cb = {"stop": True,
+              "rules_fired": [f"休市: 最新期号 {current_latest} 未变化, 无新开奖"],
+              "streak_type": "-", "streak_len": 0, "zl_streak": 0, "gs_count_30": 0,
+              "last2_both_gs": False, "sums_3": [0, 0, 0], "push_type": "组六", "push_count": 0}
         recs = []
-        print("  熔断, 不推荐")
-        reason = f"熔断触发({'; '.join(cb['rules_fired'])})"
+        reason = "福彩3D休市(无新开奖), 无推荐"
+        print("\n[5/7] 熔断判定: 休市, 跳过")
+        print("[6/7] 生成推荐: 休市, 无推荐")
     else:
-        info = {"stop": False, "push_type": cb["push_type"], "push_count": cb["push_count"]}
-        recs = generate_recommendations(history, info, count=cb["push_count"])
-        print(f"  生成{len(recs)}注{cb['push_type']}:")
-        for i, r in enumerate(recs):
-            print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
-        reason = f"{cb['push_type']}{len(recs)}注推荐 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常推荐"])
+        print("\n[5/7] 熔断判定...")
+        cb = circuit_breaker_user_rules(history)
+        print(f"  形态: {cb['streak_type']}{cb['streak_len']}连, 组六{cb['zl_streak']}连")
+        print(f"  组三近30期: {cb['gs_count_30']}次")
+        for rf in cb["rules_fired"]:
+            print(f"  🔴 {rf}")
+        status = "🛑 熔断, 0注" if cb["stop"] else f"✅ 推{cb['push_count']}注{cb['push_type']}"
+        print(f"  {status}")
+
+        print("\n[6/7] 生成推荐...")
+        if cb["stop"]:
+            recs = []
+            print("  熔断, 不推荐")
+            reason = f"熔断触发({'; '.join(cb['rules_fired'])})"
+        else:
+            info = {"stop": False, "push_type": cb["push_type"], "push_count": cb["push_count"]}
+            recs = generate_recommendations(history, info, count=cb["push_count"])
+            print(f"  生成{len(recs)}注{cb['push_type']}:")
+            for i, r in enumerate(recs):
+                print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
+            reason = f"{cb['push_type']}{len(recs)}注推荐 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常推荐"])
+
+    # 计算目标期号 (休市则无)
+    if is_suspension:
+        target_qihao = None
+    else:
+        target_qihao = None
+        if pl["records"]:
+            prev = pl["records"][-1]
+            if prev.get("target_qihao"):
+                target_qihao = str(int(prev["target_qihao"]) + 1)
+            elif prev.get("draw") not in (None, "待开奖"):
+                target_qihao = str(int(prev["draw"]) + 1)
+        if target_qihao is None:
+            target_qihao = str(int(latest["qihao"]) + 1)
 
     # 检查今天是否已有记录
     today_exists = any(r["date"] == TODAY for r in pl["records"])
     if today_exists:
         print(f"\n  今天({TODAY})已有记录, 跳过添加")
-        # 更新现有记录的推荐 (如果熔断状态变化)
         for r in pl["records"]:
             if r["date"] == TODAY and r["hits"] is None:
-                r["recommendations"] = [rec["nums"] for rec in recs]
-                r["notes"] = len(recs)
-                r["cost"] = len(recs) * 2
-                r["reason"] = reason
+                if is_suspension:
+                    r.update({"draw": "休市", "draw_nums": [], "draw_type": "休市",
+                              "recommendations": [], "notes": 0, "cost": 0,
+                              "hits": 0, "prize": 0, "daily_pnl": 0,
+                              "reason": reason, "target_qihao": None})
+                else:
+                    r["recommendations"] = [rec["nums"] for rec in recs]
+                    r["notes"] = len(recs)
+                    r["cost"] = len(recs) * 2
+                    r["reason"] = reason
+                    r["target_qihao"] = target_qihao
                 break
     else:
-        # 添加今日记录
-        today_rec = {
-            "date": TODAY,
-            "draw": "待开奖",
-            "draw_nums": [],
-            "draw_type": "",
-            "recommendations": [r["nums"] for r in recs],
-            "notes": len(recs),
-            "cost": len(recs) * 2,
-            "hits": None,
-            "prize": None,
-            "daily_pnl": None,
-            "reason": reason
-        }
+        if is_suspension:
+            today_rec = {"date": TODAY, "target_qihao": None, "draw": "休市",
+                         "draw_nums": [], "draw_type": "休市", "recommendations": [],
+                         "notes": 0, "cost": 0, "hits": 0, "prize": 0,
+                         "daily_pnl": 0, "reason": reason}
+        else:
+            # 添加今日记录
+            today_rec = {
+                "date": TODAY,
+                "target_qihao": target_qihao,
+                "draw": "待开奖",
+                "draw_nums": [],
+                "draw_type": "",
+                "recommendations": [r["nums"] for r in recs],
+                "notes": len(recs),
+                "cost": len(recs) * 2,
+                "hits": None,
+                "prize": None,
+                "daily_pnl": None,
+                "reason": reason
+            }
         pl["records"].append(today_rec)
 
     # 再次更新summary (包含今日pending)
