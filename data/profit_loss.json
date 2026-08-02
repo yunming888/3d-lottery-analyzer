@@ -2741,44 +2741,44 @@
     {
       "date": "2026-08-01",
       "target_qihao": null,
-      "draw": "休市",
+      "draw": "数据未更新",
       "draw_nums": [],
-      "draw_type": "休市",
+      "draw_type": "数据未更新",
       "recommendations": [],
       "notes": 0,
       "cost": 0,
       "hits": 0,
       "prize": 0,
       "daily_pnl": 0,
-      "reason": "福彩3D休市(自2026199/2026-07-28起无开奖), 无推荐"
+      "reason": "数据滞后(抓取源过期), 暂停推荐, 待数据源恢复"
     },
     {
       "date": "2026-08-02",
       "target_qihao": null,
-      "draw": "休市",
+      "draw": "数据未更新",
       "draw_nums": [],
-      "draw_type": "休市",
+      "draw_type": "数据未更新",
       "recommendations": [],
       "notes": 0,
       "cost": 0,
       "hits": 0,
       "prize": 0,
       "daily_pnl": 0,
-      "reason": "福彩3D休市(自2026199/2026-07-28起无开奖), 无推荐"
+      "reason": "数据滞后(抓取源过期), 暂停推荐, 待数据源恢复"
     },
     {
       "date": "2026-08-03",
       "target_qihao": null,
-      "draw": "休市",
+      "draw": "数据未更新",
       "draw_nums": [],
-      "draw_type": "休市",
+      "draw_type": "数据未更新",
       "recommendations": [],
       "notes": 0,
       "cost": 0,
       "hits": 0,
       "prize": 0,
       "daily_pnl": 0,
-      "reason": "福彩3D休市(无新开奖), 无推荐"
+      "reason": "数据滞后(抓取源过期), 暂停推荐, 待数据源恢复"
     }
   ],
   "summary": {
@@ -2792,8 +2792,8 @@
     "net_pnl": -394,
     "pending_bets": 3,
     "pending_cost": 6,
-    "last_settled": "2026-08-03",
-    "last_hit": "2026-08-03 2注"
+    "last_settled": "2026-08-02",
+    "last_hit": "2026-08-02 2注"
   },
   "last_draw_qihao": "2026199"
 }

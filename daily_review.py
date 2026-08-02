@@ -24,6 +24,7 @@ from analyze import (
     frequency_analysis, missing_analysis, sum_value_analysis,
     span_analysis, type_analysis, generate_recommendations
 )
+from trading_day import is_trading_day, expected_qihao_for_date
 
 # 支持 --date YYYY-MM-DD 回溯运行 (用于补跑历史日期)
 parser = argparse.ArgumentParser()
@@ -493,12 +494,34 @@ def main():
     print(f"  追踪区间: {pl['start_date']} ~ {pl['end_date']}")
     print(f"  当前累计: {pl['summary']['net_pnl']:+d}元")
 
-    # 2.5 休市检测: 最新期号较上次无变化 => 无新开奖(休市)
+    # 2.5 休市检测 (修正版): 以日历为准, 不再用"期号不变=休市"
+    #   - 今日为官方休市期  => 真休市 (春节/国庆等)
+    #   - 今日为交易日, 但本地数据期号落后 => 数据滞后(抓取源过期), 不误判休市
     last_draw = pl.get("last_draw_qihao")
     current_latest = history[0]["qihao"]
-    is_suspension = (last_draw is not None and last_draw == current_latest)
-    if is_suspension:
-        print(f"  ⏸ 休市检测: 最新期号仍为 {current_latest} (与上次一致), 判定为无新开奖")
+    today_dt = datetime.strptime(TODAY, "%Y-%m-%d").date()
+    is_holiday = not is_trading_day(today_dt)
+    data_stale = False
+    if not is_holiday:
+        # 以本地最新一条(期号, 日期)为锚, 推算今日应有的期号
+        anchor_date = None
+        anchor_qihao = None
+        for h in history:
+            if h.get("date"):
+                anchor_date = datetime.strptime(h["date"], "%Y-%m-%d").date()
+                anchor_qihao = int(h["qihao"])
+                break
+        if anchor_date is not None:
+            try:
+                expected_qh = expected_qihao_for_date(today_dt, anchor_qihao, anchor_date)
+                if int(current_latest) < expected_qh:
+                    data_stale = True
+                    print(f"  ⚠️ 数据滞后: 本地最新 {current_latest} < 预期 {expected_qh}, 抓取源可能过期, 不判休市")
+            except ValueError:
+                pass
+    is_suspension = is_holiday
+    if is_holiday:
+        print(f"  ⏸ 休市: 今日为官方休市期(非交易日)")
     else:
         pl["last_draw_qihao"] = current_latest
 
@@ -513,16 +536,25 @@ def main():
     print(f"  总注数: {summary['total_bets']}, 总命中: {summary['total_hits']}")
     print(f"  净盈亏: {summary['net_pnl']:+d}元, 待结算: {summary['pending_bets']}注")
 
-    # 5. 熔断判定 + 6. 生成推荐 (休市时跳过)
+    # 5. 熔断判定 + 6. 生成推荐 (休市或数据滞后时跳过)
     if is_suspension:
         cb = {"stop": True,
-              "rules_fired": [f"休市: 最新期号 {current_latest} 未变化, 无新开奖"],
+              "rules_fired": [f"休市: 今日为官方休市期, 无新开奖"],
               "streak_type": "-", "streak_len": 0, "zl_streak": 0, "gs_count_30": 0,
               "last2_both_gs": False, "sums_3": [0, 0, 0], "push_type": "组六", "push_count": 0}
         recs = []
-        reason = "福彩3D休市(无新开奖), 无推荐"
+        reason = "福彩3D休市(官方休市期), 无推荐"
         print("\n[5/7] 熔断判定: 休市, 跳过")
         print("[6/7] 生成推荐: 休市, 无推荐")
+    elif data_stale:
+        cb = {"stop": True,
+              "rules_fired": [f"数据滞后: 本地最新 {current_latest} 落后预期期号, 抓取源过期, 暂停推荐"],
+              "streak_type": "-", "streak_len": 0, "zl_streak": 0, "gs_count_30": 0,
+              "last2_both_gs": False, "sums_3": [0, 0, 0], "push_type": "组六", "push_count": 0}
+        recs = []
+        reason = "数据滞后(抓取源过期), 暂停推荐, 待数据源恢复"
+        print("\n[5/7] 熔断判定: 数据滞后, 跳过")
+        print("[6/7] 生成推荐: 数据滞后, 无推荐")
     else:
         print("\n[5/7] 熔断判定...")
         cb = circuit_breaker_user_rules(history)
@@ -546,8 +578,8 @@ def main():
                 print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
             reason = f"{cb['push_type']}{len(recs)}注推荐 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常推荐"])
 
-    # 计算目标期号 (休市则无)
-    if is_suspension:
+    # 计算目标期号 (休市或数据滞后则无)
+    if is_suspension or data_stale:
         target_qihao = None
     else:
         target_qihao = None
@@ -563,25 +595,37 @@ def main():
     # 检查今天是否已有记录
     today_exists = any(r["date"] == TODAY for r in pl["records"])
     if today_exists:
-        print(f"\n  今天({TODAY})已有记录, 跳过添加")
+        print(f"\n  今天({TODAY})已有记录, 检查是否需要纠正")
         for r in pl["records"]:
-            if r["date"] == TODAY and r["hits"] is None:
+            if r["date"] == TODAY:
                 if is_suspension:
                     r.update({"draw": "休市", "draw_nums": [], "draw_type": "休市",
                               "recommendations": [], "notes": 0, "cost": 0,
                               "hits": 0, "prize": 0, "daily_pnl": 0,
                               "reason": reason, "target_qihao": None})
+                elif data_stale:
+                    r.update({"draw": "数据未更新", "draw_nums": [], "draw_type": "数据未更新",
+                              "recommendations": [], "notes": 0, "cost": 0,
+                              "hits": 0, "prize": 0, "daily_pnl": 0,
+                              "reason": reason, "target_qihao": None})
                 else:
-                    r["recommendations"] = [rec["nums"] for rec in recs]
-                    r["notes"] = len(recs)
-                    r["cost"] = len(recs) * 2
-                    r["reason"] = reason
-                    r["target_qihao"] = target_qihao
+                    # 正常交易日: 仅当推荐为空时补全(避免覆盖已生成/已结算记录)
+                    if not r.get("recommendations"):
+                        r["recommendations"] = [rec["nums"] for rec in recs]
+                        r["notes"] = len(recs)
+                        r["cost"] = len(recs) * 2
+                        r["reason"] = reason
+                        r["target_qihao"] = target_qihao
                 break
     else:
         if is_suspension:
             today_rec = {"date": TODAY, "target_qihao": None, "draw": "休市",
                          "draw_nums": [], "draw_type": "休市", "recommendations": [],
+                         "notes": 0, "cost": 0, "hits": 0, "prize": 0,
+                         "daily_pnl": 0, "reason": reason}
+        elif data_stale:
+            today_rec = {"date": TODAY, "target_qihao": None, "draw": "数据未更新",
+                         "draw_nums": [], "draw_type": "数据未更新", "recommendations": [],
                          "notes": 0, "cost": 0, "hits": 0, "prize": 0,
                          "daily_pnl": 0, "reason": reason}
         else:
