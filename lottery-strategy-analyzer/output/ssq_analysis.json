@@ -1,0 +1,1134 @@
+{
+  "meta": {
+    "source": "500彩票网",
+    "game": "ssq",
+    "name": "双色球",
+    "latest_issue": "26089",
+    "fetched_at": "2026-08-05T09:22:45",
+    "count": 300,
+    "window": 300,
+    "from_cache": false
+  },
+  "spec": {
+    "key": "ssq",
+    "name": "双色球",
+    "red": [
+      1,
+      33,
+      6
+    ],
+    "blue": [
+      1,
+      16,
+      1
+    ]
+  },
+  "stats": {
+    "window": 300,
+    "red": {
+      "freq": {
+        "1": 54,
+        "2": 69,
+        "3": 60,
+        "4": 60,
+        "5": 52,
+        "6": 57,
+        "7": 51,
+        "8": 56,
+        "9": 61,
+        "10": 60,
+        "11": 54,
+        "12": 46,
+        "13": 64,
+        "14": 54,
+        "15": 56,
+        "16": 58,
+        "17": 57,
+        "18": 61,
+        "19": 51,
+        "20": 41,
+        "21": 43,
+        "22": 58,
+        "23": 52,
+        "24": 63,
+        "25": 57,
+        "26": 42,
+        "27": 54,
+        "28": 46,
+        "29": 46,
+        "30": 65,
+        "31": 43,
+        "32": 49,
+        "33": 60
+      },
+      "recent_freq": {
+        "1": 6,
+        "2": 4,
+        "3": 4,
+        "4": 6,
+        "5": 9,
+        "6": 6,
+        "7": 8,
+        "8": 6,
+        "9": 4,
+        "10": 6,
+        "11": 5,
+        "12": 5,
+        "13": 2,
+        "14": 8,
+        "15": 5,
+        "16": 7,
+        "17": 4,
+        "18": 8,
+        "19": 5,
+        "20": 1,
+        "21": 5,
+        "22": 3,
+        "23": 6,
+        "24": 9,
+        "25": 5,
+        "26": 2,
+        "27": 7,
+        "28": 8,
+        "29": 6,
+        "30": 5,
+        "31": 3,
+        "32": 7,
+        "33": 5
+      },
+      "omission": {
+        "1": 5,
+        "2": 3,
+        "3": 13,
+        "4": 2,
+        "5": 0,
+        "6": 1,
+        "7": 1,
+        "8": 14,
+        "9": 4,
+        "10": 2,
+        "11": 1,
+        "12": 5,
+        "13": 4,
+        "14": 3,
+        "15": 6,
+        "16": 5,
+        "17": 4,
+        "18": 0,
+        "19": 9,
+        "20": 13,
+        "21": 7,
+        "22": 1,
+        "23": 0,
+        "24": 0,
+        "25": 3,
+        "26": 15,
+        "27": 0,
+        "28": 4,
+        "29": 10,
+        "30": 3,
+        "31": 2,
+        "32": 3,
+        "33": 0
+      },
+      "max_omission": {
+        "1": 24,
+        "2": 23,
+        "3": 18,
+        "4": 23,
+        "5": 43,
+        "6": 27,
+        "7": 20,
+        "8": 17,
+        "9": 14,
+        "10": 18,
+        "11": 21,
+        "12": 26,
+        "13": 22,
+        "14": 23,
+        "15": 14,
+        "16": 32,
+        "17": 23,
+        "18": 14,
+        "19": 20,
+        "20": 30,
+        "21": 32,
+        "22": 30,
+        "23": 21,
+        "24": 20,
+        "25": 16,
+        "26": 34,
+        "27": 22,
+        "28": 17,
+        "29": 26,
+        "30": 22,
+        "31": 27,
+        "32": 17,
+        "33": 22
+      },
+      "expected_freq": 54.55,
+      "hot": [
+        22,
+        3,
+        4,
+        10,
+        33,
+        9,
+        18,
+        24,
+        13,
+        30,
+        2
+      ],
+      "warm": [
+        23,
+        1,
+        11,
+        14,
+        27,
+        8,
+        15,
+        6,
+        17,
+        25,
+        16
+      ],
+      "cold": [
+        20,
+        26,
+        21,
+        31,
+        12,
+        28,
+        29,
+        32,
+        7,
+        19,
+        5
+      ],
+      "high_omission": [
+        26,
+        8,
+        3,
+        20,
+        29,
+        19,
+        21,
+        15,
+        1,
+        12,
+        16
+      ],
+      "band_dist": {
+        "01-11": 634,
+        "12-22": 589,
+        "23-33": 577
+      },
+      "parity_sum": {
+        "avg_odd_ratio": 0.508,
+        "sum_min": 41,
+        "sum_max": 153,
+        "sum_avg": 99.5
+      }
+    },
+    "blue": {
+      "freq": {
+        "1": 21,
+        "2": 18,
+        "3": 21,
+        "4": 21,
+        "5": 22,
+        "6": 16,
+        "7": 18,
+        "8": 17,
+        "9": 10,
+        "10": 21,
+        "11": 24,
+        "12": 17,
+        "13": 16,
+        "14": 15,
+        "15": 21,
+        "16": 22
+      },
+      "recent_freq": {
+        "1": 3,
+        "2": 2,
+        "3": 2,
+        "4": 5,
+        "5": 4,
+        "6": 1,
+        "7": 2,
+        "8": 3,
+        "9": 1,
+        "10": 0,
+        "11": 2,
+        "12": 1,
+        "13": 1,
+        "14": 0,
+        "15": 2,
+        "16": 1
+      },
+      "omission": {
+        "1": 9,
+        "2": 24,
+        "3": 0,
+        "4": 7,
+        "5": 1,
+        "6": 11,
+        "7": 13,
+        "8": 16,
+        "9": 27,
+        "10": 38,
+        "11": 2,
+        "12": 8,
+        "13": 22,
+        "14": 65,
+        "15": 4,
+        "16": 23
+      },
+      "max_omission": {
+        "1": 64,
+        "2": 60,
+        "3": 52,
+        "4": 61,
+        "5": 64,
+        "6": 50,
+        "7": 53,
+        "8": 52,
+        "9": 87,
+        "10": 44,
+        "11": 40,
+        "12": 43,
+        "13": 58,
+        "14": 65,
+        "15": 46,
+        "16": 39
+      },
+      "expected_freq": 18.75,
+      "hot": [
+        10,
+        15,
+        5,
+        16,
+        11
+      ],
+      "warm": [
+        12,
+        2,
+        7,
+        1,
+        3,
+        4
+      ],
+      "cold": [
+        9,
+        14,
+        6,
+        13,
+        8
+      ],
+      "high_omission": [
+        14,
+        10,
+        9,
+        2,
+        16
+      ],
+      "band_dist": {
+        "01-05": 103,
+        "06-10": 82,
+        "11-16": 115
+      },
+      "parity_sum": {
+        "avg_odd_ratio": 0.51,
+        "sum_min": 1,
+        "sum_max": 16,
+        "sum_avg": 8.4
+      }
+    }
+  },
+  "recommend": {
+    "hot": {
+      "desc": "热号优先：选取统计窗口内出现频率最高的号码",
+      "red": [
+        2,
+        9,
+        13,
+        18,
+        24,
+        30
+      ],
+      "blue": [
+        11
+      ],
+      "red_alts": [
+        [
+          2,
+          3,
+          9,
+          13,
+          18,
+          24
+        ],
+        [
+          2,
+          4,
+          9,
+          13,
+          18,
+          30
+        ],
+        [
+          2,
+          9,
+          10,
+          13,
+          24,
+          30
+        ],
+        [
+          2,
+          9,
+          18,
+          24,
+          30,
+          33
+        ]
+      ],
+      "blue_alts": [
+        [
+          5
+        ],
+        [
+          16
+        ],
+        [
+          1
+        ],
+        [
+          3
+        ]
+      ],
+      "red_pool": [
+        {
+          "num": 2,
+          "score": 1.0,
+          "freq": 69,
+          "recent_freq": 4,
+          "omission": 3,
+          "max_omission": 23
+        },
+        {
+          "num": 30,
+          "score": 0.942,
+          "freq": 65,
+          "recent_freq": 5,
+          "omission": 3,
+          "max_omission": 22
+        },
+        {
+          "num": 13,
+          "score": 0.9275,
+          "freq": 64,
+          "recent_freq": 2,
+          "omission": 4,
+          "max_omission": 22
+        },
+        {
+          "num": 24,
+          "score": 0.913,
+          "freq": 63,
+          "recent_freq": 9,
+          "omission": 0,
+          "max_omission": 20
+        },
+        {
+          "num": 9,
+          "score": 0.8841,
+          "freq": 61,
+          "recent_freq": 4,
+          "omission": 4,
+          "max_omission": 14
+        },
+        {
+          "num": 18,
+          "score": 0.8841,
+          "freq": 61,
+          "recent_freq": 8,
+          "omission": 0,
+          "max_omission": 14
+        },
+        {
+          "num": 3,
+          "score": 0.8696,
+          "freq": 60,
+          "recent_freq": 4,
+          "omission": 13,
+          "max_omission": 18
+        },
+        {
+          "num": 4,
+          "score": 0.8696,
+          "freq": 60,
+          "recent_freq": 6,
+          "omission": 2,
+          "max_omission": 23
+        },
+        {
+          "num": 10,
+          "score": 0.8696,
+          "freq": 60,
+          "recent_freq": 6,
+          "omission": 2,
+          "max_omission": 18
+        },
+        {
+          "num": 33,
+          "score": 0.8696,
+          "freq": 60,
+          "recent_freq": 5,
+          "omission": 0,
+          "max_omission": 22
+        },
+        {
+          "num": 16,
+          "score": 0.8406,
+          "freq": 58,
+          "recent_freq": 7,
+          "omission": 5,
+          "max_omission": 32
+        },
+        {
+          "num": 22,
+          "score": 0.8406,
+          "freq": 58,
+          "recent_freq": 3,
+          "omission": 1,
+          "max_omission": 30
+        }
+      ],
+      "blue_pool": [
+        {
+          "num": 11,
+          "score": 1.0,
+          "freq": 24,
+          "recent_freq": 2,
+          "omission": 2,
+          "max_omission": 40
+        },
+        {
+          "num": 5,
+          "score": 0.9167,
+          "freq": 22,
+          "recent_freq": 4,
+          "omission": 1,
+          "max_omission": 64
+        },
+        {
+          "num": 16,
+          "score": 0.9167,
+          "freq": 22,
+          "recent_freq": 1,
+          "omission": 23,
+          "max_omission": 39
+        },
+        {
+          "num": 1,
+          "score": 0.875,
+          "freq": 21,
+          "recent_freq": 3,
+          "omission": 9,
+          "max_omission": 64
+        },
+        {
+          "num": 3,
+          "score": 0.875,
+          "freq": 21,
+          "recent_freq": 2,
+          "omission": 0,
+          "max_omission": 52
+        },
+        {
+          "num": 4,
+          "score": 0.875,
+          "freq": 21,
+          "recent_freq": 5,
+          "omission": 7,
+          "max_omission": 61
+        },
+        {
+          "num": 10,
+          "score": 0.875,
+          "freq": 21,
+          "recent_freq": 0,
+          "omission": 38,
+          "max_omission": 44
+        }
+      ]
+    },
+    "cold": {
+      "desc": "冷号回补：选取当前遗漏值最大的号码（假设'该出'）",
+      "red": [
+        3,
+        8,
+        19,
+        20,
+        26,
+        29
+      ],
+      "blue": [
+        14
+      ],
+      "red_alts": [
+        [
+          3,
+          8,
+          19,
+          20,
+          21,
+          26
+        ],
+        [
+          3,
+          8,
+          15,
+          19,
+          20,
+          29
+        ],
+        [
+          1,
+          3,
+          8,
+          19,
+          26,
+          29
+        ],
+        [
+          3,
+          8,
+          12,
+          20,
+          26,
+          29
+        ]
+      ],
+      "blue_alts": [
+        [
+          10
+        ],
+        [
+          9
+        ],
+        [
+          2
+        ],
+        [
+          16
+        ]
+      ],
+      "red_pool": [
+        {
+          "num": 26,
+          "score": 1.0,
+          "freq": 42,
+          "recent_freq": 2,
+          "omission": 15,
+          "max_omission": 34
+        },
+        {
+          "num": 8,
+          "score": 0.9333,
+          "freq": 56,
+          "recent_freq": 6,
+          "omission": 14,
+          "max_omission": 17
+        },
+        {
+          "num": 3,
+          "score": 0.8667,
+          "freq": 60,
+          "recent_freq": 4,
+          "omission": 13,
+          "max_omission": 18
+        },
+        {
+          "num": 20,
+          "score": 0.8667,
+          "freq": 41,
+          "recent_freq": 1,
+          "omission": 13,
+          "max_omission": 30
+        },
+        {
+          "num": 29,
+          "score": 0.6667,
+          "freq": 46,
+          "recent_freq": 6,
+          "omission": 10,
+          "max_omission": 26
+        },
+        {
+          "num": 19,
+          "score": 0.6,
+          "freq": 51,
+          "recent_freq": 5,
+          "omission": 9,
+          "max_omission": 20
+        },
+        {
+          "num": 21,
+          "score": 0.4667,
+          "freq": 43,
+          "recent_freq": 5,
+          "omission": 7,
+          "max_omission": 32
+        },
+        {
+          "num": 15,
+          "score": 0.4,
+          "freq": 56,
+          "recent_freq": 5,
+          "omission": 6,
+          "max_omission": 14
+        },
+        {
+          "num": 1,
+          "score": 0.3333,
+          "freq": 54,
+          "recent_freq": 6,
+          "omission": 5,
+          "max_omission": 24
+        },
+        {
+          "num": 12,
+          "score": 0.3333,
+          "freq": 46,
+          "recent_freq": 5,
+          "omission": 5,
+          "max_omission": 26
+        },
+        {
+          "num": 16,
+          "score": 0.3333,
+          "freq": 58,
+          "recent_freq": 7,
+          "omission": 5,
+          "max_omission": 32
+        },
+        {
+          "num": 9,
+          "score": 0.2667,
+          "freq": 61,
+          "recent_freq": 4,
+          "omission": 4,
+          "max_omission": 14
+        }
+      ],
+      "blue_pool": [
+        {
+          "num": 14,
+          "score": 1.0,
+          "freq": 15,
+          "recent_freq": 0,
+          "omission": 65,
+          "max_omission": 65
+        },
+        {
+          "num": 10,
+          "score": 0.5846,
+          "freq": 21,
+          "recent_freq": 0,
+          "omission": 38,
+          "max_omission": 44
+        },
+        {
+          "num": 9,
+          "score": 0.4154,
+          "freq": 10,
+          "recent_freq": 1,
+          "omission": 27,
+          "max_omission": 87
+        },
+        {
+          "num": 2,
+          "score": 0.3692,
+          "freq": 18,
+          "recent_freq": 2,
+          "omission": 24,
+          "max_omission": 60
+        },
+        {
+          "num": 16,
+          "score": 0.3538,
+          "freq": 22,
+          "recent_freq": 1,
+          "omission": 23,
+          "max_omission": 39
+        },
+        {
+          "num": 13,
+          "score": 0.3385,
+          "freq": 16,
+          "recent_freq": 1,
+          "omission": 22,
+          "max_omission": 58
+        },
+        {
+          "num": 8,
+          "score": 0.2462,
+          "freq": 17,
+          "recent_freq": 3,
+          "omission": 16,
+          "max_omission": 52
+        }
+      ]
+    },
+    "balanced": {
+      "desc": "均衡混合：频率与遗漏加权综合（55%频率 / 45%遗漏）",
+      "red": [
+        3,
+        8,
+        19,
+        20,
+        26,
+        29
+      ],
+      "blue": [
+        14
+      ],
+      "red_alts": [
+        [
+          2,
+          3,
+          8,
+          19,
+          20,
+          26
+        ],
+        [
+          3,
+          8,
+          13,
+          19,
+          20,
+          29
+        ],
+        [
+          3,
+          8,
+          15,
+          19,
+          26,
+          29
+        ],
+        [
+          3,
+          8,
+          16,
+          20,
+          26,
+          29
+        ]
+      ],
+      "blue_alts": [
+        [
+          10
+        ],
+        [
+          16
+        ],
+        [
+          2
+        ],
+        [
+          11
+        ]
+      ],
+      "red_pool": [
+        {
+          "num": 3,
+          "score": 0.8683,
+          "freq": 60,
+          "recent_freq": 4,
+          "omission": 13,
+          "max_omission": 18
+        },
+        {
+          "num": 8,
+          "score": 0.8664,
+          "freq": 56,
+          "recent_freq": 6,
+          "omission": 14,
+          "max_omission": 17
+        },
+        {
+          "num": 26,
+          "score": 0.7848,
+          "freq": 42,
+          "recent_freq": 2,
+          "omission": 15,
+          "max_omission": 34
+        },
+        {
+          "num": 20,
+          "score": 0.7168,
+          "freq": 41,
+          "recent_freq": 1,
+          "omission": 13,
+          "max_omission": 30
+        },
+        {
+          "num": 19,
+          "score": 0.6765,
+          "freq": 51,
+          "recent_freq": 5,
+          "omission": 9,
+          "max_omission": 20
+        },
+        {
+          "num": 29,
+          "score": 0.6667,
+          "freq": 46,
+          "recent_freq": 6,
+          "omission": 10,
+          "max_omission": 26
+        },
+        {
+          "num": 2,
+          "score": 0.64,
+          "freq": 69,
+          "recent_freq": 4,
+          "omission": 3,
+          "max_omission": 23
+        },
+        {
+          "num": 13,
+          "score": 0.6301,
+          "freq": 64,
+          "recent_freq": 2,
+          "omission": 4,
+          "max_omission": 22
+        },
+        {
+          "num": 15,
+          "score": 0.6264,
+          "freq": 56,
+          "recent_freq": 5,
+          "omission": 6,
+          "max_omission": 14
+        },
+        {
+          "num": 16,
+          "score": 0.6123,
+          "freq": 58,
+          "recent_freq": 7,
+          "omission": 5,
+          "max_omission": 32
+        },
+        {
+          "num": 30,
+          "score": 0.6081,
+          "freq": 65,
+          "recent_freq": 5,
+          "omission": 3,
+          "max_omission": 22
+        },
+        {
+          "num": 9,
+          "score": 0.6062,
+          "freq": 61,
+          "recent_freq": 4,
+          "omission": 4,
+          "max_omission": 14
+        }
+      ],
+      "blue_pool": [
+        {
+          "num": 14,
+          "score": 0.7937,
+          "freq": 15,
+          "recent_freq": 0,
+          "omission": 65,
+          "max_omission": 65
+        },
+        {
+          "num": 10,
+          "score": 0.7443,
+          "freq": 21,
+          "recent_freq": 0,
+          "omission": 38,
+          "max_omission": 44
+        },
+        {
+          "num": 16,
+          "score": 0.6634,
+          "freq": 22,
+          "recent_freq": 1,
+          "omission": 23,
+          "max_omission": 39
+        },
+        {
+          "num": 2,
+          "score": 0.5787,
+          "freq": 18,
+          "recent_freq": 2,
+          "omission": 24,
+          "max_omission": 60
+        },
+        {
+          "num": 11,
+          "score": 0.5638,
+          "freq": 24,
+          "recent_freq": 2,
+          "omission": 2,
+          "max_omission": 40
+        },
+        {
+          "num": 1,
+          "score": 0.5436,
+          "freq": 21,
+          "recent_freq": 3,
+          "omission": 9,
+          "max_omission": 64
+        },
+        {
+          "num": 4,
+          "score": 0.5297,
+          "freq": 21,
+          "recent_freq": 5,
+          "omission": 7,
+          "max_omission": 61
+        }
+      ]
+    }
+  },
+  "backtest": [
+    {
+      "strategy": "balanced",
+      "tested": 80,
+      "train_window": 300,
+      "avg_red_match": 1.225,
+      "avg_blue_match": 0.037,
+      "red_match_dist": {
+        "0": 17,
+        "1": 40,
+        "2": 12,
+        "3": 10,
+        "4": 1
+      },
+      "blue_match_dist": {
+        "0": 77,
+        "1": 3
+      },
+      "any_prize_rate": 0.05,
+      "any_prize_theory": 0.067095,
+      "tier_detail": {
+        "5": {
+          "name": "五等奖",
+          "count": 1,
+          "fixed": 10
+        },
+        "6": {
+          "name": "六等奖",
+          "count": 3,
+          "fixed": 5
+        }
+      },
+      "jackpot_wins": 0,
+      "cost": 160,
+      "fixed_return": 25.0,
+      "net": -135.0,
+      "theory_probs": {
+        "1": 6e-08,
+        "2": 8.5e-07,
+        "3": 9.14e-06,
+        "4": 0.00043423,
+        "5": 0.00775771,
+        "6": 0.05889255
+      }
+    },
+    {
+      "strategy": "hot",
+      "tested": 80,
+      "train_window": 300,
+      "avg_red_match": 1.113,
+      "avg_blue_match": 0.037,
+      "red_match_dist": {
+        "0": 22,
+        "1": 31,
+        "2": 23,
+        "3": 4
+      },
+      "blue_match_dist": {
+        "0": 77,
+        "1": 3
+      },
+      "any_prize_rate": 0.0375,
+      "any_prize_theory": 0.067095,
+      "tier_detail": {
+        "6": {
+          "name": "六等奖",
+          "count": 3,
+          "fixed": 5
+        }
+      },
+      "jackpot_wins": 0,
+      "cost": 160,
+      "fixed_return": 15.0,
+      "net": -145.0,
+      "theory_probs": {
+        "1": 6e-08,
+        "2": 8.5e-07,
+        "3": 9.14e-06,
+        "4": 0.00043423,
+        "5": 0.00775771,
+        "6": 0.05889255
+      }
+    },
+    {
+      "strategy": "cold",
+      "tested": 80,
+      "train_window": 300,
+      "avg_red_match": 1.087,
+      "avg_blue_match": 0.037,
+      "red_match_dist": {
+        "0": 21,
+        "1": 36,
+        "2": 19,
+        "3": 3,
+        "4": 1
+      },
+      "blue_match_dist": {
+        "0": 77,
+        "1": 3
+      },
+      "any_prize_rate": 0.05,
+      "any_prize_theory": 0.067095,
+      "tier_detail": {
+        "5": {
+          "name": "五等奖",
+          "count": 1,
+          "fixed": 10
+        },
+        "6": {
+          "name": "六等奖",
+          "count": 3,
+          "fixed": 5
+        }
+      },
+      "jackpot_wins": 0,
+      "cost": 160,
+      "fixed_return": 25.0,
+      "net": -135.0,
+      "theory_probs": {
+        "1": 6e-08,
+        "2": 8.5e-07,
+        "3": 9.14e-06,
+        "4": 0.00043423,
+        "5": 0.00775771,
+        "6": 0.05889255
+      }
+    }
+  ]
+}

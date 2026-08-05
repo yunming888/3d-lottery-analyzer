@@ -22,3 +22,12 @@
 ## 追踪期
 - 2026-06-13 ~ 2026-08-31
 - profit_loss.json end_date = 2026-08-31
+
+## 子项目: lottery-strategy-analyzer (2026-08-05 新建)
+- 位置: 本仓库 `lottery-strategy-analyzer/` —— 通用彩票策略分析程序（双色球/大乐透），与 3D 项目独立。
+- 结构: `lottery_analyzer/` 包(config/fetcher/analyzer/recommender/backtester/visualizer/report) + `run.py`(CLI)。
+- 数据源: 500彩票网历史接口 `datachart.500.com/{game}/history/newinc/history.php`(server-render HTML, 需剔 `<!--<td>2</td>-->` 注释伪节点; 期号 YYNNN 跨年, 抓取起点按当前年份回退≥2年取窗口)。
+- 统计: 频率/冷热三分位/当前+最大遗漏/区间/奇偶和值; 三策略(hot/cold/balanced)选号+回测(组合数学理论中奖率对照)。
+- 输出: `output/{game}_analysis.json` / `_report.md` / `_report.html`(图表 base64 内嵌) + 4张 PNG。
+- 依赖 matplotlib(已装项目 venv)；运行需 `--refresh` 重新抓取。
+- 新增彩种只需在 `config.py` 的 LOTTERIES/SOURCE_500/TIER_FUNC 注册, 核心算法不动。
