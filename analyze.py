@@ -6,6 +6,7 @@ v4: 3条熔断规则全部暂停等用户决策 + 正常每天10注
 import json
 import os
 from collections import Counter, defaultdict
+from itertools import combinations
 
 DATA_FILE = "data/3d_history.json"
 
@@ -188,10 +189,16 @@ def circuit_breaker(records, target_type="组六"):
 
 def generate_recommendations(records, info, count=10):
     """
-    形态自适应选号（用于自动化任务）
+    形态自适应选号（用于自动化任务） v2：合理性 + 分布均衡
     info: {"stop": bool, "push_type": "组六"/"组三", "push_count": int}
-    组三: 组合90种, 单注奖金320 (正EV); 组六: 组合120种, 单注奖金160 (负EV)
-    返回: [{"nums": [...], "logic": "...", "sum_val": N, "span": N}, ...]
+
+    改进（相对旧版）：
+    1. 枚举全量候选(组六120/组三90)，按"统计合理性"打分：
+       和值贴近近期中区、跨度落在典型区间(4~6最优)、遗漏仅作弱 tie-breaker
+       （摒弃"冷号必出"的赌徒谬误）。
+    2. 多样性贪心筛选：优先引入未覆盖数字、惩罚已过度使用的数字，
+       使最终 N 注在 0~9 十个数位上分布均衡、互不冗余。
+    输出组数严格等于 count（由熔断规则决定，不在此处写死）。
     """
     if info.get("stop"):
         return []
@@ -201,198 +208,136 @@ def generate_recommendations(records, info, count=10):
     if n < 4:
         return []
 
-    # 计算遗漏
+    # 计算遗漏（仅用于弱 tie-breaker）
     last_seen = {}
     for idx, r in enumerate(records):
         for num in r["nums"]:
             if num not in last_seen:
                 last_seen[num] = idx
-
     missing = {i: last_seen.get(i, n) for i in range(10)}
 
-    # 计算频率
-    freq = Counter()
-    for r in records:
-        for num in r["nums"]:
-            freq[num] += 1
-
-    # 冷热排序
-    cold = sorted(range(10), key=lambda x: (-missing[x], -freq[x]))
-    hot = sorted(range(10), key=lambda x: (-freq[x], missing[x]))
-
-    # 近10期和值/跨度
-    recent_sums = [r["sum_val"] for r in records[:10]]
+    # 近期和值均值（定位中区，用更长窗口更稳）
+    recent_sums = [r["sum_val"] for r in records[:30]]
     avg_sum = sum(recent_sums) / len(recent_sums) if recent_sums else 13.5
-    recent_spans = [max(r["nums"]) - min(r["nums"]) for r in records[:10]]
-    avg_span = sum(recent_spans) / len(recent_spans) if recent_spans else 5
 
     if push_type == "组三":
-        return _gen_zusan(records, cold, hot, missing, freq, avg_sum, avg_span, count)
-    return _gen_zuliu(records, cold, hot, missing, freq, avg_sum, avg_span, count)
+        candidates = _build_zusan_pool(missing, avg_sum)
+    else:
+        candidates = _build_zuliu_pool(missing, avg_sum)
+
+    return _select_diverse(candidates, count)
 
 
-def _gen_zuliu(records, cold, hot, missing, freq, avg_sum, avg_span, count):
-    """组六选号（原逻辑，3数字互不相同）"""
-    candidates = []
-    seen_sets = set()
-
-    def add_candidate(nums, logic):
-        if len(set(nums)) < 3:
-            return
-        key = tuple(sorted(nums))
-        if key in seen_sets:
-            return
-        seen_sets.add(key)
-        s = sum(nums)
-        sp = max(nums) - min(nums)
-        candidates.append({"nums": sorted(nums), "logic": logic, "sum_val": s, "span": sp})
-
-    # 策略1: 遗漏回补核心（最冷3号组合）
-    _cold = cold[:]
-    for _ in range(2):
-        add_candidate([_cold[0], _cold[1], _cold[2]],
-                      f"遗漏回补核心: {_cold[0]}(缺{missing[_cold[0]]}期)+{_cold[1]}(缺{missing[_cold[1]]}期)+{_cold[2]}(缺{missing[_cold[2]]}期)")
-        _cold = _cold[3:] + _cold[:3]
-
-    # 策略2: 冷热搭配
-    _cold2, _hot = cold[:], hot[:]
-    for _ in range(2):
-        add_candidate([_cold2[0], _hot[0], _hot[1]],
-                      f"冷热搭配: {_cold2[0]}(冷)+{_hot[0]}(热)+{_hot[1]}(热)")
-        _cold2 = _cold2[1:] + _cold2[:1]
-        _hot = _hot[2:] + _hot[:2]
-
-    # 策略3: 和值回归（目标接近理论均值13.5）
-    target_sum = 14 if avg_sum < 10 else 11 if avg_sum > 17 else 13
-    _cold3 = cold[:]
-    for _ in range(2):
-        a = _cold3[0]
-        for b in range(10):
-            if b == a:
-                continue
-            c = target_sum - a - b
-            if 0 <= c <= 9 and c != a and c != b:
-                add_candidate([a, b, c], f"和值{target_sum}回归: {a}+{b}+{c}={target_sum}")
-                break
-        _cold3 = _cold3[1:] + _cold3[:1]
-        target_sum = target_sum + 1 if target_sum < 13 else target_sum - 1
-
-    # 策略4: 跨度修正
-    target_span = max(2, min(8, int(avg_span))) if avg_span >= 8 else min(8, max(3, int(avg_span + 3)))
-    _cold4 = cold[:]
-    _hot4 = hot[:]
-    for _ in range(2):
-        a = _cold4[0]
-        b = _hot4[0] if _hot4[0] != a else _hot4[1]
-        for c in range(10):
-            if c != a and c != b and max(a, b, c) - min(a, b, c) == target_span:
-                add_candidate([a, b, c], f"跨{target_span}修正: 近均值{target_span}跨")
-                break
-        _cold4 = _cold4[1:] + _cold4[:1]
-        _hot4 = _hot4[1:] + _hot4[:1]
-        target_span = max(3, target_span - 1)
-
-    # 策略5: 位置独立（百/十/个各取优号）
-    pos_counter = {"bai": Counter(), "shi": Counter(), "ge": Counter()}
-    for r in records:
-        pos_counter["bai"][r["bai"]] += 1
-        pos_counter["shi"][r["shi"]] += 1
-        pos_counter["ge"][r["ge"]] += 1
-    bai_top = [n for n, _ in pos_counter["bai"].most_common(5)]
-    shi_top = [n for n, _ in pos_counter["shi"].most_common(5)]
-    ge_top = [n for n, _ in pos_counter["ge"].most_common(5)]
-    for i in range(2):
-        a = bai_top[0]
-        b = shi_top[min(i, len(shi_top) - 1)]
-        c = ge_top[min(i + 2, len(ge_top) - 1)]
-        if len({a, b, c}) == 3:
-            add_candidate([a, b, c], f"位置独立: 百{a}(热)+十{b}(热)+个{c}(热)")
-        bai_top = bai_top[1:] + bai_top[:1]
-
-    # 策略6: 补位填充
-    fill_candidates = []
-    for a in cold[:6]:
-        for b in hot[:6]:
-            if b == a:
-                continue
-            for c in range(10):
-                if c == a or c == b:
-                    continue
-                key = tuple(sorted([a, b, c]))
-                if key not in seen_sets:
-                    s = sum(key)
-                    sp = max(key) - min(key)
-                    score = (1 if 10 <= s <= 16 else 0) + (1 if 3 <= sp <= 7 else 0) + (2 if a in cold[:3] else 0)
-                    fill_candidates.append((score, sorted([a, b, c]), key, s, sp))
-    fill_candidates.sort(key=lambda x: -x[0])
-    for score, nums, key, s, sp in fill_candidates:
-        if key not in seen_sets:
-            seen_sets.add(key)
-            candidates.append({
-                "nums": nums,
-                "logic": f"补位: {nums[0]}(缺{missing[nums[0]]})+{nums[1]}(热)+{nums[2]}, 和{s}跨{sp}",
-                "sum_val": s, "span": sp
-            })
-            if len(candidates) >= count:
-                break
-
-    return candidates[:count]
+def _score_combo(multiset, missing, avg_sum):
+    """统计合理性打分 (0~1)。和值/跨度为主，遗漏为弱项，避免赌徒谬误。"""
+    s = sum(multiset)
+    sp = max(multiset) - min(multiset)
+    # 和值：贴近近期中区(10~17)，越近越高
+    center = max(10, min(17, round(avg_sum)))
+    sum_score = 1.0 - min(abs(s - center), 9) / 9.0
+    # 跨度：4~6 最优，向外递减
+    if sp in (4, 5, 6):
+        span_score = 1.0
+    elif sp in (3, 7):
+        span_score = 0.7
+    elif sp in (2, 8):
+        span_score = 0.4
+    else:
+        span_score = 0.15
+    # 遗漏：弱项，仅作轻微偏好（冷号不等于必出）
+    max_miss = max(missing.values()) or 1
+    om_score = sum(missing[d] for d in set(multiset)) / (len(set(multiset)) * max_miss)
+    score = 0.5 * sum_score + 0.3 * span_score + 0.2 * om_score
+    return s, sp, score
 
 
-def _gen_zusan(records, cold, hot, missing, freq, avg_sum, avg_span, count):
-    """
-    组三选号（正EV玩法）：一个重复号 d + 一个单号 s, 号码 [d,d,s], 共90种
-    重复号优先冷号(回补)与热号(延续); 单号优先热号; 约束和值8-20, 跨度1-7
-    """
-    candidates = []
-    seen = set()
+def _build_zuliu_pool(missing, avg_sum):
+    """枚举全部 120 组六组合并打分。"""
+    cands = []
+    for combo in combinations(range(10), 3):
+        nums = sorted(combo)
+        s, sp, score = _score_combo(nums, missing, avg_sum)
+        cands.append({
+            "nums": nums,
+            "multiset": list(nums),
+            "distinct": set(nums),
+            "sum_val": s, "span": sp, "score": score,
+        })
+    return cands
 
-    def add(d, s, logic):
-        if d == s:
-            return
-        nums = sorted([d, d, s])
-        key = tuple(nums)
-        if key in seen:
-            return
-        seen.add(key)
-        candidates.append({"nums": nums, "logic": logic, "sum_val": 2 * d + s, "span": abs(d - s)})
 
-    # 重复号候选: 冷号优先(易重复回补) + 热号(延续)
-    dup_cands = []
-    for x in cold[:5]:
-        if x not in dup_cands:
-            dup_cands.append(x)
-    for x in hot[:3]:
-        if x not in dup_cands:
-            dup_cands.append(x)
-    single_cands = hot[:8]
-
-    for d in dup_cands:
-        for s in single_cands:
+def _build_zusan_pool(missing, avg_sum):
+    """枚举全部 90 组三组合 [d,d,s] 并打分。"""
+    cands = []
+    for d in range(10):
+        for s in range(10):
             if s == d:
                 continue
+            nums = sorted([d, d, s])
             sv = 2 * d + s
-            if not (8 <= sv <= 20):
+            sp = abs(d - s)
+            _, _, score = _score_combo([d, d, s], missing, avg_sum)
+            # 组三额外约束：和值 8~20、跨度 1~7 才给基础合理分
+            if not (8 <= sv <= 20) or sp < 1 or sp > 7:
+                score *= 0.5
+            cands.append({
+                "nums": nums,
+                "multiset": [d, d, s],
+                "distinct": {d, s},
+                "sum_val": sv, "span": sp, "score": score,
+            })
+    return cands
+
+
+def _select_diverse(candidates, count):
+    """
+    多样性贪心筛选：在合理候选中挑 count 注，使 0~9 数位分布均衡。
+    分数主导，多样性做乘性微调：优先引入未覆盖数字、惩罚过度使用的数字。
+    """
+    if count <= 0:
+        return []
+    selected = []
+    used = Counter()
+    pool = sorted(candidates, key=lambda c: -c["score"])
+
+    while len(selected) < count and pool:
+        best = None
+        best_val = None
+        for c in pool:
+            if c in selected:
                 continue
-            if abs(d - s) < 1:
-                continue
-            add(d, s, f"组三: 重号{d}(缺{missing[d]}期/热{freq[d]})+单号{s}(热{freq[s]}), 和{sv}跨{abs(d - s)}")
-        if len(candidates) >= count:
+            new_digits = sum(1 for d in c["distinct"] if used[d] == 0)
+            overuse = sum(used[d] for d in c["distinct"])
+            # 乘性调整：保留分数主导，多样性只做相对微调
+            val = c["score"] * (1 + 0.3 * new_digits - 0.2 * overuse)
+            if best_val is None or val > best_val:
+                best = c
+                best_val = val
+        if best is None:
             break
+        best["_new"] = [d for d in sorted(best["distinct"]) if used[d] == 0]
+        selected.append(best)
+        for d in best["multiset"]:
+            used[d] += 1
+        pool.remove(best)
 
-    # 不足则放宽约束补全
-    if len(candidates) < count:
-        for d in dup_cands:
-            for s in range(10):
-                if s == d:
-                    continue
-                add(d, s, f"组三补位: 重{d}+单{s}")
-                if len(candidates) >= count:
-                    break
-            if len(candidates) >= count:
-                break
+    return [{
+        "nums": c["nums"],
+        "logic": _make_logic(c),
+        "sum_val": c["sum_val"],
+        "span": c["span"],
+    } for c in selected]
 
-    return candidates[:count]
+
+def _make_logic(c):
+    """生成可读的推导逻辑（合理性 + 均衡性）。"""
+    sv = c["sum_val"]
+    band = "和值中区" if 10 <= sv <= 17 else ("和值小" if sv < 10 else "和值大")
+    sp = c["span"]
+    span_desc = "典型跨度" if sp in (4, 5, 6) else "跨度"
+    new = c.get("_new", [])
+    extra = (" · 新号" + "/".join(map(str, new))) if new else " · 均衡补位"
+    return f"{band}{sv}·{span_desc}{sp}{extra}"
 
 def full_report():
     """生成完整分析报告"""
