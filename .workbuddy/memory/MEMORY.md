@@ -6,10 +6,15 @@
 - 覆盖规则: Rule4(3连同形态→强推)/Rule6(组三2连→推组六)/Rule7(组六11连→警戒) 不熔断
 - 用户只推组六, 不推组三
 
+## 选号算法版本
+- v2 (2026-08-06): analyze.py `generate_recommendations` 重构 —— 枚举全量候选(组六120/组三90)→ 统计合理性打分(和值贴近近期中区10~17 / 跨度4~6最优 / 遗漏仅作弱tie-breaker, 摒弃"冷号必出"赌徒谬误)→ 多样性贪心筛选(分数主导, 乘性微调: 优先引入未覆盖数字、惩罚过度使用数字, 使0~9分布均衡)。输出组数严格等于熔断给的 count, 不写死。
+- 组六×5: 0~9全覆盖, 单数字1~2次, 和值13~17; 组六×10: 每数字精确3次; 组三×10: 全覆盖, 4~2次。
+- v1 (废弃): 固定策略顺序(遗漏回补/冷热搭配/和值回归/跨度修正/位置独立/补位)拼接后截断, 无均衡约束, 偏赌徒谬误。
+
 ## 技术备忘
 - git push: 统一用 `git pull --rebase` + `git push origin master`; Python API 兜底已废弃(token 失效)
 - 微信推送(automation push_to_wechat): 自动化回复禁止调用 present_files(微信不渲染文件卡片→空白), 改为纯文本自包含输出
-- 数据源: **已切换为 huiniao 官方镜像** `http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit=30` (fetch_data.py `fetch_huiniao`, 免鉴权, ~5分钟同步, 含 200+, 返回 `data.data.list[].{code,day,one,two,three}`)。东方财富兜底仍保留但已过期卡在 2026199。huiniao 实测最新 2026204(2026-08-02), 2026205 每晚21:15开。
+- 数据源: **已切换为 huiniao 官方镜像** `http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit=30` (fetch_data.py `fetch_huiniao`, 免鉴权, ~5分钟同步, 含 200+, 返回 `data.data.list[].{code,day,one,two,three}`)。东方财富兜底仍保留但已过期卡在 2026199。huiniao 实测最新 2026207(2026-08-05开), 2026208 每晚21:15开。
 - 每日7点自动执行 (automation-1782775804842)
 
 ## 休市判断 (2026-08-03 重构)

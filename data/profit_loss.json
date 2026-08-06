@@ -2895,9 +2895,13 @@
     {
       "date": "2026-08-06",
       "target_qihao": "2026208",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026208",
+      "draw_nums": [
+        6,
+        3,
+        2
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           1,
@@ -2927,25 +2931,65 @@
       ],
       "notes": 5,
       "cost": 10,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -10,
+      "reason": "组六5注->0命中 开奖632组六"
+    },
+    {
+      "date": "2026-08-07",
+      "target_qihao": "2026209",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          1,
+          6,
+          7
+        ],
+        [
+          2,
+          4,
+          8
+        ],
+        [
+          3,
+          5,
+          9
+        ],
+        [
+          0,
+          6,
+          7
+        ],
+        [
+          2,
+          5,
+          8
+        ]
+      ],
+      "notes": 5,
+      "cost": 10,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "组六5注推荐(新算法v2: 合理性+分布均衡) | Rule4: 连续5期组六 -> 强推不熔断; 形态自适应: 组六5连 -> 轻仓组六5注降损耗"
+      "reason": "组六5注推荐 | Rule4: 连续6期组六 -> 强推不熔断; 形态自适应: 组六6连 -> 轻仓组六5注降损耗"
     }
   ],
   "summary": {
-    "total_days": 56,
-    "settled_days": 55,
-    "active_days": 40,
-    "total_bets": 373,
-    "total_cost": 746,
+    "total_days": 57,
+    "settled_days": 56,
+    "active_days": 41,
+    "total_bets": 378,
+    "total_cost": 756,
     "total_hits": 2,
     "total_prize": 320,
-    "net_pnl": -426,
+    "net_pnl": -436,
     "pending_bets": 5,
     "pending_cost": 10,
-    "last_settled": "2026-08-06",
-    "last_hit": "2026-08-06 2注"
+    "last_settled": "2026-08-07",
+    "last_hit": "2026-08-07 2注"
   },
-  "last_draw_qihao": "2026207"
+  "last_draw_qihao": "2026208"
 }
