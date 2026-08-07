@@ -121,22 +121,57 @@ def _pick_blues(weights: dict, rng: random.Random, totals: dict) -> list:
     return sorted(chosen)
 
 
+def _red_sum_band(records):
+    """红球和值经验区间（10%~90% 分位），用于剔除极端和值。"""
+    sums = [sum(r.get("reds", [])) for r in records if r.get("reds")]
+    if len(sums) < 10:
+        return None, None
+    sums.sort()
+    n = len(sums)
+    return sums[n // 10], sums[min(n - 1, n * 9 // 10)]
+
+
+def _valid_note(reds, blues, red_sum_lo, red_sum_hi):
+    """硬均衡：红球奇偶/大小不极端(2..RED_COUNT-2)，和值在区间内；后区奇偶/大小严格1:1。"""
+    ro = sum(1 for d in reds if d % 2 == 1)
+    if not (2 <= ro <= config.RED_COUNT - 2):
+        return False
+    rb = sum(1 for d in reds if d >= RED_BIG)
+    if not (2 <= rb <= config.RED_COUNT - 2):
+        return False
+    rs = sum(reds)
+    if red_sum_lo is not None and not (red_sum_lo <= rs <= red_sum_hi):
+        return False
+    bo = sum(1 for d in blues if d % 2 == 1)
+    if bo != 1:
+        return False
+    bb = sum(1 for d in blues if d >= BLUE_BIG)
+    if bb != 1:
+        return False
+    return True
+
+
 def generate_notes(records: list, count: int = config.NOTES, seed=config.SEED):
-    """生成 count 注（前区5 + 后区2），返回 (notes, balance)。"""
+    """生成 count 注（前区 + 后区），返回 (notes, balance)。
+    v2: 在经验频率加权(已有)基础上，增加硬均衡约束(奇偶/大小/和值区间)，
+        与福彩3D经验分布采样思路一致——只出"形态典型"的号，不声称预测。"""
     rng = random.Random(seed)
     weights = build_weights(records, rng)
+    red_sum_lo, red_sum_hi = _red_sum_band(records)
     notes = []
     seen = set()
     totals = {"r_odd": 0, "r_even": 0, "r_big": 0, "r_small": 0,
               "b_odd": 0, "b_even": 0, "b_big": 0, "b_small": 0}
     attempts = 0
-    max_attempts = count * 80
+    max_attempts = count * 200
     while len(notes) < count and attempts < max_attempts:
         attempts += 1
         reds = _pick_reds(weights, rng, totals)
         blues = _pick_blues(weights, rng, totals)
         key = (tuple(reds), tuple(blues))
         if key in seen:
+            continue
+        if not _valid_note(reds, blues, red_sum_lo, red_sum_hi):
             continue
         seen.add(key)
         notes.append({"reds": reds, "blues": blues})
