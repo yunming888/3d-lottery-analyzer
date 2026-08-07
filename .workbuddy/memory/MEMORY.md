@@ -18,7 +18,8 @@
 - 微信推送(automation push_to_wechat): 自动化回复禁止调用 present_files(微信不渲染文件卡片→空白), 改为纯文本自包含输出
 - 数据源: **已切换为 huiniao 官方镜像** `http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit=100` (fetch_data.py `fetch_huiniao`, 免鉴权, ~5分钟同步, 返回 `data.data.list[].{code,day,one,two,three}`)。东方财富兜底仍保留但已过期卡在 2026199。huiniao 实测最新 2026208(2026-08-06开)。出号前拉100期做走势研判(`analyze.trend_analysis`)。
 - 走势研判: `analyze.trend_analysis(records, window=100)` 输出热冷号/和值跨度均值与趋势/组六连出/最大遗漏, 经 daily_review 与 unified_review 进入报告与微信摘要。
-- 每日7点自动执行: **`automation-1786103338209`「彩票每期复盘（福彩3D+大乐透+双色球）」**(ACTIVE, 列表可见, 有效期至2026-09-30); 旧 `automation-1782775804842` 因列表不可见已于 2026-08-07 改为 PAUSED 停用。
+- 数据校验/官网抓取: 中福彩官网(cwl.gov.cn)子路径对无头浏览器 **403(WAF)**, 体彩官方 API(webapi.sporttery.cn) **E0001(需签名)** —— 二者均无法直接自动化抓取。权威替代源: **huiniao 镜像(即中福彩官方数据)** 支持 `type=fcsd/ssq/dlt` 三品种, 响应为 `data.data.list`(两层 data), 期号 3D/双色球7位、大乐透6位(比对归一化后5位); **500彩票网**(官方聚合) 需带 `User-Agent` 否则触发反爬挑战页。双源交叉校验脚本见 `verify_data.py`(内部完整性+一致性)。
+- 每日7点自动执行: **`automation-1786103338209`「彩票每期复盘（福彩3D+大乐透+双色球）」**(ACTIVE, 列表可见, validFrom=2026-08-08北京时间, 有效期至2026-09-30); 旧 `automation-1782775804842` 经核实已**删除(not found)**, 无遗留重复任务。
 
 ## 休市判断 (2026-08-03 重构)
 - 福彩3D **天天开奖、全年无休**, 周末照常开; 仅财政部公告的官方休市期停开: 春节(2026-02-14~02-23, 10天)、国庆(2026-10-01~10-04, 4天)。
@@ -46,7 +47,7 @@
 - 大乐透/双色球 选号规则(用户 2026-08-07): **各固定 5 组**(`dlt/config.py`/`ssq/config.py` NOTES=5); 引入持久化 `portfolio`(data/dlt_state.json/ssq_state.json), **每2周周五(ISO周偶数)轮换最冷2组**(按号码遗漏和度量冷度, 生成2注新号替换); 修复非开奖日重复堆积 pending 导致重复结算的 bug(改为按 target_issue 仅保留一条 pending)。
 - 结算: 按目标期号(target=最新+1)结算 pending; 奖级 `_dlt_tier`/`_ssq_tier` + 固定奖(`DLT_PRIZE` 3~9档 / `SSQ_PRIZE` 3~6档), 一/二等奖浮动奖池记为"浮动奖"不计入PnL(保守)。
 - 开奖日: 福彩3D 每日; 大乐透 周一/三/六; 双色球 周二/四/日。昨日无开奖的品种在报告中注明。
-- 自动化整合(2026-08-07): **唯一彩票自动化 = `automation-1786103338209`「彩票每期复盘（福彩3D+大乐透+双色球）」**(ACTIVE, 列表可见, 07:00, 有效期至2026-09-30, 运行 unified_review.py + git push)。旧 `automation-1782775804842`(同名隐藏不可见) 已 PAUSED 停用。已删除冗余: 1786094467671(21:30三品种)/1782898966636(大乐透07:10)/1782899625085(大乐透月度换号)/1785907472096(月度盈亏报告)。保留非彩票: 1784424937390(快手云明夜话)/1784967703745(三平台内容复盘)。
+- 自动化整合(2026-08-07): **唯一彩票自动化 = `automation-1786103338209`「彩票每期复盘（福彩3D+大乐透+双色球）」**(ACTIVE, 列表可见, 07:00, validFrom=2026-08-08北京时间, 有效期至2026-09-30, 运行 unified_review.py + git push)。旧 `automation-1782775804842`(同名隐藏不可见) 经核实已**删除(not found)**, 无重复触发。已删除冗余: 1786094467671(21:30三品种)/1782898966636(大乐透07:10)/1782899625085(大乐透月度换号)/1785907472096(月度盈亏报告)。保留非彩票: 1784424937390(快手云明夜话)/1784967703745(三平台内容复盘)。
 - 运行环境: 必须用 venv `C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe`(已装 requests); 裸 managed python 3.13 缺 requests 会报 ModuleNotFoundError。
 
 ## 用户对"彩票规律/预测"的立场与我的应对 (2026-08-07 两次强调)
