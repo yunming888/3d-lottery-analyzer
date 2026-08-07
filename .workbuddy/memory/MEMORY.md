@@ -1,10 +1,8 @@
 # 3D彩票分析器 - 项目记忆
 
-## 熔断规则版本
-- v7 (2026-07-06): Rule1组三高频熔断已禁用, 靠Rule2(和值极端)/Rule3(连续同形态)管
-- v6 (2026-07-06): Rule1 改为近30期组三>=10次 (已废弃, 仍太敏感)
-- 覆盖规则: Rule4(3连同形态→强推)/Rule6(组三2连→推组六)/Rule7(组六11连→警戒) 不熔断
-- 用户只推组六, 不推组三
+## 熔断规则版本 (福彩3D)
+- v9 (2026-08-07, 用户新规则): **常态每天推 10 组组六(每天更换)**; **仅当组六连续开出 > 6 期(即>=7期)时熔断暂停(0注)**, 回避极端连开; 形态打断(出组三/豹子)即恢复。旧 Rule1~7/形态自适应逻辑全部废弃。
+- 用户只推组六, 不推组三。
 
 ## 选号算法版本
 - v2 (2026-08-06): analyze.py `generate_recommendations` 重构 —— 枚举全量候选(组六120/组三90)→ 统计合理性打分(和值贴近近期中区10~17 / 跨度4~6最优 / 遗漏仅作弱tie-breaker, 摒弃"冷号必出"赌徒谬误)→ 多样性贪心筛选(分数主导, 乘性微调: 优先引入未覆盖数字、惩罚过度使用数字, 使0~9分布均衡)。输出组数严格等于熔断给的 count, 不写死。
@@ -37,9 +35,11 @@
 - 依赖 matplotlib(已装项目 venv)；运行需 `--refresh` 重新抓取。
 - 新增彩种只需在 `config.py` 的 LOTTERIES/SOURCE_500/TIER_FUNC 注册, 核心算法不动。
 
-## 统一三品种每日复盘 (2026-08-07)
-- 编排器 `unified_review.py`：每日 07:00 运行，依次 `daily_review.main()`(福彩3D) + `dlt/settle.run_daily()` + `ssq/settle.run_daily()`，汇总三品种「昨日数据摘要/复盘结论/具体盈亏」，写 `data/reports/unified_YYYY-MM-DD.md`，打印唯一【微信推送摘要】(自动化直接抓取推送)。
-- 结算模块 `dlt/settle.py` / `ssq/settle.py`：维护 `data/dlt_state.json` / `data/ssq_state.json`(每期选号+结算状态)；按目标期号(target=最新+1)结算 pending；奖级 `_dlt_tier`/`_ssq_tier` + 固定奖(`DLT_PRIZE` 3~9档 / `SSQ_PRIZE` 3~6档)，一/二等奖浮动奖池记为"浮动奖"不计入PnL(保守)；**同日幂等**(今日记录已存在则跳过选号, 防重复下单/结算)。
+## 统一三品种每日复盘 (2026-08-07 整合落地)
+- 编排器 `unified_review.py`：每日 07:00 运行，依次 `daily_review.main()`(福彩3D) + `dlt/settle.run_daily()` + `ssq/settle.run_daily()`，汇总三品种「昨日数据摘要/复盘结论/具体盈亏」，写 `data/reports/unified_YYYY-MM-DD.md`，打印唯一【微信推送摘要】(自动化直接抓取推送)。**每月1号额外生成上月月度盈亏报告 `data/reports/YYYY-MM-monthly.md`**(替代已删除的月度盈亏自动化)。
+- 福彩3D 选号规则(用户 2026-08-07): **固定 10 组组六, 每天更换**; **组六连出 > 6 期(>=7)熔断暂停**(daily_review.circuit_breaker_user_rules)。结算模块 `daily_review.py` 旧 Rule1~7 逻辑已废弃。
+- 大乐透/双色球 选号规则(用户 2026-08-07): **各固定 5 组**(`dlt/config.py`/`ssq/config.py` NOTES=5); 引入持久化 `portfolio`(data/dlt_state.json/ssq_state.json), **每2周周五(ISO周偶数)轮换最冷2组**(按号码遗漏和度量冷度, 生成2注新号替换); 修复非开奖日重复堆积 pending 导致重复结算的 bug(改为按 target_issue 仅保留一条 pending)。
+- 结算: 按目标期号(target=最新+1)结算 pending; 奖级 `_dlt_tier`/`_ssq_tier` + 固定奖(`DLT_PRIZE` 3~9档 / `SSQ_PRIZE` 3~6档), 一/二等奖浮动奖池记为"浮动奖"不计入PnL(保守)。
 - 开奖日: 福彩3D 每日; 大乐透 周一/三/六; 双色球 周二/四/日。昨日无开奖的品种在报告中注明。
-- 自动化: `automation-1782775804842`「彩票每日复盘（福彩3D+大乐透+双色球）07:00」= 唯一全品种任务(运行 unified_review.py + git push); 原 21:30 的 `automation-1786094467671` 已 PAUSED(被覆盖)。疑似重复 `1782898966636`(大乐透07:10)/`1784967703745`(三平台10:00) 未动, 因幂等不污染状态。
+- 自动化整合(2026-08-07): **唯一彩票自动化 = `automation-1782775804842`「彩票每期复盘（福彩3D+大乐透+双色球）」**(07:00, 运行 unified_review.py + git push)。已删除冗余: 1786094467671(21:30三品种)/1782898966636(大乐透07:10)/1782899625085(大乐透月度换号)/1785907472096(月度盈亏报告)。保留非彩票: 1784424937390(快手云明夜话)/1784967703745(三平台内容复盘)。
 - 运行环境: 必须用 venv `C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe`(已装 requests); 裸 managed python 3.13 缺 requests 会报 ModuleNotFoundError。
