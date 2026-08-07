@@ -1,0 +1,51 @@
+2026-08-07 12:21:36.075: [INFO] CurrentProfilePath: C:\Users\Administrator\WorkBuddy\2026-06-30-06-19-04\3d-lottery-analyzer\.edge_profile\Default
+2026-08-07 12:21:36.075: [INFO] Profiles total count: 1
+2026-08-07 12:21:36.075: [INFO] Profile: name=用户配置 1 path=C:\Users\Administrator\WorkBuddy\2026-06-30-06-19-04\3d-lottery-analyzer\.edge_profile\Default lastActive=null
+2026-08-07 12:21:36.075: [INFO] LastUsedProfileDir: C:\Users\Administrator\WorkBuddy\2026-06-30-06-19-04\3d-lottery-analyzer\.edge_profile\Default
+2026-08-07 12:21:36.075: [INFO] VisibilityChanged: 0
+2026-08-07 12:21:36.091: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:36.092: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:36.093: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:36.093: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:36.094: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:36.095: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:36.096: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:36.096: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:36.097: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:36.098: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:36.106: [INFO] OnDoneLoading sync enabled: 0
+2026-08-07 12:21:36.106: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-08-07 12:21:36.106: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-08-07 12:21:36.106: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-08-07 12:21:36.144: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:52.020: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-08-07 12:21:52.024: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-08-07 12:21:52.026: [INFO] Primary account changed.
+2026-08-07 12:21:52.026: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-08-07 12:21:52.032: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-08-07 12:21:52.272: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-08-07 12:21:59.602: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.602: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.602: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.602: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.602: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.602: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.603: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.603: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.603: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.603: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.603: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.603: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.604: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.604: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.604: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.604: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.604: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.604: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.604: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.604: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.605: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.605: [INFO] BookmarkNodeAdded, ABU: 0
+2026-08-07 12:21:59.623: [INFO] BookmarkBarPrefChanged showBar=0 showBarNTP=0
+2026-08-07 12:21:59.625: [INFO] VisibilityChanged: 1
+2026-08-07 12:22:09.656: [INFO] Sync initialization duration: 17181ms

@@ -44,10 +44,10 @@
 ## 统一三品种每日复盘 (2026-08-07 整合落地)
 - 编排器 `unified_review.py`：每日 07:00 运行，依次 `daily_review.main()`(福彩3D) + `dlt/settle.run_daily()` + `ssq/settle.run_daily()`，汇总三品种「昨日数据摘要/复盘结论/具体盈亏」，写 `data/reports/unified_YYYY-MM-DD.md`，打印唯一【微信推送摘要】(自动化直接抓取推送)。**每月1号额外生成上月月度盈亏报告 `data/reports/YYYY-MM-monthly.md`**(替代已删除的月度盈亏自动化)。
 - 福彩3D 选号规则(用户 2026-08-07): **固定 10 组组六, 每天更换**; **组六连出 > 6 期(>=7)熔断暂停**(daily_review.circuit_breaker_user_rules)。结算模块 `daily_review.py` 旧 Rule1~7 逻辑已废弃。
-- 大乐透/双色球 选号规则(用户 2026-08-07): **各固定 5 组**(`dlt/config.py`/`ssq/config.py` NOTES=5); 引入持久化 `portfolio`(data/dlt_state.json/ssq_state.json), **每2周周五(ISO周偶数)轮换最冷2组**(按号码遗漏和度量冷度, 生成2注新号替换); 修复非开奖日重复堆积 pending 导致重复结算的 bug(改为按 target_issue 仅保留一条 pending)。
+- 大乐透/双色球 选号规则(用户 2026-08-07, 2026-08-07再确认): **各固定 5 组**(`dlt/config.py`/`ssq/config.py` NOTES=5); 引入持久化 `portfolio`(data/dlt_state.json/ssq_state.json), **每2周周五轮换最冷2组**: 轮换日判定改为「以 2026-08-14 为锚点、每14天一次」(`_is_rotation_day`: `ROTATION_ANCHOR=date(2026,8,14)`, `diff>=0 and diff%14==0`), 首次轮换=08-14/08-28/09-11/09-25… (旧 ISO 偶周逻辑已废弃, 因与锚点错开一周); 换号逻辑 `_rotate_portfolio` 按号码遗漏和(冷度)降序取最冷2组替换为新号, 即「换掉概率最低的2注」。修复非开奖日重复堆积 pending 导致重复结算的 bug(改为按 target_issue 仅保留一条 pending)。
 - 结算: 按目标期号(target=最新+1)结算 pending; 奖级 `_dlt_tier`/`_ssq_tier` + 固定奖(`DLT_PRIZE` 3~9档 / `SSQ_PRIZE` 3~6档), 一/二等奖浮动奖池记为"浮动奖"不计入PnL(保守)。
 - 开奖日: 福彩3D 每日; 大乐透 周一/三/六; 双色球 周二/四/日。昨日无开奖的品种在报告中注明。
-- 自动化整合(2026-08-07): **唯一彩票自动化 = `automation-1786103338209`「彩票每期复盘（福彩3D+大乐透+双色球）」**(ACTIVE, 列表可见, 07:00, validFrom=2026-08-08北京时间, 有效期至2026-09-30, 运行 unified_review.py + git push)。旧 `automation-1782775804842`(同名隐藏不可见) 经核实已**删除(not found)**, 无重复触发。已删除冗余: 1786094467671(21:30三品种)/1782898966636(大乐透07:10)/1782899625085(大乐透月度换号)/1785907472096(月度盈亏报告)。保留非彩票: 1784424937390(快手云明夜话)/1784967703745(三平台内容复盘)。
+- 自动化整合(2026-08-07): **唯一彩票自动化 = `automation-1786103338209`「彩票每期复盘（福彩3D+大乐透+双色球）」** ACTIVE(列表可见, DAILY;BYHOUR=7), 运行 unified_review.py + git push, 有效期至 2026-09-30。旧重复任务 `automation-1782775804842`(隐藏/未在列表) 已于 2026-08-07 晚经用户确认**删除**, 重复触发风险解除。已删除冗余: 1786094467671/1782898966636/1782899625085/1785907472096/1782775804842。保留非彩票: 1786099733599(注册安全师打卡)/1784424937390(快手云明夜话)/1784967703745(三平台内容复盘)。
 - 运行环境: 必须用 venv `C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe`(已装 requests); 裸 managed python 3.13 缺 requests 会报 ModuleNotFoundError。
 
 ## 用户对"彩票规律/预测"的立场与我的应对 (2026-08-07 两次强调)

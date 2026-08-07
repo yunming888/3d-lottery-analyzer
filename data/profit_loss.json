@@ -2939,9 +2939,13 @@
     {
       "date": "2026-08-07",
       "target_qihao": "2026209",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026209",
+      "draw_nums": [
+        2,
+        8,
+        9
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           1,
@@ -2996,25 +3000,39 @@
       ],
       "notes": 10,
       "cost": 20,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -20,
+      "reason": "组六10注->0命中 开奖289组六"
+    },
+    {
+      "date": "2026-08-08",
+      "target_qihao": "2026210",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [],
+      "notes": 0,
+      "cost": 0,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "组六10注推荐 | 常态: 推 10 组组六 (组六连出 6 期, 未达熔断阈值 7 期)"
+      "reason": "熔断触发(熔断: 组六已连出 7 期(>6) -> 暂停推送, 回避极端连开风险)"
     }
   ],
   "summary": {
-    "total_days": 57,
-    "settled_days": 56,
-    "active_days": 41,
-    "total_bets": 378,
-    "total_cost": 756,
+    "total_days": 58,
+    "settled_days": 57,
+    "active_days": 42,
+    "total_bets": 388,
+    "total_cost": 776,
     "total_hits": 2,
     "total_prize": 320,
-    "net_pnl": -436,
-    "pending_bets": 10,
-    "pending_cost": 20,
-    "last_settled": "2026-08-07",
-    "last_hit": "2026-08-07 2注"
+    "net_pnl": -456,
+    "pending_bets": 0,
+    "pending_cost": 0,
+    "last_settled": "2026-08-08",
+    "last_hit": "2026-08-08 2注"
   },
-  "last_draw_qihao": "2026208"
+  "last_draw_qihao": "2026209"
 }
