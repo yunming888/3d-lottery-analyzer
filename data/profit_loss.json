@@ -2967,14 +2967,39 @@
           2,
           5,
           8
+        ],
+        [
+          3,
+          4,
+          9
+        ],
+        [
+          0,
+          1,
+          6
+        ],
+        [
+          7,
+          8,
+          9
+        ],
+        [
+          1,
+          2,
+          3
+        ],
+        [
+          0,
+          1,
+          2
         ]
       ],
-      "notes": 5,
-      "cost": 10,
+      "notes": 10,
+      "cost": 20,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "组六5注推荐 | Rule4: 连续6期组六 -> 强推不熔断; 形态自适应: 组六6连 -> 轻仓组六5注降损耗"
+      "reason": "组六10注推荐 | 常态: 推 10 组组六 (组六连出 6 期, 未达熔断阈值 7 期)"
     }
   ],
   "summary": {
@@ -2986,8 +3011,8 @@
     "total_hits": 2,
     "total_prize": 320,
     "net_pnl": -436,
-    "pending_bets": 5,
-    "pending_cost": 10,
+    "pending_bets": 10,
+    "pending_cost": 20,
     "last_settled": "2026-08-07",
     "last_hit": "2026-08-07 2注"
   },

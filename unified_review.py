@@ -3,11 +3,12 @@
 彩票每日复盘（统一编排器）
 ------------------------
 每日 07:00 运行：
-  1) 福彩3D 复盘 + 结算 + 选号 (daily_review.main)
-  2) 大乐透 结算 + 选号 (dlt.settle.run_daily)
-  3) 双色球 结算 + 选号 (ssq.settle.run_daily)
+  1) 福彩3D 复盘 + 结算 + 选号 (daily_review.main)：每天10组组六，组六连出>6期熔断暂停
+  2) 大乐透 结算 + 选号 (dlt.settle.run_daily)：5组组合持有，每2周周五轮换最冷2组
+  3) 双色球 结算 + 选号 (ssq.settle.run_daily)：5组组合持有，每2周周五轮换最冷2组
 汇总三品种「昨日数据摘要 / 复盘结论 / 具体盈亏」，写 unified_YYYY-MM-DD.md，
 并打印唯一【微信推送摘要】供自动化抓取推送。
+每月1号额外生成上月月度盈亏报告（替代已删除的月度盈亏自动化）。
 
 用法: python unified_review.py
 """
@@ -135,13 +136,16 @@ def wechat_block(today, yesterday, r3, rd, rs):
     else:
         lines.append("结算：今日无待结算（待%s期开奖）" % rd.get("target"))
     s_d = rd["summary"]
-    lines.append("复盘：热号为主+冷号补足；奇偶/大小均衡；随机扰动")
+    rot_d = rd.get("rotation")
+    lines.append("复盘：5组持有·每2周周五轮换最冷2组" + ("；" + rot_d if rot_d else "；热号为主+冷号补足，奇偶/大小均衡"))
     lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
         s_d["net_pnl"], s_d["rounds"], s_d["pending_rounds"]))
     nd = rd.get("notes", [])
     if nd:
         lines.append("今日推荐：%d注（押%s期）" % (len(nd), rd.get("target")))
         lines.append("  " + " / ".join(_fmt_dlt(n) for n in nd[:3]) + (" ..." if len(nd) > 3 else ""))
+        if rd.get("rotation"):
+            lines.append("  🔄 %s" % rd["rotation"])
     else:
         lines.append("今日推荐：无")
 
@@ -163,13 +167,16 @@ def wechat_block(today, yesterday, r3, rd, rs):
     else:
         lines.append("结算：今日无待结算（待%s期开奖）" % rs.get("target"))
     s_s = rs["summary"]
-    lines.append("复盘：热号为主+冷号补足；奇偶/大小均衡；随机扰动")
+    rot_s = rs.get("rotation")
+    lines.append("复盘：5组持有·每2周周五轮换最冷2组" + ("；" + rot_s if rot_s else "；热号为主+冷号补足，奇偶/大小均衡"))
     lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
         s_s["net_pnl"], s_s["rounds"], s_s["pending_rounds"]))
     ns = rs.get("notes", [])
     if ns:
         lines.append("今日推荐：%d注（押%s期）" % (len(ns), rs.get("target")))
         lines.append("  " + " / ".join(_fmt_ssq(n) for n in ns[:3]) + (" ..." if len(ns) > 3 else ""))
+        if rs.get("rotation"):
+            lines.append("  🔄 %s" % rs["rotation"])
     else:
         lines.append("今日推荐：无")
 
@@ -238,6 +245,67 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
     return path
 
 
+def _monthly_pnl():
+    """聚合上月三品种盈亏，返回 (ym, details)。"""
+    today_d = date.today()
+    first = today_d.replace(day=1)
+    prev_month = first - timedelta(days=1)
+    ym = prev_month.strftime("%Y-%m")
+
+    # 福彩3D：按建仓日期归属月份
+    pnl3 = bets3 = hits3 = 0
+    try:
+        with open(PL_FILE, encoding="utf-8") as f:
+            pl = json.load(f)
+        for rec in pl["records"]:
+            if rec.get("date", "").startswith(ym) and rec.get("hits") is not None:
+                pnl3 += rec.get("daily_pnl", 0) or 0
+                bets3 += rec.get("notes", 0)
+                hits3 += rec.get("hits", 0)
+    except Exception:
+        pass
+
+    def _agg_state(path):
+        pnl = rounds = 0
+        try:
+            with open(path, encoding="utf-8") as f:
+                st = json.load(f)
+            for rec in st.get("records", []):
+                if rec.get("status") == "settled" and str(rec.get("draw_date", "")).startswith(ym):
+                    pnl += rec.get("daily_pnl", 0) or 0
+                    rounds += 1
+        except Exception:
+            pass
+        return pnl, rounds
+
+    pnl_d, r_d = _agg_state(os.path.join(ROOT, "data", "dlt_state.json"))
+    pnl_s, r_s = _agg_state(os.path.join(ROOT, "data", "ssq_state.json"))
+    return ym, {"3D": (pnl3, bets3, hits3), "dlt": (pnl_d, r_d), "ssq": (pnl_s, r_s)}
+
+
+def write_monthly_report():
+    ym, det = _monthly_pnl()
+    path = os.path.join(REPORT_DIR, "%s-monthly.md" % ym)
+    p3, b3, h3 = det["3D"]
+    p_d, r_d = det["dlt"]
+    p_s, r_s = det["ssq"]
+    total = p3 + p_d + p_s
+    L = []
+    L.append("# 彩票月度盈亏报告 %s\n" % ym)
+    L.append("\n## 福彩3D\n")
+    L.append("- 净盈亏：**%+d元**（%d注/%d命中）\n" % (p3, b3, h3))
+    L.append("\n## 大乐透\n")
+    L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_d, r_d))
+    L.append("\n## 双色球\n")
+    L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_s, r_s))
+    L.append("\n## 三品种合计\n")
+    L.append("- 月度净盈亏合计：**%+d元**\n" % total)
+    L.append("\n---\n*本报告由每日复盘自动化于次月1号汇总生成。仅供学习研究，不构成投注建议。*\n")
+    with open(path, "w", encoding="utf-8") as f:
+        f.writelines(L)
+    return path, ym, total
+
+
 def main():
     today, yesterday, r3, rd, rs = build_summary()
     wechat = wechat_block(today, yesterday, r3, rd, rs)
@@ -246,6 +314,14 @@ def main():
     print(wechat)
     print("=" * 60)
     print("\n📄 统一报告：%s" % report_path)
+
+    # 每月1号额外生成上月月度盈亏报告
+    if date.today().day == 1:
+        try:
+            mpath, mym, mtotal = write_monthly_report()
+            print("📅 月度盈亏报告：%s（%s 净盈亏 %+d元）" % (mpath, mym, mtotal))
+        except Exception as e:
+            print("⚠️ 月度报告生成失败：%s" % e)
 
 
 if __name__ == "__main__":

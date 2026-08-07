@@ -2,8 +2,8 @@
 福彩3D 每日复盘自动化脚本 (动态版)
 - 抓取最新数据
 - 结算昨日待结算推荐 (修正: 按日期匹配开奖, 避免6/29期号错位bug)
-- 熔断判定 (用户规则: Rule4/6/7 覆盖 Rule1/2/3)
-- 生成10注组六推荐
+- 熔断判定 (用户新规则 2026-08-07: 每天10组组六, 组六连出>6期熔断暂停)
+- 生成10组组六推荐(每天都换)
 - 更新 profit_loss.json
 - 生成 markdown 报告
 - 输出摘要
@@ -187,17 +187,14 @@ def calc_summary(pl):
 
 def circuit_breaker_user_rules(history):
     """
-    形态自适应熔断规则 (v8)
-    Rule4/6/7 覆盖 Rule1/2/3
-    核心改动: 不再死守组六, 按近期形态分布动态切换
-      - 组三密集期 -> 主推组三(奖金320, 正EV)
-      - 组六期 -> 轻仓组六(降负EV损耗)
-    Rule3(连续同形态) 由硬熔断改为"观望降仓"(不空仓错失机会)
+    熔断规则 (用户新规则 2026-08-07)
+    - 常态: 每天推 10 组组六 (每天都换)
+    - 熔断: 当组六连续开出 > 6 期(即 >=7 期)时, 熔断暂停(0注),
+            回避极端连开风险, 直到形态打断(出组三/豹子)再恢复
     """
     types_all = [r["type"] for r in history]
-    sums_3 = [r["sum_val"] for r in history[:3]]
 
-    # 当前连续同形态
+    # 当前连续同形态 (含组三/豹子)
     streak_type = types_all[0]
     streak_len = 1
     for t in types_all[1:]:
@@ -206,7 +203,7 @@ def circuit_breaker_user_rules(history):
         else:
             break
 
-    # 组六连出长度
+    # 组六连出长度 (从最新一期往前)
     zl_streak = 0
     for r in history:
         if r["type"] == "组六":
@@ -214,87 +211,21 @@ def circuit_breaker_user_rules(history):
         else:
             break
 
-    # 组三连出长度
-    gs_streak = 0
-    for r in history:
-        if r["type"] == "组三":
-            gs_streak += 1
-        else:
-            break
-
-    # 组三在近30期内的次数
-    recent_30_types = types_all[:30]
-    gs_count_30 = recent_30_types.count("组三")
-
-    # 最近2期是否都是组三
-    last2_both_gs = (len(types_all) >= 2 and types_all[0] == "组三" and types_all[1] == "组三")
+    # 组三近30期次数 (信息留存, 不参与熔断决策)
+    gs_count_30 = types_all[:30].count("组三")
+    sums_3 = [r["sum_val"] for r in history[:3]]
 
     rules_fired = []
-    stop = False
-    reduce = False  # 观望降仓标记
-
-    # === Rule1: 组三高频熔断 — 已禁用 (2026-07-06) ===
-    # 仅记录组三频率供参考, 不触发熔断
-    if gs_count_30 >= 10:
-        rules_fired.append(f"Rule1(已禁用): 近30期组三{gs_count_30}次>=10, 仅记录不熔断")
-
-    # === 覆盖规则 (始终生效) ===
-    # Rule 4: 连续3期同形态 -> 不熔断, 强力推荐
-    if streak_len >= 3:
-        rules_fired.append(f"Rule4: 连续{streak_len}期{streak_type} -> 强推不熔断")
-
-    # Rule 6: 组三2连 -> 不熔断, 推组六
-    if streak_type == "组三" and streak_len >= 2:
-        rules_fired.append(f"Rule6: 组三{streak_len}连 -> 推组六不熔断")
-
-    # Rule 7: 组六11连+ -> 警戒但不熔断
-    if zl_streak >= 11:
-        rules_fired.append(f"Rule7: 组六{zl_streak}连 -> 警戒但不熔断")
-
-    # === 次级熔断规则 (仅当无覆盖规则时生效) ===
-    if not any("Rule4" in r or "Rule6" in r or "Rule7" in r for r in rules_fired):
-        # Rule 2: 近3期和值极端 -> 强信号, 熔断不参与
-        if all(s <= 5 for s in sums_3):
-            rules_fired.append(f"Rule2: 近3期和值极端小({sums_3}) -> 熔断")
-            stop = True
-        elif all(s >= 22 for s in sums_3):
-            rules_fired.append(f"Rule2: 近3期和值极端大({sums_3}) -> 熔断")
-            stop = True
-
-        # Rule 3: 连续2期同形态 -> 观望降仓(不硬停, 避免错失机会)
-        if streak_len >= 2:
-            rules_fired.append(f"Rule3: 连续{streak_len}期{streak_type} -> 观望降仓")
-            reduce = True
-
-    # === 形态自适应决策 (v8 核心) ===
-    gs10 = types_all[:10].count("组三")
-    gs20 = types_all[:20].count("组三")
-
-    if stop:
-        # 和值极端熔断, 不参与
-        push_type = "组六"
-        push_count = 0
+    # 熔断规则：组六连出 > 6 期 -> 暂停
+    if zl_streak > 6:
+        rules_fired.append(f"熔断: 组六已连出 {zl_streak} 期(>6) -> 暂停推送, 回避极端连开风险")
+        stop = True
     else:
-        if gs10 >= 4:
-            # 近10期组三>=4(>=40%, 明显高于理论27%) -> 主推组三(奖金320)
-            push_type = "组三"
-            push_count = 10
-            rules_fired.append(f"形态自适应: 组三密集(近10期{gs10}/近20期{gs20}) -> 主推组三(奖金320)")
-        elif zl_streak >= 4:
-            # 组六强连 -> 轻仓组六降损耗
-            push_type = "组六"
-            push_count = 5
-            rules_fired.append(f"形态自适应: 组六{zl_streak}连 -> 轻仓组六5注降损耗")
-        else:
-            # 常态 -> 组六轻仓(避免无脑满仓负EV)
-            push_type = "组六"
-            push_count = 5
-            rules_fired.append(f"形态自适应: 常态 -> 组六5注降损耗(负EV控成本)")
+        stop = False
+        rules_fired.append(f"常态: 推 10 组组六 (组六连出 {zl_streak} 期, 未达熔断阈值 7 期)")
 
-        # 观望降仓: 实推注数减半(保底3注)
-        if reduce:
-            push_count = max(3, push_count // 2)
-            rules_fired.append(f"形态自适应: 触发降仓, 实推{push_count}注")
+    push_type = "组六"
+    push_count = 0 if stop else 10
 
     return {
         "stop": stop,
@@ -303,7 +234,7 @@ def circuit_breaker_user_rules(history):
         "streak_len": streak_len,
         "zl_streak": zl_streak,
         "gs_count_30": gs_count_30,
-        "last2_both_gs": last2_both_gs,
+        "last2_both_gs": False,
         "sums_3": sums_3,
         "push_type": push_type,
         "push_count": push_count,
@@ -619,8 +550,9 @@ def main():
                               "hits": 0, "prize": 0, "daily_pnl": 0,
                               "reason": reason, "target_qihao": None})
                 else:
-                    # 正常交易日: 仅当推荐为空时补全(避免覆盖已生成/已结算记录)
-                    if not r.get("recommendations"):
+                    # 正常交易日: 若今日记录尚未结算(待开奖)且注数与当前规则(push_count)不符,
+                    # 则按新规则刷新(确保"10组组六/熔断暂停"等改动即时生效到今日记录)
+                    if r.get("hits") is None and (not r.get("recommendations") or r.get("notes") != len(recs)):
                         r["recommendations"] = [rec["nums"] for rec in recs]
                         r["notes"] = len(recs)
                         r["cost"] = len(recs) * 2

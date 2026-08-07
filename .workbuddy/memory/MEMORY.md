@@ -36,3 +36,10 @@
 - 输出: `output/{game}_analysis.json` / `_report.md` / `_report.html`(图表 base64 内嵌) + 4张 PNG。
 - 依赖 matplotlib(已装项目 venv)；运行需 `--refresh` 重新抓取。
 - 新增彩种只需在 `config.py` 的 LOTTERIES/SOURCE_500/TIER_FUNC 注册, 核心算法不动。
+
+## 统一三品种每日复盘 (2026-08-07)
+- 编排器 `unified_review.py`：每日 07:00 运行，依次 `daily_review.main()`(福彩3D) + `dlt/settle.run_daily()` + `ssq/settle.run_daily()`，汇总三品种「昨日数据摘要/复盘结论/具体盈亏」，写 `data/reports/unified_YYYY-MM-DD.md`，打印唯一【微信推送摘要】(自动化直接抓取推送)。
+- 结算模块 `dlt/settle.py` / `ssq/settle.py`：维护 `data/dlt_state.json` / `data/ssq_state.json`(每期选号+结算状态)；按目标期号(target=最新+1)结算 pending；奖级 `_dlt_tier`/`_ssq_tier` + 固定奖(`DLT_PRIZE` 3~9档 / `SSQ_PRIZE` 3~6档)，一/二等奖浮动奖池记为"浮动奖"不计入PnL(保守)；**同日幂等**(今日记录已存在则跳过选号, 防重复下单/结算)。
+- 开奖日: 福彩3D 每日; 大乐透 周一/三/六; 双色球 周二/四/日。昨日无开奖的品种在报告中注明。
+- 自动化: `automation-1782775804842`「彩票每日复盘（福彩3D+大乐透+双色球）07:00」= 唯一全品种任务(运行 unified_review.py + git push); 原 21:30 的 `automation-1786094467671` 已 PAUSED(被覆盖)。疑似重复 `1782898966636`(大乐透07:10)/`1784967703745`(三平台10:00) 未动, 因幂等不污染状态。
+- 运行环境: 必须用 venv `C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe`(已装 requests); 裸 managed python 3.13 缺 requests 会报 ModuleNotFoundError。
