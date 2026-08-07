@@ -163,12 +163,15 @@ def _calc_summary(st: dict):
 
 
 # ---------- 组合（portfolio）管理 ----------
+# 轮换锚点：首次轮换日 = 2026-08-14（周五），之后每14天（每2周周五）轮换一次
+ROTATION_ANCHOR = date(2026, 8, 14)
+
 def _is_rotation_day(d):
-    """每2周的周五轮换：周五 且 ISO周号为偶数。"""
+    """每2周的周五轮换：以 2026-08-14 为锚点，每14天一次。"""
     if d.weekday() != 4:  # Monday=0 ... Friday=4
         return False
-    _, iso_week, _ = d.isocalendar()
-    return iso_week % 2 == 0
+    diff = (d - ROTATION_ANCHOR).days
+    return diff >= 0 and diff % 14 == 0
 
 
 def _note_key(note):
