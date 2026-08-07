@@ -118,6 +118,10 @@ def wechat_block(today, yesterday, r3, rd, rs):
     else:
         lines.append("今日推荐：休市/熔断，0注")
 
+    tr = r3.get("trend") or {}
+    if tr.get("conclusion"):
+        lines.append("走势研判：%s" % tr["conclusion"])
+
     # ===== 大乐透 =====
     lines.append("")
     lines.append("━━ 🎲 大乐透 ━━")
@@ -212,6 +216,9 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
         L.append("- 结算：押%s(%s) %d命中，日盈亏%+d元\n" % (
             s3set["draw_qihao"], _fmt_3d_nums(s3set["draw_nums"]), s3set["hits"], s3set["daily_pnl"]))
     L.append("- 累计净盈亏：%+d元（%d命中/%d注）\n" % (s3["net_pnl"], s3["total_hits"], s3["total_bets"]))
+    tr = r3.get("trend") or {}
+    if tr.get("conclusion"):
+        L.append("- 100期走势研判：%s\n" % tr["conclusion"])
 
     L.append("\n## 大乐透\n")
     if rd.get("yesterday_draw"):

@@ -372,9 +372,9 @@ def load_data():
 
 def load_or_fetch():
 
-    # Step 1: 主源 huiniao (官方数据镜像, 免鉴权, 含 200+)
+    # Step 1: 主源 huiniao (中福彩官方开奖数据公开镜像, 免鉴权, 拉最近100期用于走势研判)
 
-    new_records = fetch_huiniao(limit=30)
+    new_records = fetch_huiniao(limit=100)
 
     if new_records:
 

@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from fetch_data import load_or_fetch
 from analyze import (
     frequency_analysis, missing_analysis, sum_value_analysis,
-    span_analysis, type_analysis, generate_recommendations
+    span_analysis, type_analysis, generate_recommendations, trend_analysis
 )
 from trading_day import is_trading_day, expected_qihao_for_date
 
@@ -241,7 +241,7 @@ def circuit_breaker_user_rules(history):
     }
 
 
-def generate_report(history, pl, cb, recs, settlement, today_draw_qihao):
+def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=None):
     """生成 markdown 报告"""
     os.makedirs(REPORT_DIR, exist_ok=True)
 
@@ -331,6 +331,38 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao):
     s = pl["summary"]
     next_qihao = str(int(latest["qihao"]) + 1)
 
+    # 100期走势研判段落（出号前必看）
+    trend_section = ""
+    if trend:
+        freq_rows = "\n".join(
+            f"| {d} | {c}次 | {p:.1f}% | {'█' * min(c, 15)} |"
+            for d, c, p in trend["freq_sorted"]
+        )
+        trend_section = f"""
+---
+
+## 三·五、100期走势研判（出号前必看）
+
+> {trend['conclusion']}
+
+### 数字热冷（近{trend['window']}期全位）
+| 数字 | 出现次数 | 频率 | 热度 |
+|------|----------|------|------|
+{freq_rows}
+
+### 和值 / 跨度趋势
+| 指标 | 近{trend['window']}期均值 | 近30期均值 | 走势 |
+|------|------|------|------|
+| 和值 | {trend['avg_sum_all']:.1f} | {trend['avg_sum_recent']:.1f} | {trend['sum_trend']} |
+| 跨度 | {trend['span_avg_all']:.1f} | {trend['span_avg_recent']:.1f} | {trend['span_trend']} |
+
+### 当前形态连开
+- 组六连出 **{trend['zl_streak']}** 期
+- 最大遗漏: {', '.join(f"{d}号({m}期)" for d, m in trend['overdue'])}
+
+---
+"""
+
     report = f"""# 福彩3D 每日复盘报告
 **日期: {TODAY}** | 期号: {latest['qihao']} 已开 → {next_qihao} 待开
 
@@ -370,8 +402,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao):
 - 组三近30期: {cb['gs_count_30']}次
 - 近3期和值: {', '.join(map(str, cb['sums_3']))}
 
----
-
+{trend_section}
 ## 四、今日推荐 ({len(recs)}注{cb['push_type']})
 
 | # | 号码 | 和值 | 跨度 | 推导逻辑 |
@@ -485,6 +516,7 @@ def main():
     print(f"  净盈亏: {summary['net_pnl']:+d}元, 待结算: {summary['pending_bets']}注")
 
     # 5. 熔断判定 + 6. 生成推荐 (休市或数据滞后时跳过)
+    trend = None
     if is_suspension:
         cb = {"stop": True,
               "rules_fired": [f"休市: 今日为官方休市期, 无新开奖"],
@@ -512,6 +544,11 @@ def main():
             print(f"  🔴 {rf}")
         status = "🛑 熔断, 0注" if cb["stop"] else f"✅ 推{cb['push_count']}注{cb['push_type']}"
         print(f"  {status}")
+
+        # 5.5 100期走势研判（出号前必看）
+        trend = trend_analysis(history)
+        print(f"\n[5.5/7] 100期走势研判:")
+        print(f"  {trend['conclusion']}")
 
         print("\n[6/7] 生成推荐...")
         if cb["stop"]:
@@ -597,7 +634,7 @@ def main():
 
     # 7. 生成报告
     print("\n[7/7] 生成报告...")
-    report_path = generate_report(history, pl, cb, recs, settlement, latest["qihao"])
+    report_path = generate_report(history, pl, cb, recs, settlement, latest["qihao"], trend)
 
     # 摘要
     print(f"\n{'='*50}")
@@ -619,6 +656,7 @@ def main():
         "recommendations": recs,   # list of {nums, sum_val, span, logic}
         "next_qihao": target_qihao,
         "circuit": cb,
+        "trend": trend,
         "report_path": report_path,
     }
 

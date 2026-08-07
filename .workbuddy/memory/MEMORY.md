@@ -5,14 +5,19 @@
 - 用户只推组六, 不推组三。
 
 ## 选号算法版本
+- v3 (2026-08-07, 用户要求"抓住规律推测"): analyze.py `generate_recommendations` 升级为**经验分布采样** —— 经验数位频率乘积(联合分布, 独立假设下=各数位边际乘积)作主权重 + 硬约束**先剔除越界候选再选号**: 和值锁 9~20(占82%) / 跨度锁 3~7(占73%) / 奇偶均衡(剔除全奇全偶) + 0~9 每数字精确3次(10注)。摒弃旧软惩罚(避免多样性加分把极端号捞回)。仍属"分布对齐"≠预测。
 - v2 (2026-08-06): analyze.py `generate_recommendations` 重构 —— 枚举全量候选(组六120/组三90)→ 统计合理性打分(和值贴近近期中区10~17 / 跨度4~6最优 / 遗漏仅作弱tie-breaker, 摒弃"冷号必出"赌徒谬误)→ 多样性贪心筛选(分数主导, 乘性微调: 优先引入未覆盖数字、惩罚过度使用数字, 使0~9分布均衡)。输出组数严格等于熔断给的 count, 不写死。
 - 组六×5: 0~9全覆盖, 单数字1~2次, 和值13~17; 组六×10: 每数字精确3次; 组三×10: 全覆盖, 4~2次。
 - v1 (废弃): 固定策略顺序(遗漏回补/冷热搭配/和值回归/跨度修正/位置独立/补位)拼接后截断, 无均衡约束, 偏赌徒谬误。
 
+## 大乐透/双色球 选号器 (selector.py)
+- v2 (2026-08-07): 在经验频率加权(已有)基础上新增 `_valid_note` **硬均衡**: 红球奇偶/大小不极端(2..RED_COUNT-2)、和值经验区间(10~90分位, 剔除极端和值)、后区奇偶/大小严格1:1。与3D经验分布思路一致。已有: 频率归一+冷号补偿+随机扰动+软均衡惩罚。
+
 ## 技术备忘
 - git push: 统一用 `git pull --rebase` + `git push origin master`; Python API 兜底已废弃(token 失效)
 - 微信推送(automation push_to_wechat): 自动化回复禁止调用 present_files(微信不渲染文件卡片→空白), 改为纯文本自包含输出
-- 数据源: **已切换为 huiniao 官方镜像** `http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit=30` (fetch_data.py `fetch_huiniao`, 免鉴权, ~5分钟同步, 含 200+, 返回 `data.data.list[].{code,day,one,two,three}`)。东方财富兜底仍保留但已过期卡在 2026199。huiniao 实测最新 2026207(2026-08-05开), 2026208 每晚21:15开。
+- 数据源: **已切换为 huiniao 官方镜像** `http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit=100` (fetch_data.py `fetch_huiniao`, 免鉴权, ~5分钟同步, 返回 `data.data.list[].{code,day,one,two,three}`)。东方财富兜底仍保留但已过期卡在 2026199。huiniao 实测最新 2026208(2026-08-06开)。出号前拉100期做走势研判(`analyze.trend_analysis`)。
+- 走势研判: `analyze.trend_analysis(records, window=100)` 输出热冷号/和值跨度均值与趋势/组六连出/最大遗漏, 经 daily_review 与 unified_review 进入报告与微信摘要。
 - 每日7点自动执行: **`automation-1786103338209`「彩票每期复盘（福彩3D+大乐透+双色球）」**(ACTIVE, 列表可见, 有效期至2026-09-30); 旧 `automation-1782775804842` 因列表不可见已于 2026-08-07 改为 PAUSED 停用。
 
 ## 休市判断 (2026-08-03 重构)

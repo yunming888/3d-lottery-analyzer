@@ -219,13 +219,23 @@ def generate_recommendations(records, info, count=10):
                 last_seen[num] = idx
     missing = {i: last_seen.get(i, n) for i in range(10)}
 
-    # 经验数位频率（整体边际，Laplace 平滑避免 0）
+    # 经验数位频率（整体边际 + 近30期走势加权混合，Laplace 平滑避免 0）
+    # 全窗口(=近100期)边际捕捉长期规律，近30期捕捉近期走热/走冷，混合让"走势"进选号
     total_counter = Counter()
+    recent_counter = Counter()
     for r in records:
         for num in r["nums"]:
             total_counter[num] += 1
-    denom = n * 3 + 5  # +5 平滑（等效 0.5 先验）
-    digit_prob = {i: (total_counter.get(i, 0) + 0.5) / denom for i in range(10)}
+    for r in records[:30]:
+        for num in r["nums"]:
+            recent_counter[num] += 1
+    denom = n * 3 + 5
+    denom_r = min(n, 30) * 3 + 5
+    digit_prob = {}
+    for i in range(10):
+        base = (total_counter.get(i, 0) + 0.5) / denom
+        rec = (recent_counter.get(i, 0) + 0.5) / denom_r
+        digit_prob[i] = 0.7 * base + 0.3 * rec
 
     # 近期和值均值（仅用于兜底居中，主权重已由频率联合分布承担）
     recent_sums = [r["sum_val"] for r in records[:30]]
@@ -237,6 +247,58 @@ def generate_recommendations(records, info, count=10):
         candidates = _build_zuliu_pool(missing, avg_sum, digit_prob)
 
     return _select_diverse(candidates, count)
+
+
+def trend_analysis(records, window=100):
+    """
+    吃透最近 window 期走势图规律：数字热冷、和值/跨度趋势、当前连形态、最大遗漏。
+    返回统计 dict + 可读 conclusion（出号前研判用，不声称预测）。
+    """
+    win = records[:window]
+    n = len(win)
+    dig = Counter()
+    for r in win:
+        for x in r["nums"]:
+            dig[x] += 1
+    tot = sum(dig.values()) or 1
+    freq_sorted = sorted(((d, c, c / tot * 100) for d, c in dig.items()), key=lambda t: -t[1])
+    hot = [d for d, _, _ in freq_sorted[:3]]
+    cold = [d for d, _, _ in freq_sorted[-3:]]
+
+    recent = records[:30]
+    sums_all = [r["sum_val"] for r in win]
+    sums_recent = [r["sum_val"] for r in recent]
+    avg_all = sum(sums_all) / len(sums_all)
+    avg_recent = sum(sums_recent) / len(sums_recent)
+    spans_all = [r["span"] for r in win]
+    spans_recent = [r["span"] for r in recent]
+    span_avg_all = sum(spans_all) / len(spans_all)
+    span_avg_recent = sum(spans_recent) / len(spans_recent)
+
+    zl = 0
+    for r in records:
+        if r["type"] == "组六":
+            zl += 1
+        else:
+            break
+
+    miss = missing_analysis(records)
+    overdue = miss["most_overdue"][:3]
+
+    trend_dir = "走高" if avg_recent > avg_all + 1 else ("走低" if avg_recent < avg_all - 1 else "平稳")
+    span_dir = "扩大" if span_avg_recent > span_avg_all + 0.5 else ("收窄" if span_avg_recent < span_avg_all - 0.5 else "平稳")
+    conclusion = (
+        f"近{n}期: 热号 {hot} / 冷号 {cold}; "
+        f"和值均值 {avg_all:.1f}(近30期 {avg_recent:.1f}, {trend_dir}); "
+        f"跨度均值 {span_avg_all:.1f}(近30期 {span_avg_recent:.1f}, {span_dir}); "
+        f"组六连出 {zl} 期; 最大遗漏 {overdue[0][0]}号({overdue[0][1]}期)。"
+    )
+    return {
+        "window": n, "freq_sorted": freq_sorted, "hot": hot, "cold": cold,
+        "avg_sum_all": avg_all, "avg_sum_recent": avg_recent, "sum_trend": trend_dir,
+        "span_avg_all": span_avg_all, "span_avg_recent": span_avg_recent, "span_trend": span_dir,
+        "zl_streak": zl, "overdue": overdue, "conclusion": conclusion,
+    }
 
 
 def _score_combo(multiset, missing, avg_sum, digit_prob):
