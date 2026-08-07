@@ -490,6 +490,14 @@ def main():
     print(f"  最新: {latest['qihao']} | {' '.join(map(str, latest['nums']))} | {latest['type']}")
     print(f"  范围: {history[-1]['qihao']} ~ {history[0]['qihao']} ({len(history)}期)")
 
+    # 昨日(前一自然日)开奖，用于统一复盘摘要
+    yesterday = (NOW - timedelta(days=1)).strftime("%Y-%m-%d")
+    yesterday_draw = None
+    for h in history:
+        if h.get("date") == yesterday:
+            yesterday_draw = h
+            break
+
     # 2. 加载P&L
     print("\n[2/7] 加载盈亏数据...")
     pl = load_json(PL_FILE)
@@ -669,6 +677,18 @@ def main():
     print(f"  今日推荐: {len(recs)}注组六, 成本{len(recs)*2}元")
     print(f"  报告: {report_path}")
     print(f"  追踪期: {pl['start_date']} ~ {pl['end_date']}")
+
+    # 返回结构化摘要，供 unified_review.py 统一汇总（不影响原自动化调用）
+    return {
+        "game": "3D", "name": "福彩3D", "today": TODAY,
+        "yesterday": yesterday, "yesterday_draw": yesterday_draw,
+        "settlement": settlement,  # (rec, draw, hits, hit_list) 或 None
+        "summary": summary,
+        "recommendations": recs,   # list of {nums, sum_val, span, logic}
+        "next_qihao": target_qihao,
+        "circuit": cb,
+        "report_path": report_path,
+    }
 
 
 if __name__ == "__main__":
