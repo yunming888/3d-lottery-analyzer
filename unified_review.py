@@ -147,7 +147,8 @@ def wechat_block(today, yesterday, r3, rd, rs):
     nd = rd.get("notes", [])
     if nd:
         lines.append("今日推荐：%d注（押%s期）" % (len(nd), rd.get("target")))
-        lines.append("  " + " / ".join(_fmt_dlt(n) for n in nd[:3]) + (" ..." if len(nd) > 3 else ""))
+        for _i, n in enumerate(nd, 1):
+            lines.append("  %d. %s" % (_i, _fmt_dlt(n)))
         if rd.get("rotation"):
             lines.append("  🔄 %s" % rd["rotation"])
     else:
@@ -187,7 +188,8 @@ def wechat_block(today, yesterday, r3, rd, rs):
     ns = rs.get("notes", [])
     if ns:
         lines.append("今日推荐：%d注（押%s期）" % (len(ns), rs.get("target")))
-        lines.append("  " + " / ".join(_fmt_ssq(n) for n in ns[:3]) + (" ..." if len(ns) > 3 else ""))
+        for _i, n in enumerate(ns, 1):
+            lines.append("  %d. %s" % (_i, _fmt_ssq(n)))
         if rs.get("rotation"):
             lines.append("  🔄 %s" % rs["rotation"])
     else:
@@ -257,6 +259,11 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
         L.append("- 选号均衡：前区奇%d/偶%d、大%d/小%d；后区奇%d/偶%d、大%d/小%d\n" % (
             b_d.get("r_odd", 0), b_d.get("r_even", 0), b_d.get("r_big", 0), b_d.get("r_small", 0),
             b_d.get("b_odd", 0), b_d.get("b_even", 0), b_d.get("b_big", 0), b_d.get("b_small", 0)))
+    _nd = rd.get("notes", [])
+    if _nd:
+        L.append("- 今日推荐（押%s期，%d注）：\n" % (rd.get("target"), len(_nd)))
+        for n in _nd:
+            L.append("  - %s\n" % _fmt_dlt(n))
 
     L.append("\n## 双色球\n")
     if rs.get("yesterday_draw"):
@@ -277,6 +284,11 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
         L.append("- 选号均衡：红球奇%d/偶%d、大%d/小%d；蓝球奇%d/偶%d、大%d/小%d\n" % (
             b_s.get("r_odd", 0), b_s.get("r_even", 0), b_s.get("r_big", 0), b_s.get("r_small", 0),
             b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
+    _ns = rs.get("notes", [])
+    if _ns:
+        L.append("- 今日推荐（押%s期，%d注）：\n" % (rs.get("target"), len(_ns)))
+        for n in _ns:
+            L.append("  - %s\n" % _fmt_ssq(n))
 
     L.append("\n## 三品种合计\n")
     L.append("- 累计净盈亏合计：**%+d元**\n" % total)
