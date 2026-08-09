@@ -388,6 +388,16 @@ def run_daily(today=None, n_notes=None):
                                 settled, st["summary"], target, yest_draw,
                                 rotation_info=rotation_note)
 
+    # 走势研判（透传给统一报告，避免被压缩丢失）
+    hc = hot_cold(records, config.WINDOW)
+    trend = {
+        "hot_red": " ".join("%02d" % d for d in hc["hot_red"]),
+        "cold_red": " ".join("%02d" % d for d in hc["cold_red"]),
+        "hot_blue": " ".join("%02d" % d for d in hc["hot_blue"]),
+        "cold_blue": " ".join("%02d" % d for d in hc["cold_blue"]),
+        "bal": bal,
+    }
+
     print("  双色球 推荐 %d 注（押 %s 期）：" % (len(notes), target))
     for i, n in enumerate(notes, 1):
         print("    %2d. %s" % (i, _fmt_note(n)))
@@ -410,4 +420,5 @@ def run_daily(today=None, n_notes=None):
         "notes": notes,
         "target": target,
         "report_path": report_path,
+        "trend": trend,
     }

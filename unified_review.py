@@ -152,6 +152,15 @@ def wechat_block(today, yesterday, r3, rd, rs):
             lines.append("  🔄 %s" % rd["rotation"])
     else:
         lines.append("今日推荐：无")
+    tr_d = rd.get("trend") or {}
+    if tr_d:
+        b_d = tr_d.get("bal", {})
+        lines.append("走势研判：热号 前区[%s]/后区[%s]；冷号 前区[%s]/后区[%s]" % (
+            tr_d.get("hot_red", ""), tr_d.get("hot_blue", ""),
+            tr_d.get("cold_red", ""), tr_d.get("cold_blue", "")))
+        lines.append("  选号均衡：前区奇%d/偶%d、大%d/小%d；后区奇%d/偶%d、大%d/小%d" % (
+            b_d.get("r_odd", 0), b_d.get("r_even", 0), b_d.get("r_big", 0), b_d.get("r_small", 0),
+            b_d.get("b_odd", 0), b_d.get("b_even", 0), b_d.get("b_big", 0), b_d.get("b_small", 0)))
 
     # ===== 双色球 =====
     lines.append("")
@@ -183,6 +192,15 @@ def wechat_block(today, yesterday, r3, rd, rs):
             lines.append("  🔄 %s" % rs["rotation"])
     else:
         lines.append("今日推荐：无")
+    tr_s = rs.get("trend") or {}
+    if tr_s:
+        b_s = tr_s.get("bal", {})
+        lines.append("走势研判：热号 红球[%s]/蓝球[%s]；冷号 红球[%s]/蓝球[%s]" % (
+            tr_s.get("hot_red", ""), tr_s.get("hot_blue", ""),
+            tr_s.get("cold_red", ""), tr_s.get("cold_blue", "")))
+        lines.append("  选号均衡：红球奇%d/偶%d、大%d/小%d；蓝球奇%d/偶%d、大%d/小%d" % (
+            b_s.get("r_odd", 0), b_s.get("r_even", 0), b_s.get("r_big", 0), b_s.get("r_small", 0),
+            b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
 
     # ===== 合计 =====
     total = s3["net_pnl"] + s_d["net_pnl"] + s_s["net_pnl"]
@@ -230,6 +248,15 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
     for x in (rd.get("settled") or []):
         L.append("- 结算：%s期 → %d命中，日盈亏%+d元\n" % (x["draw_issue"], x["win_notes"], x["daily_pnl"]))
     L.append("- 累计净盈亏：%+d元（已结算%d轮，待结算%d轮）\n" % (s_d["net_pnl"], s_d["rounds"], s_d["pending_rounds"]))
+    tr_d = rd.get("trend") or {}
+    if tr_d:
+        b_d = tr_d.get("bal", {})
+        L.append("- 走势研判：热号 前区[%s]/后区[%s]；冷号 前区[%s]/后区[%s]\n" % (
+            tr_d.get("hot_red", ""), tr_d.get("hot_blue", ""),
+            tr_d.get("cold_red", ""), tr_d.get("cold_blue", "")))
+        L.append("- 选号均衡：前区奇%d/偶%d、大%d/小%d；后区奇%d/偶%d、大%d/小%d\n" % (
+            b_d.get("r_odd", 0), b_d.get("r_even", 0), b_d.get("r_big", 0), b_d.get("r_small", 0),
+            b_d.get("b_odd", 0), b_d.get("b_even", 0), b_d.get("b_big", 0), b_d.get("b_small", 0)))
 
     L.append("\n## 双色球\n")
     if rs.get("yesterday_draw"):
@@ -241,6 +268,15 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
     for x in (rs.get("settled") or []):
         L.append("- 结算：%s期 → %d命中，日盈亏%+d元\n" % (x["draw_issue"], x["win_notes"], x["daily_pnl"]))
     L.append("- 累计净盈亏：%+d元（已结算%d轮，待结算%d轮）\n" % (s_s["net_pnl"], s_s["rounds"], s_s["pending_rounds"]))
+    tr_s = rs.get("trend") or {}
+    if tr_s:
+        b_s = tr_s.get("bal", {})
+        L.append("- 走势研判：热号 红球[%s]/蓝球[%s]；冷号 红球[%s]/蓝球[%s]\n" % (
+            tr_s.get("hot_red", ""), tr_s.get("hot_blue", ""),
+            tr_s.get("cold_red", ""), tr_s.get("cold_blue", "")))
+        L.append("- 选号均衡：红球奇%d/偶%d、大%d/小%d；蓝球奇%d/偶%d、大%d/小%d\n" % (
+            b_s.get("r_odd", 0), b_s.get("r_even", 0), b_s.get("r_big", 0), b_s.get("r_small", 0),
+            b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
 
     L.append("\n## 三品种合计\n")
     L.append("- 累计净盈亏合计：**%+d元**\n" % total)
