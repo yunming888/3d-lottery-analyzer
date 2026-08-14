@@ -114,7 +114,8 @@ def wechat_block(today, yesterday, r3, rd, rs):
     recs3 = r3.get("recommendations", [])
     if recs3:
         lines.append("今日推荐：%d注%s（押%s）" % (len(recs3), cb.get("push_type", "组六"), r3.get("next_qihao")))
-        lines.append("  " + " / ".join(_fmt_3d_nums(r["nums"]) for r in recs3[:5]) + (" ..." if len(recs3) > 5 else ""))
+        for i, r in enumerate(recs3, 1):
+            lines.append("  %d. %s" % (i, _fmt_3d_nums(r["nums"])))
     else:
         lines.append("今日推荐：休市/熔断，0注")
 
