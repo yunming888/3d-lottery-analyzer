@@ -3578,9 +3578,13 @@
     {
       "date": "2026-08-17",
       "target_qihao": "2026219",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026219",
+      "draw_nums": [
+        2,
+        2,
+        5
+      ],
+      "draw_type": "组三",
       "recommendations": [
         [
           2,
@@ -3635,25 +3639,90 @@
       ],
       "notes": 10,
       "cost": 20,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -20,
+      "reason": "组三10注->0命中 开奖225组三"
+    },
+    {
+      "date": "2026-08-18",
+      "target_qihao": "2026220",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          2,
+          5,
+          8
+        ],
+        [
+          4,
+          6,
+          9
+        ],
+        [
+          0,
+          3,
+          7
+        ],
+        [
+          1,
+          2,
+          8
+        ],
+        [
+          4,
+          5,
+          9
+        ],
+        [
+          3,
+          6,
+          7
+        ],
+        [
+          1,
+          2,
+          6
+        ],
+        [
+          0,
+          4,
+          5
+        ],
+        [
+          1,
+          7,
+          8
+        ],
+        [
+          0,
+          3,
+          6
+        ]
+      ],
+      "notes": 10,
+      "cost": 20,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "组六10注推荐 | 常态: 推 10 组组六 (组六连出 1 期, 未达熔断阈值 7 期)"
+      "reason": "组六10注推荐 | 常态: 推 10 组组六 (组六连出 0 期, 未达熔断阈值 7 期)"
     }
   ],
   "summary": {
-    "total_days": 67,
-    "settled_days": 66,
-    "active_days": 50,
-    "total_bets": 468,
-    "total_cost": 936,
+    "total_days": 68,
+    "settled_days": 67,
+    "active_days": 51,
+    "total_bets": 478,
+    "total_cost": 956,
     "total_hits": 2,
     "total_prize": 320,
-    "net_pnl": -616,
+    "net_pnl": -636,
     "pending_bets": 10,
     "pending_cost": 20,
-    "last_settled": "2026-08-17",
-    "last_hit": "2026-08-17 2注"
+    "last_settled": "2026-08-18",
+    "last_hit": "2026-08-18 2注"
   },
-  "last_draw_qihao": "2026218"
+  "last_draw_qihao": "2026219"
 }
