@@ -3,14 +3,29 @@
     "source": "500彩票网",
     "game": "dlt",
     "name": "大乐透",
-    "fetched_at": "2026-08-19T06:55:57",
+    "fetched_at": "2026-08-20T07:02:04",
     "window": 100,
-    "latest_issue": "26093",
+    "latest_issue": "26094",
     "count": 100,
     "from_cache": false,
     "fallback": false
   },
   "draws": [
+    {
+      "issue": "26094",
+      "date": "2026-08-19",
+      "reds": [
+        5,
+        14,
+        15,
+        17,
+        33
+      ],
+      "blues": [
+        1,
+        7
+      ]
+    },
     {
       "issue": "26093",
       "date": "2026-08-17",
@@ -1494,21 +1509,6 @@
       "blues": [
         4,
         5
-      ]
-    },
-    {
-      "issue": "25144",
-      "date": "2025-12-17",
-      "reds": [
-        2,
-        5,
-        13,
-        15,
-        28
-      ],
-      "blues": [
-        5,
-        8
       ]
     }
   ]
