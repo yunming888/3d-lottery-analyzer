@@ -23,6 +23,9 @@ sys.path.insert(0, ROOT)
 import daily_review
 from dlt.settle import run_daily as dlt_run
 from ssq.settle import run_daily as ssq_run
+from analyze import ENGINE_VERSION as FCD_VERSION
+from dlt.selector import ENGINE_VERSION as DLT_VERSION
+from ssq.selector import ENGINE_VERSION as SSQ_VERSION
 
 REPORT_DIR = os.path.join(ROOT, "data", "reports")
 PL_FILE = os.path.join(ROOT, "data", "profit_loss.json")
@@ -113,7 +116,7 @@ def wechat_block(today, yesterday, r3, rd, rs):
     lines.append("累计净盈亏：%+d元（%d命中/%d注）" % (s3["net_pnl"], s3["total_hits"], s3["total_bets"]))
     recs3 = r3.get("recommendations", [])
     if recs3:
-        lines.append("今日推荐：%d注%s（押%s）" % (len(recs3), cb.get("push_type", "组六"), r3.get("next_qihao")))
+        lines.append("今日推荐：%d注%s（押%s）｜选号引擎 %s" % (len(recs3), cb.get("push_type", "组六"), r3.get("next_qihao"), FCD_VERSION))
         for i, r in enumerate(recs3, 1):
             lines.append("  %d. %s" % (i, _fmt_3d_nums(r["nums"])))
     else:
@@ -147,7 +150,7 @@ def wechat_block(today, yesterday, r3, rd, rs):
         s_d["net_pnl"], s_d["rounds"], s_d["pending_rounds"]))
     nd = rd.get("notes", [])
     if nd:
-        lines.append("今日推荐：%d注（押%s期）" % (len(nd), rd.get("target")))
+        lines.append("今日推荐：%d注（押%s期）｜选号引擎 %s" % (len(nd), rd.get("target"), DLT_VERSION))
         for _i, n in enumerate(nd, 1):
             lines.append("  %d. %s" % (_i, _fmt_dlt(n)))
         if rd.get("rotation"):
@@ -188,7 +191,7 @@ def wechat_block(today, yesterday, r3, rd, rs):
         s_s["net_pnl"], s_s["rounds"], s_s["pending_rounds"]))
     ns = rs.get("notes", [])
     if ns:
-        lines.append("今日推荐：%d注（押%s期）" % (len(ns), rs.get("target")))
+        lines.append("今日推荐：%d注（押%s期）｜选号引擎 %s" % (len(ns), rs.get("target"), SSQ_VERSION))
         for _i, n in enumerate(ns, 1):
             lines.append("  %d. %s" % (_i, _fmt_ssq(n)))
         if rs.get("rotation"):
@@ -262,7 +265,7 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
             b_d.get("b_odd", 0), b_d.get("b_even", 0), b_d.get("b_big", 0), b_d.get("b_small", 0)))
     _nd = rd.get("notes", [])
     if _nd:
-        L.append("- 今日推荐（押%s期，%d注）：\n" % (rd.get("target"), len(_nd)))
+        L.append("- 今日推荐（押%s期，%d注）【选号引擎 %s】：\n" % (rd.get("target"), len(_nd), DLT_VERSION))
         for n in _nd:
             L.append("  - %s\n" % _fmt_dlt(n))
 
@@ -287,7 +290,7 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
             b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
     _ns = rs.get("notes", [])
     if _ns:
-        L.append("- 今日推荐（押%s期，%d注）：\n" % (rs.get("target"), len(_ns)))
+        L.append("- 今日推荐（押%s期，%d注）【选号引擎 %s】：\n" % (rs.get("target"), len(_ns), SSQ_VERSION))
         for n in _ns:
             L.append("  - %s\n" % _fmt_ssq(n))
 

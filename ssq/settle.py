@@ -15,7 +15,7 @@ from datetime import date, datetime, timedelta
 from . import config
 from .fetcher import fetch_history
 from .analysis import load_history, hot_cold, latest
-from .selector import generate_notes
+from .selector import generate_notes, ENGINE_VERSION
 
 STATE_FILE = os.path.join(config.BASE_DIR, "data", "ssq_state.json")
 COST_PER_NOTE = 2  # 每注基本投注金额（元）
@@ -306,7 +306,7 @@ def _write_report(today, history, meta, notes, bal, n_notes, settled, summary, t
             summary["rounds"], summary["total_notes"], summary["total_cost"],
             summary["total_prize"], summary["net_pnl"], summary["pending_rounds"]))
 
-        L.append("\n## 四、今日推荐（%d 注，押 %s 期）\n" % (len(notes), target))
+        L.append("\n## 四、今日推荐（%d 注，押 %s 期）【选号引擎 %s】\n" % (len(notes), target, ENGINE_VERSION))
         if rotation_info:
             L.append("> 🔄 %s（组合每2周周五轮换最冷2组，轮换前保持持有）\n" % rotation_info)
         else:

@@ -187,6 +187,7 @@ def circuit_breaker(records, target_type="组六"):
 
 
 # ===================== 选号引擎 v4（重写） =====================
+ENGINE_VERSION = "v4"  # 选号引擎版本，供报告/推送标注（出号时附带说明）
 def _digit_marginal(records):
     """长期经验数位边际分布（全窗口 Laplace 平滑）。
     去除旧逻辑的'近30期热号0.3权重'——近期热≠未来热, 属赌徒谬误, 不提升期望。"""

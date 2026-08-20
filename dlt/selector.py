@@ -18,6 +18,8 @@ import random
 from .analysis import red_freq, blue_freq, hot_cold
 from . import config
 
+ENGINE_VERSION = "v2"  # 选号引擎版本，供报告/推送标注（出号时附带说明）
+
 RED_BIG = config.RED_BIG_THRESHOLD
 BLUE_BIG = config.BLUE_BIG_THRESHOLD
 

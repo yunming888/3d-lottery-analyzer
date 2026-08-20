@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from fetch_data import load_or_fetch
 from analyze import (
     frequency_analysis, missing_analysis, sum_value_analysis,
-    span_analysis, type_analysis, generate_recommendations, trend_analysis
+    span_analysis, type_analysis, generate_recommendations, trend_analysis, ENGINE_VERSION
 )
 from trading_day import is_trading_day, expected_qihao_for_date
 
@@ -403,7 +403,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
 - 近3期和值: {', '.join(map(str, cb['sums_3']))}
 
 {trend_section}
-## 四、今日推荐 ({len(recs)}注{cb['push_type']})
+## 四、今日推荐 ({len(recs)}注{cb['push_type']})  【选号引擎 {ENGINE_VERSION}】
 
 | # | 号码 | 和值 | 跨度 | 推导逻辑 |
 |---|------|------|------|----------|
