@@ -1,10 +1,22 @@
 """
 福彩3D数据分析引擎
 统计：频率热冷号、遗漏值、和值分布、跨度、形态
-v4: 3条熔断规则全部暂停等用户决策 + 正常每天10注
+选号引擎 v4（2026-08-20 重写）:
+  问题诊断(回测证实):
+    旧逻辑给"近30期热号"加0.3权重(近期热≠未来热, 赌徒谬误);
+    旧硬约束(和值9-20/跨度3-7/奇偶1-2)把120个组六集合砍到60个,
+    真实组六开奖46.75%落在约束带外 -> 近一半组六日命中率被锁死0%,
+    虽不改变数学期望(每注理论中奖率恒定), 但放大"全不中"方差、体验更差。
+  新逻辑:
+    1) 长期经验数位边际分布(全窗口 Laplace 平滑), 去除近期赌徒谬误权重;
+    2) 按边际分布无放回覆盖加权采样, 自然复现"和值/跨度典型"且不再硬剔除半数空间;
+    3) 覆盖均衡: 每数字出现次数趋向均衡, 提升数字覆盖;
+    4) 按最新期号派生随机种子 -> 同日确定、跨日自然变化、可复现。
+  仍属"分布对齐", 不改变负EV与理论中奖率; 真实开奖独立随机。
 """
 import json
 import os
+import random
 from collections import Counter, defaultdict
 from itertools import combinations
 
@@ -119,15 +131,7 @@ def type_analysis(records):
 
 def circuit_breaker(records, target_type="组六"):
     """
-    熔断判定 v4: 3条规则全部暂停等用户决策
-    返回: {
-        "stop": bool,          # 是否暂停（所有熔断都=true, 用户决定）
-        "reason": str,         # 触发原因
-        "suggest": str,        # 给用户的建议
-        "push_type": str,      # 推荐目标形态
-        "push_count": int,     # 建议推荐注数
-        "signal_strength": str # 信号强度
-    }
+    熔断判定（保留旧接口；实际每日规则见 daily_review.circuit_breaker_user_rules）
     """
     n = len(records)
     if n < 3:
@@ -137,7 +141,6 @@ def circuit_breaker(records, target_type="组六"):
     types_all = [r["type"] for r in records]
     sums_3 = [r["sum_val"] for r in records[:3]]
 
-    # 当前组六连出长度
     zl_streak = 0
     for r in records:
         if r["type"] == "组六":
@@ -145,7 +148,6 @@ def circuit_breaker(records, target_type="组六"):
         else:
             break
 
-    # 当前连续同形态（组三或组六）
     streak_type = types_all[0]
     streak_len = 1
     for t in types_all[1:]:
@@ -154,7 +156,6 @@ def circuit_breaker(records, target_type="组六"):
         else:
             break
 
-    # === 规则A: 组六连续8期 → 暂停 ===
     if zl_streak >= 8:
         p = 1 - (0.732 ** zl_streak)
         return {"stop": True,
@@ -162,7 +163,6 @@ def circuit_breaker(records, target_type="组六"):
                 "suggest": f"组三概率已达{p*100:.0f}%，建议推10注组三搏回归。是否推？",
                 "push_type": "组三", "push_count": 10, "signal_strength": "极强"}
 
-    # === 规则B: 连续3期同形态 → 暂停建议强推反向 ===
     if streak_len >= 3:
         reverse = "组六" if streak_type == "组三" else "组三"
         return {"stop": True,
@@ -171,7 +171,6 @@ def circuit_breaker(records, target_type="组六"):
                 "push_type": reverse, "push_count": 10,
                 "signal_strength": "极强" if streak_len >= 4 else "强"}
 
-    # === 规则C: 近3期和值连续极端 → 暂停 ===
     if all(s <= 5 for s in sums_3):
         return {"stop": True,
                 "reason": f"近3期和值连续极端小({sums_3})",
@@ -183,25 +182,74 @@ def circuit_breaker(records, target_type="组六"):
                 "suggest": "和值异常走高，可能均值回归。建议推均值附近10注组六。是否推？",
                 "push_type": target_type, "push_count": 10, "signal_strength": ""}
 
-    # === 正常情况: 每天推满10注组六 ===
     return {"stop": False, "reason": f"正常推荐 (组六{zl_streak}连，{streak_len}连{streak_type})",
             "suggest": "", "push_type": target_type, "push_count": 10, "signal_strength": "中"}
 
+
+# ===================== 选号引擎 v4（重写） =====================
+def _digit_marginal(records):
+    """长期经验数位边际分布（全窗口 Laplace 平滑）。
+    去除旧逻辑的'近30期热号0.3权重'——近期热≠未来热, 属赌徒谬误, 不提升期望。"""
+    total = Counter()
+    for r in records:
+        for num in r["nums"]:
+            total[num] += 1
+    denom = len(records) * 3 + 10  # Laplace: 每数字 +1 先验
+    return {i: (total.get(i, 0) + 1.0) / denom for i in range(10)}
+
+
+def _weighted_choice_dict(w, rng):
+    items = list(w.items())
+    tot = sum(v for _, v in items)
+    if tot <= 0:
+        return items[rng.randrange(len(items))][0]
+    r = rng.random() * tot
+    cum = 0.0
+    for d, v in items:
+        cum += v
+        if r <= cum:
+            return d
+    return items[-1][0]
+
+
+def _sample_digits(rng, marginal, used, target, k, exclude=()):
+    """无放回按'边际×覆盖均衡'权重抽 k 个互异数字。
+    - 边际: 经验频率越高越优先(自然复现典型和值/跨度)
+    - 覆盖均衡: 已超额使用的数字降权, 未达标的升权 -> 每数字出现次数趋向均衡
+    - exclude: 组三时排除已选的'对子数字'"""
+    chosen = []
+    avail = [d for d in range(10) if d not in exclude]
+    for _ in range(k):
+        w = {}
+        for d in avail:
+            if d in chosen:
+                continue
+            base = marginal[d]
+            util = used.get(d, 0)
+            if util >= target:
+                w[d] = base * 0.2          # 已达均衡目标, 大幅降权
+            else:
+                w[d] = base * (1.0 + 0.6 * (target - util) / max(1, target))
+        d = _weighted_choice_dict(w, rng)
+        chosen.append(d)
+        avail.remove(d)
+    return sorted(chosen)
+
+
+def _make_logic_simple(nums, push_type):
+    sv = sum(nums)
+    band = "和值中区" if 9 <= sv <= 20 else ("和值小" if sv < 9 else "和值大")
+    return f"经验边际·{band}{sv}·覆盖均衡"
+
+
 def generate_recommendations(records, info, count=10):
     """
-    选号引擎 v3（经验分布采样）：抓住真实可用的边际规律，最大化"形态典型"
+    选号引擎 v4（经验边际采样 + 覆盖均衡 + 每日变化）
     info: {"stop": bool, "push_type": "组六"/"组三", "push_count": int}
+    返回: list of {"nums":[...], "sum_val":int, "span":int, "logic":str}
 
-    核心改动（相对 v2）：
-    1. 经验联合分布加权：用真实数位频率（整体边际）作为各位置权重，
-       在独立抽取假设下，联合概率 = 各数位边际乘积，天然复现"和值聚中区/
-       跨度典型/数位均衡"等真实规律（而非人为拍脑袋定中区）。
-    2. 硬约束带对齐实测密集区：和值锁 9~20（占 82%）、跨度锁 3~7（占 73%），
-       剔除结构上极罕出的组合（极端和值/跨度 0、9）。
-    3. 奇偶均衡：剔除全奇/全偶，逼近真实 ~50:50。
-    4. 遗漏仅作弱 tie-breaker（摒弃"冷号必出"赌徒谬误）。
-    注：以上属"分布对齐"，不声称能预测具体开奖（独立随机，EV 仍为负）。
-    输出组数严格等于 count（由熔断规则决定，不在此处写死）。
+    说明: 公平随机下每注理论中奖率恒定, 本引擎不改变负EV与理论中奖率;
+    仅去除假性规律(赌徒谬误), 使选号统计上更干净、覆盖更均衡、不再把半数开奖日锁死0%。
     """
     if info.get("stop"):
         return []
@@ -211,42 +259,45 @@ def generate_recommendations(records, info, count=10):
     if n < 4:
         return []
 
-    # 计算遗漏（仅用于弱 tie-breaker）
-    last_seen = {}
-    for idx, r in enumerate(records):
-        for num in r["nums"]:
-            if num not in last_seen:
-                last_seen[num] = idx
-    missing = {i: last_seen.get(i, n) for i in range(10)}
+    marginal = _digit_marginal(records)
+    # 每日变化种子: 用最新期号派生 -> 同日确定、跨日自然变化、可复现
+    try:
+        seed = int(records[0]["qihao"])
+    except Exception:
+        seed = 20260613
+    rng = random.Random(seed)
 
-    # 经验数位频率（整体边际 + 近30期走势加权混合，Laplace 平滑避免 0）
-    # 全窗口(=近100期)边际捕捉长期规律，近30期捕捉近期走热/走冷，混合让"走势"进选号
-    total_counter = Counter()
-    recent_counter = Counter()
-    for r in records:
-        for num in r["nums"]:
-            total_counter[num] += 1
-    for r in records[:30]:
-        for num in r["nums"]:
-            recent_counter[num] += 1
-    denom = n * 3 + 5
-    denom_r = min(n, 30) * 3 + 5
-    digit_prob = {}
-    for i in range(10):
-        base = (total_counter.get(i, 0) + 0.5) / denom
-        rec = (recent_counter.get(i, 0) + 0.5) / denom_r
-        digit_prob[i] = 0.7 * base + 0.3 * rec
+    target = count * 3 / 10.0  # 每数字期望出现次数(每注3码)
+    used = Counter()
+    selected = []
+    seen = set()
+    attempts = 0
+    max_attempts = count * 500
 
-    # 近期和值均值（仅用于兜底居中，主权重已由频率联合分布承担）
-    recent_sums = [r["sum_val"] for r in records[:30]]
-    avg_sum = sum(recent_sums) / len(recent_sums) if recent_sums else 13.5
+    while len(selected) < count and attempts < max_attempts:
+        attempts += 1
+        if push_type == "组三":
+            d = _sample_digits(rng, marginal, used, target, 1)[0]   # 对子数字
+            s = _sample_digits(rng, marginal, used, target, 1, exclude=(d,))[0]  # 单数字
+            nums = sorted([d, d, s])
+        else:
+            nums = _sample_digits(rng, marginal, used, target, 3)
+        key = tuple(nums)
+        if key in seen:
+            continue
+        seen.add(key)
+        sv = sum(nums)
+        sp = max(nums) - min(nums)
+        selected.append({
+            "nums": nums,
+            "sum_val": sv,
+            "span": sp,
+            "logic": _make_logic_simple(nums, push_type),
+        })
+        for x in nums:
+            used[x] += 1
 
-    if push_type == "组三":
-        candidates = _build_zusan_pool(missing, avg_sum, digit_prob)
-    else:
-        candidates = _build_zuliu_pool(missing, avg_sum, digit_prob)
-
-    return _select_diverse(candidates, count)
+    return selected
 
 
 def trend_analysis(records, window=100):
@@ -301,143 +352,6 @@ def trend_analysis(records, window=100):
     }
 
 
-def _score_combo(multiset, missing, avg_sum, digit_prob):
-    """经验分布打分。频率联合分布为主，和值/跨度硬带 + 奇偶均衡为辅，遗漏弱项。"""
-    s = sum(multiset)
-    sp = max(multiset) - min(multiset)
-    # 经验联合分布（独立假设下 = 各数位边际乘积），频率越高权重越大
-    joint = 1.0
-    for d in multiset:
-        joint *= digit_prob[d]
-    joint_norm = joint / (0.1 ** 3)  # 中心化：频率10%时≈1，热号>1冷号<1
-    # 和值带 [9,20]（实测密集带，占 82%）；外侧骤降
-    if 9 <= s <= 20:
-        sum_score = 1.0
-    elif 7 <= s <= 22:
-        sum_score = 0.5
-    else:
-        sum_score = 0.08
-    # 跨度带 [3,7]（实测典型段，占 73%）；跨度 0/1/2/8/9 极罕出
-    if 3 <= sp <= 7:
-        span_score = 1.0
-    elif sp in (2, 8):
-        span_score = 0.5
-    else:
-        span_score = 0.08
-    # 奇偶均衡：避免全奇/全偶（真实 ~50:50）
-    odds = sum(1 for d in multiset if d % 2 == 1)
-    balance_score = 1.0 if odds in (1, 2) else 0.3
-    # 遗漏：弱项，仅作轻微偏好（冷号不等于必出）
-    max_miss = max(missing.values()) or 1
-    om_score = sum(missing[d] for d in set(multiset)) / (len(set(multiset)) * max_miss)
-    score = (0.35 * joint_norm + 0.30 * sum_score + 0.20 * span_score
-             + 0.15 * balance_score + 0.05 * om_score)
-    return s, sp, score
-
-
-def _eligible(multiset):
-    """硬约束：和值 9~20、跨度 3~7、奇偶均衡(非全奇/全偶)。仅合格候选进入选号池。"""
-    s = sum(multiset)
-    sp = max(multiset) - min(multiset)
-    if not (9 <= s <= 20):
-        return False
-    if not (3 <= sp <= 7):
-        return False
-    odds = sum(1 for d in multiset if d % 2 == 1)
-    if odds not in (1, 2):
-        return False
-    return True
-
-
-def _build_zuliu_pool(missing, avg_sum, digit_prob):
-    """枚举全部 120 组六组合，仅保留硬约束合格者并按经验分布打分。"""
-    cands = []
-    for combo in combinations(range(10), 3):
-        nums = sorted(combo)
-        if not _eligible(nums):
-            continue
-        s, sp, score = _score_combo(nums, missing, avg_sum, digit_prob)
-        cands.append({
-            "nums": nums,
-            "multiset": list(nums),
-            "distinct": set(nums),
-            "sum_val": s, "span": sp, "score": score,
-        })
-    return cands
-
-
-def _build_zusan_pool(missing, avg_sum, digit_prob):
-    """枚举全部 90 组三组合 [d,d,s]，仅保留硬约束合格者并按经验分布打分。"""
-    cands = []
-    for d in range(10):
-        for s in range(10):
-            if s == d:
-                continue
-            nums = sorted([d, d, s])
-            if not _eligible(nums):
-                continue
-            sv = 2 * d + s
-            sp = abs(d - s)
-            _, _, score = _score_combo([d, d, s], missing, avg_sum, digit_prob)
-            cands.append({
-                "nums": nums,
-                "multiset": [d, d, s],
-                "distinct": {d, s},
-                "sum_val": sv, "span": sp, "score": score,
-            })
-    return cands
-
-
-def _select_diverse(candidates, count):
-    """
-    多样性贪心筛选：在合理候选中挑 count 注，使 0~9 数位分布均衡。
-    分数主导，多样性做乘性微调：优先引入未覆盖数字、惩罚过度使用的数字。
-    """
-    if count <= 0:
-        return []
-    selected = []
-    used = Counter()
-    pool = sorted(candidates, key=lambda c: -c["score"])
-
-    while len(selected) < count and pool:
-        best = None
-        best_val = None
-        for c in pool:
-            if c in selected:
-                continue
-            new_digits = sum(1 for d in c["distinct"] if used[d] == 0)
-            overuse = sum(used[d] for d in c["distinct"])
-            # 乘性调整：保留分数主导，多样性只做相对微调
-            val = c["score"] * (1 + 0.3 * new_digits - 0.2 * overuse)
-            if best_val is None or val > best_val:
-                best = c
-                best_val = val
-        if best is None:
-            break
-        best["_new"] = [d for d in sorted(best["distinct"]) if used[d] == 0]
-        selected.append(best)
-        for d in best["multiset"]:
-            used[d] += 1
-        pool.remove(best)
-
-    return [{
-        "nums": c["nums"],
-        "logic": _make_logic(c),
-        "sum_val": c["sum_val"],
-        "span": c["span"],
-    } for c in selected]
-
-
-def _make_logic(c):
-    """生成可读的推导逻辑（经验分布对齐 + 均衡性）。"""
-    sv = c["sum_val"]
-    band = "和值中区" if 9 <= sv <= 20 else ("和值小" if sv < 9 else "和值大")
-    sp = c["span"]
-    span_desc = "典型跨度" if 3 <= sp <= 7 else "跨度"
-    new = c.get("_new", [])
-    extra = (" · 新号" + "/".join(map(str, new))) if new else " · 均衡补位"
-    return f"经验分布·{band}{sv}·{span_desc}{sp}{extra}"
-
 def full_report():
     """生成完整分析报告"""
     records = load_data()
@@ -470,6 +384,7 @@ def full_report():
 
     print("分析报告已生成: data/analysis_report.json")
     return report
+
 
 def print_summary(report):
     """打印摘要"""
@@ -526,6 +441,7 @@ def print_summary(report):
         for i, r in enumerate(recs):
             print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
     print("\n" + "=" * 50)
+
 
 if __name__ == "__main__":
     report = full_report()

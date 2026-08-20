@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-大乐透 增强选号引擎
-------------------
+大乐透 选号引擎 v2（2026-08-20 重写 generate_notes）
+-------------------------------------------------
 每注 = 前区 5 个不重复号(1-35) + 后区 2 个不重复号(1-12)，生成 NOTES 注。
-选号逻辑三要素（与 fc3d 平行）：
-  1) 冷热号分析：权重 = 频率归一 + 冷号补偿(遗漏) + 随机扰动
-  2) 奇偶/大小均衡：全局统计奇/偶、大/小，对“多数方”加权惩罚，逼近 50:50
-  3) 随机扰动：权重注入扰动 + 加权随机抽样，避免号码呈固定规律
+
+选号要素:
+  1) 经验频率加权(保留): redis/blues 经验频率归一作先验, 使号码"典型";
+  2) 奇偶/大小均衡(保留): 单注内对多数方加权惩罚, 逼近 50:50;
+  3) 覆盖最大化贪心(新增): 在有效候选池中, 优先选取能引入最多"未覆盖数字"的注。
+     目的: 降低"5注全不中"的方差(经验期望不变, 但减少连续空枪的体验)。
+  4) 冷号补偿: 已下调为装饰性(见 config.COLD_WEIGHT)。冷号≠必出, 属赌徒谬误,
+     不依赖它提升中奖率; 仅作轻微扰动避免号码呈固定规律。
+
+重要: 公平随机下每注理论中奖率恒定, 本引擎不改变负EV与理论中奖率。
 """
 import random
 from .analysis import red_freq, blue_freq, hot_cold
@@ -19,6 +25,8 @@ BLUE_BIG = config.BLUE_BIG_THRESHOLD
 def _weighted_choice(w: dict, rng: random.Random) -> int:
     items = list(w.items())
     total = sum(v for _, v in items)
+    if total <= 0:
+        return items[rng.randrange(len(items))][0]
     r = rng.random() * total
     cum = 0.0
     for d, val in items:
@@ -29,7 +37,7 @@ def _weighted_choice(w: dict, rng: random.Random) -> int:
 
 
 def build_weights(records: list, rng: random.Random) -> dict:
-    """构建前区(1-35)与后区(1-12)的数字权重：频率归一 + 冷号补偿 + 随机扰动。"""
+    """构建前区(1-35)与后区(1-12)的数字权重：频率归一 + 冷号补偿(装饰性) + 随机扰动。"""
     hc = hot_cold(records, config.WINDOW)
     rfc, bfc = hc["red_freq"], hc["blue_freq"]
     r_miss, b_miss = hc["red_omission"], hc["blue_omission"]
@@ -61,7 +69,6 @@ def _pick_reds(weights: dict, rng: random.Random, totals: dict) -> list:
     chosen = []
     for _ in range(config.RED_COUNT):
         w2 = dict(w)
-        # 奇偶均衡
         if totals["r_odd"] > totals["r_even"]:
             for d in w2:
                 if d % 2 == 1:
@@ -70,7 +77,6 @@ def _pick_reds(weights: dict, rng: random.Random, totals: dict) -> list:
             for d in w2:
                 if d % 2 == 0:
                     w2[d] *= config.BALANCE_PENALTY
-        # 大小均衡
         if totals["r_big"] > totals["r_small"]:
             for d in w2:
                 if d >= RED_BIG:
@@ -151,21 +157,52 @@ def _valid_note(reds, blues, red_sum_lo, red_sum_hi):
     return True
 
 
+def _aggregate_balance(notes):
+    """计算一组注的奇偶/大小均衡统计（用于报告展示）。"""
+    totals = {"r_odd": 0, "r_even": 0, "r_big": 0, "r_small": 0,
+              "b_odd": 0, "b_even": 0, "b_big": 0, "b_small": 0}
+    for n in notes:
+        for d in n["reds"]:
+            totals["r_odd"] += (d % 2 == 1)
+            totals["r_even"] += (d % 2 == 0)
+            totals["r_big"] += (d >= RED_BIG)
+            totals["r_small"] += (d < RED_BIG)
+        for d in n["blues"]:
+            totals["b_odd"] += (d % 2 == 1)
+            totals["b_even"] += (d % 2 == 0)
+            totals["b_big"] += (d >= BLUE_BIG)
+            totals["b_small"] += (d < BLUE_BIG)
+    return totals
+
+
+def _new_coverage(note, covered_r, covered_b):
+    """该注能引入的"新"前区/后区数字个数。"""
+    return len(set(note["reds"]) - covered_r) + len(set(note["blues"]) - covered_b)
+
+
 def generate_notes(records: list, count: int = config.NOTES, seed=config.SEED):
     """生成 count 注（前区 + 后区），返回 (notes, balance)。
-    v2: 在经验频率加权(已有)基础上，增加硬均衡约束(奇偶/大小/和值区间)，
-        与福彩3D经验分布采样思路一致——只出"形态典型"的号，不声称预测。"""
+
+    v2 改动:
+      - 先生成较大有效候选池;
+      - 覆盖最大化贪心: 依次选取能引入最多未覆盖数字的注(经验权重仅作弱 tie-break),
+        降低"5注全不中"的方差(期望不变);
+      - 返回整组注的聚合均衡统计(原实现只返回末注统计, 已修正)。
+    """
     rng = random.Random(seed)
     weights = build_weights(records, rng)
     red_sum_lo, red_sum_hi = _red_sum_band(records)
-    notes = []
+
+    # 1) 候选池（有效注）
+    pool = []
     seen = set()
-    totals = {"r_odd": 0, "r_even": 0, "r_big": 0, "r_small": 0,
-              "b_odd": 0, "b_even": 0, "b_big": 0, "b_small": 0}
     attempts = 0
-    max_attempts = count * 200
-    while len(notes) < count and attempts < max_attempts:
+    pool_target = max(count * 12, 80)
+    max_attempts = count * 1000
+    while len(pool) < pool_target and attempts < max_attempts:
         attempts += 1
+        totals = {"r_odd": 0, "r_even": 0, "r_big": 0, "r_small": 0,
+                  "b_odd": 0, "b_even": 0, "b_big": 0, "b_small": 0}
         reds = _pick_reds(weights, rng, totals)
         blues = _pick_blues(weights, rng, totals)
         key = (tuple(reds), tuple(blues))
@@ -174,5 +211,36 @@ def generate_notes(records: list, count: int = config.NOTES, seed=config.SEED):
         if not _valid_note(reds, blues, red_sum_lo, red_sum_hi):
             continue
         seen.add(key)
-        notes.append({"reds": reds, "blues": blues})
-    return notes, totals
+        score = (sum(weights["red"][d] for d in reds)
+                 + sum(weights["blue"][d] for d in blues))
+        pool.append({"reds": reds, "blues": blues, "score": score})
+
+    # 2) 覆盖最大化贪心
+    selected = []
+    covered_r = set()
+    covered_b = set()
+    remaining = list(pool)
+    while len(selected) < count and remaining:
+        best = None
+        best_val = None
+        for cand in remaining:
+            nc = _new_coverage(cand, covered_r, covered_b)
+            val = nc + 0.03 * cand["score"]  # 覆盖主导, 经验权重弱 tie-break
+            if best_val is None or val > best_val:
+                best = cand
+                best_val = val
+        selected.append(best)
+        covered_r |= set(best["reds"])
+        covered_b |= set(best["blues"])
+        remaining.remove(best)
+
+    # 3) 兜底: 池不足时直接补齐
+    if len(selected) < count:
+        for c in pool:
+            if c not in selected:
+                selected.append(c)
+            if len(selected) >= count:
+                break
+
+    balance = _aggregate_balance(selected)
+    return selected, balance
