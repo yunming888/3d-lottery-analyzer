@@ -182,7 +182,7 @@ def circuit_breaker(records, target_type="组六"):
                 "suggest": "和值异常走高，可能均值回归。建议推均值附近10注组六。是否推？",
                 "push_type": target_type, "push_count": 10, "signal_strength": ""}
 
-    return {"stop": False, "reason": f"正常推荐 (组六{zl_streak}连，{streak_len}连{streak_type})",
+    return {"stop": False, "reason": f"正常出号 (组六{zl_streak}连，{streak_len}连{streak_type})",
             "suggest": "", "push_type": target_type, "push_count": 10, "signal_strength": "中"}
 
 
@@ -433,12 +433,12 @@ def print_summary(report):
     if cb.get('suggest'):
         print(f"    ⚠️ 建议: {cb.get('suggest')}")
     if not cb.get('stop'):
-        print(f"    推荐: {cb.get('push_type', '')} × {cb.get('push_count', 0)}")
+        print(f"    出号: {cb.get('push_type', '')} × {cb.get('push_count', 0)}")
         print(f"    信号: {cb.get('signal_strength', '')}")
 
     recs = report.get("推荐号码", [])
     if recs:
-        print(f"\n  [推荐号码] ({len(recs)}注)")
+        print(f"\n  [随机采样号码·等同机选] ({len(recs)}注)")
         for i, r in enumerate(recs):
             print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
     print("\n" + "=" * 50)

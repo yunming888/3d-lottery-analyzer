@@ -37,7 +37,7 @@ def main(argv=None):
     notes, bal = generate_notes(records, args.notes, seed=args.seed)
 
     # ---- 号码列表 ----
-    print("\n【推荐号码 %d 注】（百位 十位 个位）" % len(notes))
+    print("\n【随机采样号码 %d 注·等同机选·无预测力】（百位 十位 个位）" % len(notes))
     for i, n in enumerate(notes, 1):
         print("  %2d.  %d %d %d     (%d%d%d)" % (i, n[0], n[1], n[2], n[0], n[1], n[2]))
 

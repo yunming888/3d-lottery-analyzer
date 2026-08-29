@@ -1,9 +1,10 @@
 """
 福彩3D 每日复盘自动化脚本 (动态版)
 - 抓取最新数据
-- 结算昨日待结算推荐 (修正: 按日期匹配开奖, 避免6/29期号错位bug)
+- 结算昨日待结算号码 (修正: 按日期匹配开奖, 避免6/29期号错位bug)
 - 熔断判定 (用户新规则 2026-08-07: 每天10组组六, 组六连出>6期熔断暂停)
-- 生成10组组六推荐(每天都换)
+- 生成10组组六随机采样(每天都换)
+- ⚠️ 出号性质声明(2026-08-29 用户定): 采样等同机选、无预测力, 对外一律标注"随机采样"而非"推荐"
 - 更新 profit_loss.json
 - 生成 markdown 报告
 - 输出摘要
@@ -287,7 +288,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
     rec_rows = []
     for i, r in enumerate(recs):
         rec_rows.append(f"| {i+1} | {' '.join(map(str, r['nums']))} | {r['sum_val']} | {r['span']} | {r['logic']} |")
-    rec_table = "\n".join(rec_rows) if rec_rows else "| - | 休市/熔断未推 | - | - | - |"
+    rec_table = "\n".join(rec_rows) if rec_rows else "| - | 休市/熔断未出号 | - | - | - |"
 
     # 形态走势 (近15期)
     trend_rows = []
@@ -301,7 +302,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
     for rf in cb["rules_fired"]:
         cb_detail += f"- {rf}\n"
     if not cb["rules_fired"]:
-        cb_detail = "- 无规则触发, 正常推荐\n"
+        cb_detail = "- 无规则触发, 正常出号\n"
     if any("休市" in rf for rf in cb["rules_fired"]):
         cb_status = "⏸ 休市(无新开奖)"
     elif cb["stop"]:
@@ -319,14 +320,14 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
 | 项目 | 数值 |
 |------|------|
 | 开奖 | {draw['qihao']} → **{' '.join(map(str, draw['nums']))}** {draw['type']} |
-| 推荐 | {rec_data['notes']}注组六 |
+| 投注 | {rec_data['notes']}注组六 |
 | 命中 | **{hits}注** {"🎯" if hits > 0 else ""} |
 | 成本 | {rec_data['cost']}元 |
 | 奖金 | {rec_data['prize']}元 |
 | 日盈亏 | **{rec_data['daily_pnl']:+d}元** |
 """
         if hit_list:
-            settle_section += f"\n> 🎯 命中推荐: {hit_list[0]}\n"
+            settle_section += f"\n> 🎯 命中号码: {hit_list[0]}\n"
 
     s = pl["summary"]
     next_qihao = str(int(latest["qihao"]) + 1)
@@ -366,6 +367,10 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
     report = f"""# 福彩3D 每日复盘报告
 **日期: {TODAY}** | 期号: {latest['qihao']} 已开 → {next_qihao} 待开
 
+> ⚠️ **性质声明**：本报告中的号码均为程序随机采样生成，**等同投注站机选，不具备预测能力**。
+> 彩票开奖完全随机、每期独立，不存在可推算的下期号码；任何声称能预测或推荐中奖号码的个人、平台或 AI 均属诈骗。
+> 本报告仅供学习研究与盈亏记录，不构成投注建议。
+
 ---
 
 ## 一、昨日复盘 (最近3期)
@@ -382,7 +387,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
 {settle_section}
 ### 累计盈亏表
 
-| 日期 | 推荐数 | 成本 | 命中 | 奖金 | 当日盈亏 | 累计盈亏 |
+| 日期 | 投注数 | 成本 | 命中 | 奖金 | 当日盈亏 | 累计盈亏 |
 |------|--------|------|------|------|----------|----------|
 {pnl_table}
 
@@ -403,9 +408,13 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
 - 近3期和值: {', '.join(map(str, cb['sums_3']))}
 
 {trend_section}
-## 四、今日推荐 ({len(recs)}注{cb['push_type']})  【选号引擎 {ENGINE_VERSION}】
+## 四、今日随机采样 ({len(recs)}注{cb['push_type']})｜等同机选·无预测力  【选号引擎 {ENGINE_VERSION}】
 
-| # | 号码 | 和值 | 跨度 | 推导逻辑 |
+> ⚠️ 以下号码由程序按历史分布随机采样生成，**与投注站机选在统计上无区别，不具备任何预测能力**。
+> 开奖完全随机、每期独立，不存在可推算的下期号码。任何声称能预测中奖号的人或平台均为诈骗。
+> 本节仅供学习研究与记录盈亏，不构成投注建议。
+
+| # | 号码 | 和值 | 跨度 | 采样逻辑 |
 |---|------|------|------|----------|
 {rec_table}
 
@@ -561,7 +570,7 @@ def main():
             print(f"  生成{len(recs)}注{cb['push_type']}:")
             for i, r in enumerate(recs):
                 print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
-            reason = f"{cb['push_type']}{len(recs)}注推荐 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常推荐"])
+            reason = f"{cb['push_type']}{len(recs)}注随机采样 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常出号"])
 
     # 计算目标期号 (休市或数据滞后则无)
     if is_suspension or data_stale:
@@ -643,7 +652,7 @@ def main():
     if settlement:
         print(f"  昨日结算: {settlement[2]}注命中, {settlement[0]['daily_pnl']:+d}元")
     print(f"  累计盈亏: {summary['net_pnl']:+d}元 ({summary['total_hits']}注命中)")
-    print(f"  今日推荐: {len(recs)}注组六, 成本{len(recs)*2}元")
+    print(f"  今日随机采样(等同机选): {len(recs)}注组六, 成本{len(recs)*2}元")
     print(f"  报告: {report_path}")
     print(f"  追踪期: {pl['start_date']} ~ {pl['end_date']}")
 

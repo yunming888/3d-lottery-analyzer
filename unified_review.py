@@ -112,15 +112,15 @@ def wechat_block(today, yesterday, r3, rd, rs):
         lines.append("结算：昨日无新开奖/无待结算")
     s3 = r3["summary"]
     cb = r3.get("circuit", {})
-    lines.append("复盘：%s" % ("；".join(cb.get("rules_fired", [])) if cb.get("rules_fired") else "常态推荐"))
+    lines.append("复盘：%s" % ("；".join(cb.get("rules_fired", [])) if cb.get("rules_fired") else "常态出号"))
     lines.append("累计净盈亏：%+d元（%d命中/%d注）" % (s3["net_pnl"], s3["total_hits"], s3["total_bets"]))
     recs3 = r3.get("recommendations", [])
     if recs3:
-        lines.append("今日推荐：%d注%s（押%s）｜选号引擎 %s" % (len(recs3), cb.get("push_type", "组六"), r3.get("next_qihao"), FCD_VERSION))
+        lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s】" % (len(recs3), cb.get("push_type", "组六"), r3.get("next_qihao"), FCD_VERSION))
         for i, r in enumerate(recs3, 1):
             lines.append("  %d. %s" % (i, _fmt_3d_nums(r["nums"])))
     else:
-        lines.append("今日推荐：休市/熔断，0注")
+        lines.append("今日随机采样：休市/熔断，0注")
 
     tr = r3.get("trend") or {}
     if tr.get("conclusion"):
@@ -150,20 +150,20 @@ def wechat_block(today, yesterday, r3, rd, rs):
         s_d["net_pnl"], s_d["rounds"], s_d["pending_rounds"]))
     nd = rd.get("notes", [])
     if nd:
-        lines.append("今日推荐：%d注（押%s期）｜选号引擎 %s" % (len(nd), rd.get("target"), DLT_VERSION))
+        lines.append("今日随机采样：%d注（押%s期）｜等同机选·无预测力【选号引擎 %s】" % (len(nd), rd.get("target"), DLT_VERSION))
         for _i, n in enumerate(nd, 1):
             lines.append("  %d. %s" % (_i, _fmt_dlt(n)))
         if rd.get("rotation"):
             lines.append("  🔄 %s" % rd["rotation"])
     else:
-        lines.append("今日推荐：无")
+        lines.append("今日随机采样：无")
     tr_d = rd.get("trend") or {}
     if tr_d:
         b_d = tr_d.get("bal", {})
         lines.append("走势研判：热号 前区[%s]/后区[%s]；冷号 前区[%s]/后区[%s]" % (
             tr_d.get("hot_red", ""), tr_d.get("hot_blue", ""),
             tr_d.get("cold_red", ""), tr_d.get("cold_blue", "")))
-        lines.append("  选号均衡：前区奇%d/偶%d、大%d/小%d；后区奇%d/偶%d、大%d/小%d" % (
+        lines.append("  采样均衡：前区奇%d/偶%d、大%d/小%d；后区奇%d/偶%d、大%d/小%d" % (
             b_d.get("r_odd", 0), b_d.get("r_even", 0), b_d.get("r_big", 0), b_d.get("r_small", 0),
             b_d.get("b_odd", 0), b_d.get("b_even", 0), b_d.get("b_big", 0), b_d.get("b_small", 0)))
 
@@ -191,20 +191,20 @@ def wechat_block(today, yesterday, r3, rd, rs):
         s_s["net_pnl"], s_s["rounds"], s_s["pending_rounds"]))
     ns = rs.get("notes", [])
     if ns:
-        lines.append("今日推荐：%d注（押%s期）｜选号引擎 %s" % (len(ns), rs.get("target"), SSQ_VERSION))
+        lines.append("今日随机采样：%d注（押%s期）｜等同机选·无预测力【选号引擎 %s】" % (len(ns), rs.get("target"), SSQ_VERSION))
         for _i, n in enumerate(ns, 1):
             lines.append("  %d. %s" % (_i, _fmt_ssq(n)))
         if rs.get("rotation"):
             lines.append("  🔄 %s" % rs["rotation"])
     else:
-        lines.append("今日推荐：无")
+        lines.append("今日随机采样：无")
     tr_s = rs.get("trend") or {}
     if tr_s:
         b_s = tr_s.get("bal", {})
         lines.append("走势研判：热号 红球[%s]/蓝球[%s]；冷号 红球[%s]/蓝球[%s]" % (
             tr_s.get("hot_red", ""), tr_s.get("hot_blue", ""),
             tr_s.get("cold_red", ""), tr_s.get("cold_blue", "")))
-        lines.append("  选号均衡：红球奇%d/偶%d、大%d/小%d；蓝球奇%d/偶%d、大%d/小%d" % (
+        lines.append("  采样均衡：红球奇%d/偶%d、大%d/小%d；蓝球奇%d/偶%d、大%d/小%d" % (
             b_s.get("r_odd", 0), b_s.get("r_even", 0), b_s.get("r_big", 0), b_s.get("r_small", 0),
             b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
 
@@ -214,7 +214,8 @@ def wechat_block(today, yesterday, r3, rd, rs):
     lines.append("━━ 🧾 三品种合计 ━━")
     lines.append("累计净盈亏合计：%+d元（福彩3D %+d + 大乐透 %+d + 双色球 %+d）" % (
         total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"]))
-    lines.append("⚠️ 仅供学习研究，不构成投注建议。彩票为负EV，理性购彩。")
+    lines.append("⚠️ 上述号码均为随机采样，等同机选、无预测力；开奖随机且每期独立，不存在可推算的下期号码。")
+    lines.append("⚠️ 仅供学习研究，不构成投注建议；任何收费荐号均属诈骗，切勿转账。彩票为负EV，理性购彩。")
     return "\n".join(lines)
 
 
@@ -230,6 +231,9 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
     L = []
     L.append("# 彩票每日复盘（统一）%s\n" % today)
     L.append("> 前一自然日：%s\n" % yesterday)
+    L.append("\n> ⚠️ **性质声明**：本报告中的号码均为程序按历史分布随机采样生成，**等同投注站机选，不具备预测能力**。\n")
+    L.append("> 彩票开奖完全随机、每期独立，不存在可推算的下期号码；任何声称能预测或推荐中奖号码的个人、平台或 AI 均属诈骗。\n")
+    L.append("> 本报告仅供学习研究与盈亏记录，不构成投注建议。\n")
 
     L.append("\n## 福彩3D\n")
     L.append("- 昨日开奖：%s %s（%s）\n" % (
@@ -265,7 +269,7 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
             b_d.get("b_odd", 0), b_d.get("b_even", 0), b_d.get("b_big", 0), b_d.get("b_small", 0)))
     _nd = rd.get("notes", [])
     if _nd:
-        L.append("- 今日推荐（押%s期，%d注）【选号引擎 %s】：\n" % (rd.get("target"), len(_nd), DLT_VERSION))
+        L.append("- 今日随机采样（押%s期，%d注）｜等同机选·无预测力【选号引擎 %s】：\n" % (rd.get("target"), len(_nd), DLT_VERSION))
         for n in _nd:
             L.append("  - %s\n" % _fmt_dlt(n))
 
@@ -290,7 +294,7 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
             b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
     _ns = rs.get("notes", [])
     if _ns:
-        L.append("- 今日推荐（押%s期，%d注）【选号引擎 %s】：\n" % (rs.get("target"), len(_ns), SSQ_VERSION))
+        L.append("- 今日随机采样（押%s期，%d注）｜等同机选·无预测力【选号引擎 %s】：\n" % (rs.get("target"), len(_ns), SSQ_VERSION))
         for n in _ns:
             L.append("  - %s\n" % _fmt_ssq(n))
 

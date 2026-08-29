@@ -259,6 +259,9 @@ def _write_report(today, history, meta, notes, bal, n_notes, settled, summary, t
         last = latest(history)
         L.append("# 双色球 每日复盘 %s\n" % today)
         L.append("> 数据源：%s｜最新 %s｜窗口 %d 期\n" % (src, last.get("issue", "?"), meta.get("count", 0)))
+        L.append("\n> ⚠️ **性质声明**：本报告中的号码均为程序随机采样生成，**等同机选，不具备预测能力**。\n")
+        L.append("> 开奖完全随机、每期独立，不存在可推算的下期号码；任何声称能预测中奖号码者均属诈骗。\n")
+        L.append("> 本报告仅供学习研究与盈亏记录，不构成投注建议。\n")
 
         L.append("\n## 一、昨日数据摘要\n")
         if yest_draw:
@@ -281,9 +284,9 @@ def _write_report(today, history, meta, notes, bal, n_notes, settled, summary, t
         L.append("- 蓝球热号：%s；蓝球冷号(高遗漏)：%s\n" % (
             " ".join("%02d" % d for d in hc["hot_blue"]),
             " ".join("%02d" % d for d in hc["cold_blue"])))
-        L.append("- 本期选号奇偶均衡：红球 奇%d/偶%d，蓝球 奇%d/偶%d（目标≈50:50）。\n" % (
+        L.append("- 本期采样奇偶均衡：红球 奇%d/偶%d，蓝球 奇%d/偶%d（目标≈50:50）。\n" % (
             bal["r_odd"], bal["r_even"], bal["b_odd"], bal["b_even"]))
-        L.append("- 本期选号大小均衡：红球 大%d/小%d，蓝球 大%d/小%d。\n" % (
+        L.append("- 本期采样大小均衡：红球 大%d/小%d，蓝球 大%d/小%d。\n" % (
             bal["r_big"], bal["r_small"], bal["b_big"], bal["b_small"]))
 
         L.append("\n## 三、盈亏结算\n")
@@ -306,7 +309,9 @@ def _write_report(today, history, meta, notes, bal, n_notes, settled, summary, t
             summary["rounds"], summary["total_notes"], summary["total_cost"],
             summary["total_prize"], summary["net_pnl"], summary["pending_rounds"]))
 
-        L.append("\n## 四、今日推荐（%d 注，押 %s 期）【选号引擎 %s】\n" % (len(notes), target, ENGINE_VERSION))
+        L.append("\n## 四、今日随机采样（%d 注，押 %s 期）｜等同机选·无预测力【选号引擎 %s】\n" % (len(notes), target, ENGINE_VERSION))
+        L.append("> ⚠️ 以下号码为程序随机采样生成，**与机选在统计上无区别，不具备预测能力**。\n")
+        L.append("> 开奖完全随机、每期独立；任何声称能预测中奖号码的人或平台均为诈骗。本节仅供学习研究与盈亏记录。\n")
         if rotation_info:
             L.append("> 🔄 %s（组合每2周周五轮换最冷2组，轮换前保持持有）\n" % rotation_info)
         else:
@@ -398,7 +403,7 @@ def run_daily(today=None, n_notes=None):
         "bal": bal,
     }
 
-    print("  双色球 推荐 %d 注（押 %s 期）：" % (len(notes), target))
+    print("  双色球 随机采样(等同机选) %d 注（押 %s 期）：" % (len(notes), target))
     for i, n in enumerate(notes, 1):
         print("    %2d. %s" % (i, _fmt_note(n)))
 
