@@ -114,6 +114,14 @@ def wechat_block(today, yesterday, r3, rd, rs):
     cb = r3.get("circuit", {})
     lines.append("复盘：%s" % ("；".join(cb.get("rules_fired", [])) if cb.get("rules_fired") else "常态出号"))
     lines.append("累计净盈亏：%+d元（%d命中/%d注）" % (s3["net_pnl"], s3["total_hits"], s3["total_bets"]))
+    try:
+        import hot_core
+        _c3 = hot_core.peek("3d")
+        if _c3:
+            lines.append("热号核心：胆%d 拖%s（每注必含，%s 锁定，每月1号重选）" % (
+                _c3["dan"], "/".join(str(x) for x in _c3["tuo"]), _c3.get("ym", "")))
+    except Exception:
+        pass
     recs3 = r3.get("recommendations", [])
     if recs3:
         lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s】" % (len(recs3), cb.get("push_type", "组六"), r3.get("next_qihao"), FCD_VERSION))
@@ -146,6 +154,14 @@ def wechat_block(today, yesterday, r3, rd, rs):
     s_d = rd["summary"]
     rot_d = rd.get("rotation")
     lines.append("复盘：5组持有·每2周周五轮换最冷2组" + ("；" + rot_d if rot_d else "；热号为主+冷号补足，奇偶/大小均衡"))
+    try:
+        import hot_core
+        _cd = hot_core.peek("dlt")
+        if _cd:
+            lines.append("热号核心：前区 %s（每注必含，%s 锁定，每月1号重选）" % (
+                " / ".join("%02d" % d for d in _cd["core_red"]), _cd.get("ym", "")))
+    except Exception:
+        pass
     lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
         s_d["net_pnl"], s_d["rounds"], s_d["pending_rounds"]))
     nd = rd.get("notes", [])
@@ -187,6 +203,14 @@ def wechat_block(today, yesterday, r3, rd, rs):
     s_s = rs["summary"]
     rot_s = rs.get("rotation")
     lines.append("复盘：5组持有·每2周周五轮换最冷2组" + ("；" + rot_s if rot_s else "；热号为主+冷号补足，奇偶/大小均衡"))
+    try:
+        import hot_core
+        _cs = hot_core.peek("ssq")
+        if _cs:
+            lines.append("热号核心：红球 %s（每注必含，%s 锁定，每月1号重选）" % (
+                " / ".join("%02d" % d for d in _cs["core_red"]), _cs.get("ym", "")))
+    except Exception:
+        pass
     lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
         s_s["net_pnl"], s_s["rounds"], s_s["pending_rounds"]))
     ns = rs.get("notes", [])

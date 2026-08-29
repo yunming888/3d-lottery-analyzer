@@ -186,8 +186,12 @@ def circuit_breaker(records, target_type="组六"):
             "suggest": "", "push_type": target_type, "push_count": 10, "signal_strength": "中"}
 
 
-# ===================== 选号引擎 v4（重写） =====================
-ENGINE_VERSION = "v4"  # 选号引擎版本，供报告/推送标注（出号时附带说明）
+# ===================== 选号引擎 v5（热号追号） =====================
+# v5 (2026-08-29): 胆1拖5 热号固定追号，每月1号重选胆拖组；组三形态回退 v4 边际采样。
+# v4 (2026-08-20): 经验边际采样 + 覆盖均衡 + 每日变化（现作为组三/异常回退路径保留）。
+ENGINE_VERSION = "v5"  # 选号引擎版本，供报告/推送标注（出号时附带说明）
+
+
 def _digit_marginal(records):
     """长期经验数位边际分布（全窗口 Laplace 平滑）。
     去除旧逻辑的'近30期热号0.3权重'——近期热≠未来热, 属赌徒谬误, 不提升期望。"""
@@ -245,12 +249,17 @@ def _make_logic_simple(nums, push_type):
 
 def generate_recommendations(records, info, count=10):
     """
-    选号引擎 v4（经验边际采样 + 覆盖均衡 + 每日变化）
+    选号引擎 v5（热号追号：胆1拖5 固定守号）
     info: {"stop": bool, "push_type": "组六"/"组三", "push_count": int}
     返回: list of {"nums":[...], "sum_val":int, "span":int, "logic":str}
 
-    说明: 公平随机下每注理论中奖率恒定, 本引擎不改变负EV与理论中奖率;
-    仅去除假性规律(赌徒谬误), 使选号统计上更干净、覆盖更均衡、不再把半数开奖日锁死0%。
+    规则（用户 2026-08-29 定）:
+      - 胆码 = 近100期频率 TOP1，拖码 = 其余数字中频率 TOP5
+      - 胆1拖5 -> C(5,2)=10 注，每注必含胆码；每月1号重选，月内固定不动
+      - 组三形态下退化为 v4 的边际采样（胆拖只适用于组六）
+
+    ⚠️ 诚实边界: 胆拖与随机选号在数学上等价（每注中奖概率恒定，每期最多中1注、无叠加）。
+    锁定热号属投注结构偏好，不提升任何概率优势，对外保持「等同机选·无预测力」标注。
     """
     if info.get("stop"):
         return []
@@ -259,6 +268,26 @@ def generate_recommendations(records, info, count=10):
     n = len(records)
     if n < 4:
         return []
+
+    # ---- v5: 热号追号（组六胆拖）；组三/异常时回退 v4 边际采样 ----
+    if push_type == "组六":
+        try:
+            import hot_core
+            dan, tuo, meta = hot_core.get_3d_core(records)
+            notes = hot_core.dantuo_notes(dan, tuo)
+            if len(notes) == count:
+                out = []
+                for nums in notes:
+                    out.append({
+                        "nums": nums,
+                        "sum_val": sum(nums),
+                        "span": max(nums) - min(nums),
+                        "logic": "热号追号·胆%d拖%s" % (
+                            dan, "/".join(str(x) for x in tuo)),
+                    })
+                return out
+        except Exception:
+            pass  # 回退 v4
 
     marginal = _digit_marginal(records)
     # 每日变化种子: 用最新期号派生 -> 同日确定、跨日自然变化、可复现

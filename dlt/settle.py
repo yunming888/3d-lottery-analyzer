@@ -300,6 +300,14 @@ def _write_report(today, history, meta, notes, bal, n_notes, settled, summary, t
         L.append("- 后区热号：%s；后区冷号(高遗漏)：%s\n" % (
             " ".join("%02d" % d for d in hc["hot_blue"]),
             " ".join("%02d" % d for d in hc["cold_blue"])))
+        # v3 热号追号：本期锁定的核心号
+        try:
+            from hot_core import get_dlt_core
+            _core, _meta = get_dlt_core(history)
+            L.append("- 🎯 本期热号核心（每注前区必含，%s 锁定，每月1号重选）：**%s**\n" % (
+                _meta.get("ym", ""), " / ".join("%02d" % d for d in _core)))
+        except Exception:
+            pass
         L.append("- 本期采样奇偶均衡：前区 奇%d/偶%d，后区 奇%d/偶%d（目标≈50:50）。\n" % (
             bal["r_odd"], bal["r_even"], bal["b_odd"], bal["b_even"]))
         L.append("- 本期采样大小均衡：前区 大%d/小%d，后区 大%d/小%d。\n" % (
@@ -384,6 +392,30 @@ def run_daily(today=None, n_notes=None):
         portfolio = generate_notes(records, n_notes)[0]
         st["portfolio"] = portfolio
 
+    # 3.5) v3 热号追号：核心号校验
+    #      - 核心号跨月重选 → 重建组合（让新规则立即生效，不必等轮换日）
+    #      - 持仓中存在不含核心号的注 → 重建
+    rebuild_happened = False
+    try:
+        from hot_core import get_dlt_core
+        core, _meta = get_dlt_core(records)
+        core_set = set(core)
+        need = False
+        if st.get("core_ym") != _meta.get("ym"):
+            need = True
+        elif portfolio and not all(core_set <= set(n["reds"]) for n in portfolio):
+            need = True
+        if need:
+            portfolio = generate_notes(records, n_notes)[0]
+            st["portfolio"] = portfolio
+            st["core_ym"] = _meta.get("ym")
+            rebuild_happened = True
+            _msg = "热号追号·核心号%s，已重建%d组" % (
+                "/".join("%02d" % d for d in core), n_notes)
+            rotation_note = (rotation_note + "；" + _msg) if rotation_note else _msg
+    except Exception:
+        pass
+
     # 4) 每个待开奖期仅保留一条 pending（按 target_issue 幂等，避免非开奖日重复堆积导致重复结算）
     latest_issue = int(records[0]["issue"])
     next_target = str(latest_issue + 1)
@@ -393,8 +425,8 @@ def run_daily(today=None, n_notes=None):
             existing = r
             break
     if existing is not None:
-        if rotation_happened:
-            existing["notes"] = portfolio  # 轮换当日，pending 跟随最新组合
+        if rotation_happened or rebuild_happened:
+            existing["notes"] = portfolio  # 组合变更当日，pending 跟随最新组合
         notes = existing["notes"]
         target = existing["target_issue"]
     else:

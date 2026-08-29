@@ -18,7 +18,7 @@ import random
 from .analysis import red_freq, blue_freq, hot_cold
 from . import config
 
-ENGINE_VERSION = "v2"  # 选号引擎版本，供报告/推送标注（出号时附带说明）
+ENGINE_VERSION = "v3"  # 选号引擎版本，供报告/推送标注（出号时附带说明）
 
 RED_BIG = config.RED_BIG_THRESHOLD
 BLUE_BIG = config.BLUE_BIG_THRESHOLD
@@ -65,11 +65,22 @@ def build_weights(records: list, rng: random.Random) -> dict:
     return {"red": red_w, "blue": blue_w}
 
 
-def _pick_reds(weights: dict, rng: random.Random, totals: dict) -> list:
-    """按权重无放回抽 5 个前区号，实时奇偶/大小均衡惩罚。"""
+def _pick_reds(weights: dict, rng: random.Random, totals: dict, forced=()) -> list:
+    """按权重无放回抽 5 个前区号，实时奇偶/大小均衡惩罚。
+
+    forced: 必须包含的号码（热号追号用的核心号，v3 新增）。
+            先落定 forced，再从剩余号中补足 RED_COUNT - len(forced) 个。
+    """
     w = dict(weights["red"])
     chosen = []
-    for _ in range(config.RED_COUNT):
+    for d in forced:
+        chosen.append(d)
+        w.pop(d, None)
+        totals["r_odd"] += (d % 2 == 1)
+        totals["r_even"] += (d % 2 == 0)
+        totals["r_big"] += (d >= RED_BIG)
+        totals["r_small"] += (d < RED_BIG)
+    for _ in range(config.RED_COUNT - len(chosen)):
         w2 = dict(w)
         if totals["r_odd"] > totals["r_even"]:
             for d in w2:
@@ -139,8 +150,12 @@ def _red_sum_band(records):
     return sums[n // 10], sums[min(n - 1, n * 9 // 10)]
 
 
-def _valid_note(reds, blues, red_sum_lo, red_sum_hi):
-    """硬均衡：红球奇偶/大小不极端(2..RED_COUNT-2)，和值在区间内；后区奇偶/大小严格1:1。"""
+def _valid_note(reds, blues, red_sum_lo, red_sum_hi, check_sum=True):
+    """硬均衡：红球奇偶/大小不极端(2..RED_COUNT-2)，和值在区间内；后区奇偶/大小严格1:1。
+
+    check_sum=False 时放宽和值约束（热号追号的强制核心号可能与和值区间冲突，
+    用于兜底重试，避免候选池被筛空导致静默出 0 注）。
+    """
     ro = sum(1 for d in reds if d % 2 == 1)
     if not (2 <= ro <= config.RED_COUNT - 2):
         return False
@@ -148,7 +163,7 @@ def _valid_note(reds, blues, red_sum_lo, red_sum_hi):
     if not (2 <= rb <= config.RED_COUNT - 2):
         return False
     rs = sum(reds)
-    if red_sum_lo is not None and not (red_sum_lo <= rs <= red_sum_hi):
+    if check_sum and red_sum_lo is not None and not (red_sum_lo <= rs <= red_sum_hi):
         return False
     bo = sum(1 for d in blues if d % 2 == 1)
     if bo != 1:
@@ -185,6 +200,12 @@ def _new_coverage(note, covered_r, covered_b):
 def generate_notes(records: list, count: int = config.NOTES, seed=config.SEED):
     """生成 count 注（前区 + 后区），返回 (notes, balance)。
 
+    v3 改动 (2026-08-29 热号追号):
+      - 每注前区**必含核心热号 TOP2**（近100期频率最高，按月锁定）;
+      - 后区不锁, 保持权重的奇偶/大小均衡;
+      - 成本不变(仍 5 注 / 10 元)。
+      ⚠️ 与随机选号数学等价, 不提升任何概率优势, 属投注结构偏好。
+
     v2 改动:
       - 先生成较大有效候选池;
       - 覆盖最大化贪心: 依次选取能引入最多未覆盖数字的注(经验权重仅作弱 tie-break),
@@ -195,27 +216,43 @@ def generate_notes(records: list, count: int = config.NOTES, seed=config.SEED):
     weights = build_weights(records, rng)
     red_sum_lo, red_sum_hi = _red_sum_band(records)
 
+    # v3: 热号追号 —— 锁定前区核心号（按月缓存，失败则不锁、退化为 v2）
+    forced_red = ()
+    try:
+        from hot_core import get_dlt_core
+        forced_red = tuple(get_dlt_core(records)[0])
+    except Exception:
+        forced_red = ()
+
     # 1) 候选池（有效注）
-    pool = []
-    seen = set()
-    attempts = 0
     pool_target = max(count * 12, 80)
     max_attempts = count * 1000
-    while len(pool) < pool_target and attempts < max_attempts:
-        attempts += 1
-        totals = {"r_odd": 0, "r_even": 0, "r_big": 0, "r_small": 0,
-                  "b_odd": 0, "b_even": 0, "b_big": 0, "b_small": 0}
-        reds = _pick_reds(weights, rng, totals)
-        blues = _pick_blues(weights, rng, totals)
-        key = (tuple(reds), tuple(blues))
-        if key in seen:
-            continue
-        if not _valid_note(reds, blues, red_sum_lo, red_sum_hi):
-            continue
-        seen.add(key)
-        score = (sum(weights["red"][d] for d in reds)
-                 + sum(weights["blue"][d] for d in blues))
-        pool.append({"reds": reds, "blues": blues, "score": score})
+
+    def _build_pool(check_sum):
+        pool = []
+        seen = set()
+        attempts = 0
+        while len(pool) < pool_target and attempts < max_attempts:
+            attempts += 1
+            totals = {"r_odd": 0, "r_even": 0, "r_big": 0, "r_small": 0,
+                      "b_odd": 0, "b_even": 0, "b_big": 0, "b_small": 0}
+            reds = _pick_reds(weights, rng, totals, forced=forced_red)
+            blues = _pick_blues(weights, rng, totals)
+            key = (tuple(reds), tuple(blues))
+            if key in seen:
+                continue
+            if not _valid_note(reds, blues, red_sum_lo, red_sum_hi, check_sum=check_sum):
+                continue
+            seen.add(key)
+            score = (sum(weights["red"][d] for d in reds)
+                     + sum(weights["blue"][d] for d in blues))
+            pool.append({"reds": reds, "blues": blues, "score": score})
+        return pool
+
+    pool = _build_pool(True)
+    if not pool and forced_red:
+        # 核心热号与和值区间冲突 → 放宽和值约束重试，避免静默出 0 注
+        pool = _build_pool(False)
 
     # 2) 覆盖最大化贪心
     selected = []
