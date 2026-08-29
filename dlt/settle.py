@@ -300,9 +300,11 @@ def _write_report(today, history, meta, notes, bal, n_notes, settled, summary, t
         L.append("- 后区热号：%s；后区冷号(高遗漏)：%s\n" % (
             " ".join("%02d" % d for d in hc["hot_blue"]),
             " ".join("%02d" % d for d in hc["cold_blue"])))
-        # v3 热号追号：本期锁定的核心号
+        # v3 热号追号：本期锁定的核心号（生效日后才输出）
         try:
-            from hot_core import get_dlt_core
+            from hot_core import get_dlt_core, is_active, effective_desc
+            if not is_active():
+                raise ValueError(effective_desc())
             _core, _meta = get_dlt_core(history)
             L.append("- 🎯 本期热号核心（每注前区必含，%s 锁定，每月1号重选）：**%s**\n" % (
                 _meta.get("ym", ""), " / ".join("%02d" % d for d in _core)))
@@ -397,7 +399,9 @@ def run_daily(today=None, n_notes=None):
     #      - 持仓中存在不含核心号的注 → 重建
     rebuild_happened = False
     try:
-        from hot_core import get_dlt_core
+        from hot_core import get_dlt_core, is_active
+        if not is_active():
+            raise ValueError("未到生效日，跳过核心号校验")
         core, _meta = get_dlt_core(records)
         core_set = set(core)
         need = False

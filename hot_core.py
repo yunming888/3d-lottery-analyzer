@@ -14,11 +14,16 @@
   锁定热号只是「围绕看好的号码组织投注」，属于投注结构偏好，不提升任何概率优势。
   对外输出一律保持「随机采样·等同机选·无预测力」标注。
 
+生效日期（用户 2026-08-29 定）：
+  **2026-09-01 起**才启用热号追号；2026-08-30 ~ 08-31 仍走旧逻辑（3D v4 边际采样 /
+  大乐透·双色球 v2 无核心号）。到点自动切换，无需再改代码。
+  此后**每月 1 号**按最新近 100 期热号重选胆码/核心号。
+
 状态文件：data/hot_core.json（按 年-月 判定是否需要重选）
 """
 import os
 import json
-from datetime import datetime
+from datetime import datetime, date
 from collections import Counter
 from itertools import combinations
 
@@ -28,6 +33,21 @@ STATE_FILE = os.path.join(BASE_DIR, "data", "hot_core.json")
 WINDOW = 100          # 冷热号统计窗口（近 N 期）
 D3_TUO_N = 5          # 3D 拖码个数：C(5,2)=10 注
 CORE_RED_N = 2        # 大乐透/双色球 锁定的红球（前区）热号个数
+
+EFFECTIVE_FROM = "2026-09-01"   # 热号追号的生效日期（含当日）
+
+
+def is_active(today=None) -> bool:
+    """是否已到生效日期。未生效时三品种一律走旧逻辑（v4 / v2）。"""
+    d = today or datetime.now().date()
+    return d >= date.fromisoformat(EFFECTIVE_FROM)
+
+
+def effective_desc():
+    """给报告/推送用的一句话状态说明。"""
+    if is_active():
+        return "热号追号已生效（%s 起）" % EFFECTIVE_FROM
+    return "热号追号将于 %s 生效，当前仍按原随机采样出号" % EFFECTIVE_FROM
 
 
 def _load():

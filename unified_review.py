@@ -116,7 +116,7 @@ def wechat_block(today, yesterday, r3, rd, rs):
     lines.append("累计净盈亏：%+d元（%d命中/%d注）" % (s3["net_pnl"], s3["total_hits"], s3["total_bets"]))
     try:
         import hot_core
-        _c3 = hot_core.peek("3d")
+        _c3 = hot_core.peek("3d") if hot_core.is_active() else None
         if _c3:
             lines.append("热号核心：胆%d 拖%s（每注必含，%s 锁定，每月1号重选）" % (
                 _c3["dan"], "/".join(str(x) for x in _c3["tuo"]), _c3.get("ym", "")))
@@ -156,7 +156,7 @@ def wechat_block(today, yesterday, r3, rd, rs):
     lines.append("复盘：5组持有·每2周周五轮换最冷2组" + ("；" + rot_d if rot_d else "；热号为主+冷号补足，奇偶/大小均衡"))
     try:
         import hot_core
-        _cd = hot_core.peek("dlt")
+        _cd = hot_core.peek("dlt") if hot_core.is_active() else None
         if _cd:
             lines.append("热号核心：前区 %s（每注必含，%s 锁定，每月1号重选）" % (
                 " / ".join("%02d" % d for d in _cd["core_red"]), _cd.get("ym", "")))
@@ -205,7 +205,7 @@ def wechat_block(today, yesterday, r3, rd, rs):
     lines.append("复盘：5组持有·每2周周五轮换最冷2组" + ("；" + rot_s if rot_s else "；热号为主+冷号补足，奇偶/大小均衡"))
     try:
         import hot_core
-        _cs = hot_core.peek("ssq")
+        _cs = hot_core.peek("ssq") if hot_core.is_active() else None
         if _cs:
             lines.append("热号核心：红球 %s（每注必含，%s 锁定，每月1号重选）" % (
                 " / ".join("%02d" % d for d in _cs["core_red"]), _cs.get("ym", "")))
@@ -238,6 +238,11 @@ def wechat_block(today, yesterday, r3, rd, rs):
     lines.append("━━ 🧾 三品种合计 ━━")
     lines.append("累计净盈亏合计：%+d元（福彩3D %+d + 大乐透 %+d + 双色球 %+d）" % (
         total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"]))
+    try:
+        import hot_core
+        lines.append("ℹ️ %s" % hot_core.effective_desc())
+    except Exception:
+        pass
     lines.append("⚠️ 上述号码均为随机采样，等同机选、无预测力；开奖随机且每期独立，不存在可推算的下期号码。")
     lines.append("⚠️ 仅供学习研究，不构成投注建议；任何收费荐号均属诈骗，切勿转账。彩票为负EV，理性购彩。")
     return "\n".join(lines)

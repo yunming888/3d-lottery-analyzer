@@ -364,12 +364,20 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
 ---
 """
 
+    try:
+        import hot_core
+        _engine_status = hot_core.effective_desc() + "（代码版本 选号引擎 %s）" % ENGINE_VERSION
+    except Exception:
+        _engine_status = "选号引擎 %s" % ENGINE_VERSION
+
     report = f"""# 福彩3D 每日复盘报告
 **日期: {TODAY}** | 期号: {latest['qihao']} 已开 → {next_qihao} 待开
 
 > ⚠️ **性质声明**：本报告中的号码均为程序随机采样生成，**等同投注站机选，不具备预测能力**。
 > 彩票开奖完全随机、每期独立，不存在可推算的下期号码；任何声称能预测或推荐中奖号码的个人、平台或 AI 均属诈骗。
 > 本报告仅供学习研究与盈亏记录，不构成投注建议。
+>
+> ℹ️ **出号规则状态**：{_engine_status}
 
 ---
 

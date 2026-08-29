@@ -219,7 +219,9 @@ def generate_notes(records: list, count: int = config.NOTES, seed=config.SEED):
     # v3: 热号追号 —— 锁定前区核心号（按月缓存，失败则不锁、退化为 v2）
     forced_red = ()
     try:
-        from hot_core import get_dlt_core
+        from hot_core import get_dlt_core, is_active
+        if not is_active():
+            raise ValueError("未到生效日，走 v2 回退（不锁核心号）")
         forced_red = tuple(get_dlt_core(records)[0])
     except Exception:
         forced_red = ()

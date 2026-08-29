@@ -269,10 +269,12 @@ def generate_recommendations(records, info, count=10):
     if n < 4:
         return []
 
-    # ---- v5: 热号追号（组六胆拖）；组三/异常时回退 v4 边际采样 ----
+    # ---- v5: 热号追号（组六胆拖）；未到生效日 / 组三 / 异常 → 回退 v4 边际采样 ----
     if push_type == "组六":
         try:
             import hot_core
+            if not hot_core.is_active():
+                raise ValueError("未到生效日 %s，走 v4 回退" % hot_core.EFFECTIVE_FROM)
             dan, tuo, meta = hot_core.get_3d_core(records)
             notes = hot_core.dantuo_notes(dan, tuo)
             if len(notes) == count:
