@@ -30,6 +30,9 @@ from ssq.selector import ENGINE_VERSION as SSQ_VERSION
 REPORT_DIR = os.path.join(ROOT, "data", "reports")
 PL_FILE = os.path.join(ROOT, "data", "profit_loss.json")
 
+# 热号核心号说明后缀：热号追号仅为投注结构偏好，不改变每注中奖概率（红线配套）
+HOT_NOTE = "（热号仅为投注结构偏好，不改变每注中奖概率）"
+
 
 def _fmt_3d_nums(nums):
     return " ".join(map(str, nums))
@@ -118,8 +121,8 @@ def wechat_block(today, yesterday, r3, rd, rs):
         import hot_core
         _c3 = hot_core.peek("3d") if hot_core.is_active() else None
         if _c3:
-            lines.append("热号核心：胆%d 拖%s（每注必含，%s 锁定，每月1号重选）" % (
-                _c3["dan"], "/".join(str(x) for x in _c3["tuo"]), _c3.get("ym", "")))
+            lines.append("热号核心：胆%d 拖%s（每注必含，%s 锁定，每月1号重选）%s" % (
+                _c3["dan"], "/".join(str(x) for x in _c3["tuo"]), _c3.get("ym", ""), HOT_NOTE))
     except Exception:
         pass
     recs3 = r3.get("recommendations", [])
@@ -158,8 +161,8 @@ def wechat_block(today, yesterday, r3, rd, rs):
         import hot_core
         _cd = hot_core.peek("dlt") if hot_core.is_active() else None
         if _cd:
-            lines.append("热号核心：前区 %s（每注必含，%s 锁定，每月1号重选）" % (
-                " / ".join("%02d" % d for d in _cd["core_red"]), _cd.get("ym", "")))
+            lines.append("热号核心：前区 %s（每注必含，%s 锁定，每月1号重选）%s" % (
+                " / ".join("%02d" % d for d in _cd["core_red"]), _cd.get("ym", ""), HOT_NOTE))
     except Exception:
         pass
     lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
@@ -207,8 +210,8 @@ def wechat_block(today, yesterday, r3, rd, rs):
         import hot_core
         _cs = hot_core.peek("ssq") if hot_core.is_active() else None
         if _cs:
-            lines.append("热号核心：红球 %s（每注必含，%s 锁定，每月1号重选）" % (
-                " / ".join("%02d" % d for d in _cs["core_red"]), _cs.get("ym", "")))
+            lines.append("热号核心：红球 %s（每注必含，%s 锁定，每月1号重选）%s" % (
+                " / ".join("%02d" % d for d in _cs["core_red"]), _cs.get("ym", ""), HOT_NOTE))
     except Exception:
         pass
     lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (

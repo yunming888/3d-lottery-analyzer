@@ -3,6 +3,7 @@
 数据准确性 / 完整性 / 一致性 校验器
 - 内部完整性: 重复期号 / 期号缺口 / 格式与数值范围 / 派生字段(和值/跨度/形态)正确性
 - 实时双源交叉校验:
+- 开奖日历一致性: 本地最新期号日期 vs 截至昨日最近法定开奖日, 检测数据源滞后(把已开奖误当未开奖)
     * 福彩3D  : 本地(huiniao) <-> 实时 huiniao 官方镜像
     * 双色球  : 本地(500) <-> 实时 500彩票网  +  实时 huiniao(独立第二源)
     * 大乐透  : 本地(500) <-> 实时 500彩票网  +  实时 huiniao(独立第二源)
@@ -15,6 +16,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 PY = sys.version_info
+
+# 开奖日历滞后检测依赖交易日判定
+from trading_day import load_holidays as _load_holidays
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Edg/151.0.0.0"
 
@@ -172,6 +176,75 @@ def cross_check(local_map, live_maps, labels):
         })
     return report
 
+# ---------- 开奖日历一致性 (数据滞后检测) ----------
+# 目标: 抓取的「最新一期」日期若早于「截至昨日最近的法定开奖日」,
+#       说明数据源过期/滞后, 此时复盘可能把"已开奖"误当"未开奖"。
+import datetime as _dt
+
+def _is_draw_day(d, game):
+    """该日期是否为某品种的法定开奖日(考虑官方休市)。"""
+    if d.strftime("%Y-%m-%d") in _load_holidays():
+        return False
+    if game == "fcsd":
+        return True  # 福彩3D 天天开(休市除外)
+    if game == "dlt":
+        return d.weekday() in (0, 2, 5)   # 周一/三/六
+    if game == "ssq":
+        return d.weekday() in (1, 3, 6)   # 周二/四/日
+    return False
+
+def _draw_date_for_qihao(game, qihao):
+    """由期号反推开奖日期(基于开奖日规则+官方休市)。"""
+    q = str(qihao)
+    if game == "fcsd":
+        year, seq = int(q[:4]), int(q[4:])
+    else:
+        year, seq = 2000 + int(q[:2]), int(q[2:])
+    d = _dt.date(year, 1, 1)
+    one = _dt.timedelta(days=1)
+    cnt = 0
+    while cnt < seq and d.year == year:
+        if _is_draw_day(d, game):
+            cnt += 1
+            if cnt == seq:
+                return d
+        d += one
+    return None
+
+def _most_recent_draw_day(yesterday, game):
+    """yesterday(含)之前最近的法定开奖日。"""
+    d = _dt.date(yesterday.year, yesterday.month, yesterday.day)
+    one = _dt.timedelta(days=1)
+    for _ in range(14):
+        if _is_draw_day(d, game):
+            return d
+        d -= one
+    return None
+
+def calendar_check(yesterday, latest_qihao):
+    """
+    latest_qihao: {game: 最新本地期号}
+    返回 (ok, problems); ok=False 表示存在数据滞后/异常嫌疑。
+    """
+    problems = []
+    for game, qh in latest_qihao.items():
+        if not qh:
+            continue
+        exp_day = _most_recent_draw_day(yesterday, game)
+        local_day = _draw_date_for_qihao(game, qh)
+        if exp_day is None or local_day is None:
+            problems.append("%s: 无法推算日期(期号=%s)" % (game, qh))
+            continue
+        if local_day < exp_day:
+            problems.append(
+                "%s: 数据滞后嫌疑 — 预期最新一期应于 %s 开奖, 但本地最新期号 %s 对应 %s, 落后 %d 天"
+                % (game, exp_day, qh, local_day, (exp_day - local_day).days))
+        elif local_day > exp_day:
+            problems.append(
+                "%s: 本地最新期号 %s 对应 %s, 晚于最近开奖日 %s (异常, 请核查)"
+                % (game, qh, local_day, exp_day))
+    return (len(problems) == 0, problems)
+
 def main():
     lines = []
     lines.append("# 开奖数据核验报告 (前100期)\n")
@@ -262,8 +335,26 @@ def main():
         if not r["mismatch"] and not r["missing"] and not r["extra"]:
             lines.append("    ✅ 逐期完全一致")
 
+    # ---- 开奖日历一致性 (数据滞后检测) ----
+    lines.append("\n## 三、开奖日历一致性（数据滞后检测）\n")
+    latest_qihao = {
+        "fcsd": max((r.get("qihao", "") for r in d3), default=""),
+        "dlt": max((x.get("issue", "") for x in dd.get("draws", [])), default=""),
+        "ssq": max((x.get("issue", "") for x in ds.get("draws", [])), default=""),
+    }
+    yesterday = (_dt.date.today() - _dt.timedelta(days=1))
+    ok_cal, cal_problems = calendar_check(yesterday, latest_qihao)
+    lines.append("- 校验基准: 截至 %s 最近的法定开奖日, 本地最新一期期号应与之对应(否则疑数据滞后)" % yesterday)
+    if ok_cal:
+        lines.append("- ✅ 三品种本地最新期号日期均与开奖日历一致, 未见数据滞后。")
+    else:
+        lines.append("- ❌ 发现 %d 项数据滞后/异常嫌疑:" % len(cal_problems))
+        for p in cal_problems:
+            lines.append("  - %s" % p)
+    lines.append("- 备注: 大乐透/双色球开奖日按 周一/三/六、周二/四/日 + 官方休市推算; 官方休市期(如春节/国庆)可能调整排期, 此检测为滞后预警而非权威排期。")
+
     # ---- 结论 ----
-    lines.append("\n## 三、结论\n")
+    lines.append("\n## 四、结论\n")
     all_ok = (not p3) and (not pd) and (not ps)
     if all_ok:
         lines.append("- 内部完整性: ✅ 三品种各100期, 无重复/缺口, 数字格式与和值/跨度/形态标记全部正确。")
