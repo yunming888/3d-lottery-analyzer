@@ -1370,6 +1370,102 @@
         }
       ],
       "cost": 10,
+      "status": "settled",
+      "draw_issue": "26103",
+      "draw_date": "2026-09-09",
+      "draw_reds": [
+        3,
+        16,
+        17,
+        32,
+        35
+      ],
+      "draw_blues": [
+        2,
+        12
+      ],
+      "win_notes": 0,
+      "best_tier": 0,
+      "float_win": false,
+      "prize": 0,
+      "daily_pnl": -10
+    },
+    {
+      "date": "2026-09-17",
+      "target_issue": "26107",
+      "notes": [
+        {
+          "reds": [
+            1,
+            4,
+            13,
+            26,
+            27
+          ],
+          "blues": [
+            5,
+            10
+          ],
+          "score": 1.3451930799335248
+        },
+        {
+          "reds": [
+            13,
+            17,
+            26,
+            32,
+            33
+          ],
+          "blues": [
+            6,
+            11
+          ],
+          "score": 1.2171103873076041
+        },
+        {
+          "reds": [
+            5,
+            10,
+            13,
+            26,
+            30
+          ],
+          "blues": [
+            4,
+            7
+          ],
+          "score": 1.0273757122782317
+        },
+        {
+          "reds": [
+            3,
+            9,
+            13,
+            22,
+            26
+          ],
+          "blues": [
+            3,
+            8
+          ],
+          "score": 0.8816300574161176
+        },
+        {
+          "reds": [
+            13,
+            16,
+            23,
+            26,
+            31
+          ],
+          "blues": [
+            2,
+            7
+          ],
+          "score": 0.9768770976352339
+        }
+      ],
+      "cost": 10,
       "status": "pending",
       "draw_issue": null,
       "draw_date": "",
@@ -1383,11 +1479,11 @@
     }
   ],
   "summary": {
-    "rounds": 14,
-    "total_notes": 70,
-    "total_cost": 150,
+    "rounds": 15,
+    "total_notes": 75,
+    "total_cost": 160,
     "total_prize": 10,
-    "net_pnl": -140,
+    "net_pnl": -150,
     "total_win_notes": 2,
     "pending_rounds": 1
   },
