@@ -1565,6 +1565,102 @@
         }
       ],
       "cost": 10,
+      "status": "settled",
+      "draw_issue": "26109",
+      "draw_date": "2026-09-20",
+      "draw_reds": [
+        9,
+        12,
+        15,
+        26,
+        30,
+        33
+      ],
+      "draw_blues": [
+        6
+      ],
+      "win_notes": 1,
+      "best_tier": 6,
+      "float_win": false,
+      "prize": 5,
+      "daily_pnl": -5
+    },
+    {
+      "date": "2026-09-21",
+      "target_issue": "26110",
+      "notes": [
+        {
+          "reds": [
+            9,
+            11,
+            16,
+            24,
+            30,
+            32
+          ],
+          "blues": [
+            1
+          ],
+          "score": 1.1641118539854975
+        },
+        {
+          "reds": [
+            5,
+            6,
+            10,
+            24,
+            30,
+            31
+          ],
+          "blues": [
+            8
+          ],
+          "score": 0.874015189096444
+        },
+        {
+          "reds": [
+            3,
+            13,
+            15,
+            23,
+            24,
+            30
+          ],
+          "blues": [
+            15
+          ],
+          "score": 0.7442494679833676
+        },
+        {
+          "reds": [
+            4,
+            8,
+            17,
+            24,
+            29,
+            30
+          ],
+          "blues": [
+            13
+          ],
+          "score": 0.6008153295417262
+        },
+        {
+          "reds": [
+            7,
+            9,
+            16,
+            24,
+            28,
+            30
+          ],
+          "blues": [
+            6
+          ],
+          "score": 0.6863202767468529
+        }
+      ],
+      "cost": 10,
       "status": "pending",
       "draw_issue": null,
       "draw_date": "",
@@ -1578,12 +1674,12 @@
     }
   ],
   "summary": {
-    "rounds": 16,
-    "total_notes": 80,
-    "total_cost": 170,
-    "total_prize": 25,
-    "net_pnl": -145,
-    "total_win_notes": 5,
+    "rounds": 17,
+    "total_notes": 85,
+    "total_cost": 180,
+    "total_prize": 30,
+    "net_pnl": -150,
+    "total_win_notes": 6,
     "pending_rounds": 1
   },
   "portfolio": [
