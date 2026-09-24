@@ -247,49 +247,64 @@ def _make_logic_simple(nums, push_type):
     return f"经验边际·{band}{sv}·覆盖均衡"
 
 
+def _valid_pool(push_type):
+    """枚举该形态下的全部合法组合：组六 C(10,3)=120；组三 10×9=90。"""
+    if push_type == "组三":
+        return [sorted([d, d, s]) for d in range(10) for s in range(10) if s != d]
+    return [list(c) for c in combinations(range(10), 3)]
+
+
+def _combo_weight(nums, marginal):
+    """组合权重 = 三码边际概率之积，用于兜底补全时优先取典型组合。"""
+    w = 1.0
+    for x in nums:
+        w *= marginal[x]
+    return w
+
+
+def _mk_note(nums, logic):
+    return {"nums": nums, "sum_val": sum(nums),
+            "span": max(nums) - min(nums), "logic": logic}
+
+
+# 出号诊断：每次 generate_recommendations 后更新，供报告/排查读取（不参与出号决策）
+LAST_GEN = {"engine": "未运行", "target": 0, "returned": 0,
+            "core_notes": 0, "filled": 0, "note": ""}
+
+
 def generate_recommendations(records, info, count=10):
     """
-    选号引擎 v5（热号追号：胆1拖5 固定守号）
+    选号引擎 v5.1（热号追号：胆1拖5 固定守号，恒定满注）
     info: {"stop": bool, "push_type": "组六"/"组三", "push_count": int}
     返回: list of {"nums":[...], "sum_val":int, "span":int, "logic":str}
 
-    规则（用户 2026-08-29 定）:
+    规则（沿用用户 2026-08-29 定）：
       - 胆码 = 近100期频率 TOP1，拖码 = 其余数字中频率 TOP5
       - 胆1拖5 -> C(5,2)=10 注，每注必含胆码；每月1号重选，月内固定不动
       - 组三形态下退化为 v4 的边际采样（胆拖只适用于组六）
 
+    2026-09-24 改动（保持完整注数，移除静默压缩）：
+      旧版有一处「全有或全无」门控：只有当胆拖注数**恰好等于** count 时才采用热号方案，
+      否则整批丢弃、静默整体回退 v4；v4 采样若在有限次去重内凑不满，又会静默少给注数。
+      新版改为「热号胆拖打底 + 差额由边际采样/确定性枚举补全」，任何情况下都返回 count 注，
+      并把补全来源写进每条 note 的 logic 与 LAST_GEN，不再静默。
+
     ⚠️ 诚实边界: 胆拖与随机选号在数学上等价（每注中奖概率恒定，每期最多中1注、无叠加）。
     锁定热号属投注结构偏好，不提升任何概率优势，对外保持「等同机选·无预测力」标注。
     """
+    global LAST_GEN
+    LAST_GEN = {"engine": "none", "target": count, "returned": 0,
+                "core_notes": 0, "filled": 0, "note": ""}
+
     if info.get("stop"):
+        LAST_GEN.update({"engine": "熔断/休市", "note": "规则拦截，不出号"})
         return []
 
     push_type = info.get("push_type", "组六")
     n = len(records)
     if n < 4:
+        LAST_GEN.update({"engine": "数据不足", "note": "历史期数少于4期，拒绝出号"})
         return []
-
-    # ---- v5: 热号追号（组六胆拖）；未到生效日 / 组三 / 异常 → 回退 v4 边际采样 ----
-    if push_type == "组六":
-        try:
-            import hot_core
-            if not hot_core.is_active():
-                raise ValueError("未到生效日 %s，走 v4 回退" % hot_core.EFFECTIVE_FROM)
-            dan, tuo, meta = hot_core.get_3d_core(records)
-            notes = hot_core.dantuo_notes(dan, tuo)
-            if len(notes) == count:
-                out = []
-                for nums in notes:
-                    out.append({
-                        "nums": nums,
-                        "sum_val": sum(nums),
-                        "span": max(nums) - min(nums),
-                        "logic": "热号追号·胆%d拖%s" % (
-                            dan, "/".join(str(x) for x in tuo)),
-                    })
-                return out
-        except Exception:
-            pass  # 回退 v4
 
     marginal = _digit_marginal(records)
     # 每日变化种子: 用最新期号派生 -> 同日确定、跨日自然变化、可复现
@@ -299,13 +314,47 @@ def generate_recommendations(records, info, count=10):
         seed = 20260613
     rng = random.Random(seed)
 
-    target = count * 3 / 10.0  # 每数字期望出现次数(每注3码)
-    used = Counter()
+    # 注数上限保护：目标注数超过该形态的组合总数时，按物理上限出号并显式记录
+    pool_size = len(_valid_pool(push_type))
+    if count > pool_size:
+        LAST_GEN["note"] = "目标 %d 注超过%s组合总数，已按物理上限 %d 注出号" % (
+            count, push_type, pool_size)
+        count = pool_size
+
     selected = []
     seen = set()
-    attempts = 0
-    max_attempts = count * 500
+    used = Counter()
+    engine = "v4边际采样"
 
+    # ---- 1) v5 热号胆拖打底（组六专用）；未到生效日/异常则跳过，进入下步补全 ----
+    if push_type == "组六":
+        try:
+            import hot_core
+            if not hot_core.is_active():
+                raise ValueError("未到生效日 %s，跳过胆拖" % hot_core.EFFECTIVE_FROM)
+            dan, tuo, _meta = hot_core.get_3d_core(records)
+            tag = "热号追号·胆%d拖%s" % (dan, "/".join(str(x) for x in tuo))
+            for nums in hot_core.dantuo_notes(dan, tuo):
+                if len(selected) >= count:
+                    break
+                key = tuple(nums)
+                if key in seen:
+                    continue
+                seen.add(key)
+                selected.append(_mk_note(nums, tag))
+                for x in nums:
+                    used[x] += 1
+            if selected:
+                engine = "v5热号胆拖"
+        except Exception:
+            LAST_GEN["note"] = "热号核心不可用，整批由边际采样出号"
+
+    n_core = len(selected)
+
+    # ---- 2) 差额用 v4 边际采样 + 覆盖均衡补全 ----
+    target = count * 3 / 10.0
+    attempts = 0
+    max_attempts = max(500, count * 500)
     while len(selected) < count and attempts < max_attempts:
         attempts += 1
         if push_type == "组三":
@@ -318,18 +367,36 @@ def generate_recommendations(records, info, count=10):
         if key in seen:
             continue
         seen.add(key)
-        sv = sum(nums)
-        sp = max(nums) - min(nums)
-        selected.append({
-            "nums": nums,
-            "sum_val": sv,
-            "span": sp,
-            "logic": _make_logic_simple(nums, push_type),
-        })
+        selected.append(_mk_note(nums, _make_logic_simple(nums, push_type)))
         for x in nums:
             used[x] += 1
 
+    # ---- 3) 确定性兜底：仍未满额则从剩余组合按边际权重降序补足，保证 count 注 ----
+    if len(selected) < count:
+        remain = [c for c in _valid_pool(push_type) if tuple(c) not in seen]
+        remain.sort(key=lambda c: -_combo_weight(c, marginal))
+        for nums in remain:
+            if len(selected) >= count:
+                break
+            seen.add(tuple(nums))
+            selected.append(_mk_note(nums, "确定性兜底补全·" + _make_logic_simple(nums, push_type)))
+
+    n_filled = len(selected) - n_core
+    LAST_GEN.update({
+        "engine": engine, "target": count, "returned": len(selected),
+        "core_notes": n_core, "filled": n_filled,
+        "note": (LAST_GEN["note"] + ("；" if LAST_GEN["note"] else "") +
+                 ("已由%s补全%d注" % ("边际采样/兜底", n_filled) if n_filled else "热号胆拖满额出号")),
+    })
     return selected
+
+
+def last_gen_desc():
+    """给报告/推送用的一句话出号诊断（调用可选）。"""
+    g = LAST_GEN
+    return "%s：目标%d注/实出%d注（热号核心%d注，补全%d注）%s" % (
+        g["engine"], g["target"], g["returned"], g["core_notes"], g["filled"],
+        ("｜" + g["note"]) if g["note"] else "")
 
 
 def trend_analysis(records, window=100):
