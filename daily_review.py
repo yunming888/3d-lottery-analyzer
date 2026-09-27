@@ -124,21 +124,28 @@ def settle_pending(history, pl):
     is_direct = (pending.get("push_type") == "直选")
     hits = 0
     hit_list = []
+    near_hits = 0      # 擦边：直选命中2/3位（组选命中2码/3码但不对位）
     for rec_nums in pending["recommendations"]:
         rt = tuple(rec_nums)
         if is_direct:
-            if rt == draw_tuple:
+            same_pos = sum(1 for a, b in zip(rt, draw_tuple) if a == b)
+            if same_pos == 3:
                 hits += 1
                 hit_list.append(rt)
+            elif same_pos >= 2:
+                near_hits += 1
         else:
             if set(rt) == draw_set:
                 hits += 1
                 hit_list.append(rt)
+            elif len(set(rt) & draw_set) == 3 and rt != draw_tuple:
+                near_hits += 1
 
     pending["draw"] = draw["qihao"]
     pending["draw_nums"] = draw["nums"]
     pending["draw_type"] = draw["type"]
     pending["hits"] = hits
+    pending["near_hits"] = near_hits
     # 动态奖金: 直选 1040 / 组三 320 / 组六 160 / 豹子 1040
     if is_direct:
         per = DIRECT_PRIZE
@@ -154,12 +161,15 @@ def settle_pending(history, pl):
         hit_strs = ['[' + ''.join(map(str, h)) + ']' for h in hit_list]
         pending["reason"] = f"{kind}{pending['notes']}注->{hits}命中{''.join(hit_strs)} 开奖{draw_str}{ptype}, 日盈亏{pending['daily_pnl']}元"
     else:
-        pending["reason"] = f"{kind}{pending['notes']}注->0命中 开奖{draw_str}{ptype}"
+        pending["reason"] = f"{kind}{pending['notes']}注->0命中 开奖{draw_str}{ptype}" + (
+            f" (擦边{near_hits}注)" if near_hits else "")
 
     print(f"  开奖: {draw['qihao']} = {draw_str} ({draw['type']})")
-    print(f"  命中: {hits}注, 奖金: {pending['prize']}元, 当日盈亏: {pending['daily_pnl']}元")
+    print(f"  命中: {hits}注, 擦边: {near_hits}注, 奖金: {pending['prize']}元, 当日盈亏: {pending['daily_pnl']}元")
     if hit_list:
         print(f"  🎯 命中推荐: {hit_list[0]}")
+    elif near_hits:
+        print(f"  📌 擦边(2位): {near_hits}注, 无奖金")
 
     return pending, draw, hits, hit_list
 

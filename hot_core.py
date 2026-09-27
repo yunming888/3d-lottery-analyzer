@@ -115,8 +115,7 @@ def dantuo_notes(dan, tuo):
 
 def _compute_3d_position(records, window=WINDOW, n=2):
     """直选定位候选：百/十/个 三位各自取近 window 期频率 TOP n。
-    与全号频率（_compute_3d）不同，这里按位置统计——每位 0-9 是独立随机变量，
-    定位候选用于「三位各 n 选 1」的直选注生成。"""
+    与全号频率（_compute_3d）不同，按位置统计。window 默认 100。"""
     if not records or len(records) < MIN_RECORDS:
         raise ValueError("历史数据不足(%d期)，拒绝计算定位候选" % (len(records or []),))
     win = records[:window]
@@ -133,7 +132,7 @@ def _compute_3d_position(records, window=WINDOW, n=2):
 
 
 def get_3d_position(records, window=WINDOW, n=2):
-    """返回 {"bai":[..n..], "shi":[..n..], "ge":[..n..]}。按月缓存，月内固定。
+    """返回 {"bai":[..n..], "shi":[..n..], "ge":[..n..]}。按月缓存，月内固定（每月1号重选）。
     独立 3d_pos 键，不动现有 dan/tuo。"""
     state = _load()
     rec = state.get("3d_pos")

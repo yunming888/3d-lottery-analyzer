@@ -410,10 +410,11 @@ def last_gen_desc():
 
 
 # ===================== 直选定位 + 和值带（v6，2026-09-27） =====================
-def _sum_band_of(records, window=100):
-    """近 window 期和值分布峰值 ±2 的整数区间 [lo, hi]。
-    定位直选 8 注的和值天然聚在「候选和值均值」附近，取峰值±2 既保留典型组合、
-    又避免窄带（如 ±1）把 8 注砍到 3-4 注导致覆盖过窄。无数据时回退 10-17。"""
+def _sum_band_of(records, window=30):
+    """近 window 期和值峰值 ±2 的整数区间 [lo, hi]（v6.2，2026-09-27 18:45 修正）。
+    v6.1 误改用「近30期实际开出和值并集」，但近30期和值散在 2~26，并集无意义（等同不过滤）。
+    回退到「峰值±2」：定位直选 8 注和值天然聚在候选均值附近，峰值±2 既保留典型组合、
+    又避免把 8 注全砍光。无数据回退 10-17。"""
     c = Counter()
     for r in records[:window]:
         c[r["sum_val"]] += 1
@@ -434,7 +435,8 @@ def _generate_direct(records, info, count):
 
     try:
         import hot_core
-        pos, _meta = hot_core.get_3d_position(records)
+        # 定位候选 = 近100期按位热号 TOP2（月内锁定，每月1号重选，hot_core 3d_pos 键）
+        pos, _meta = hot_core.get_3d_position(records, n=2)
         bai, shi, ge = pos["bai"], pos["shi"], pos["ge"]
         if not bai or not shi or not ge:
             raise ValueError("定位候选缺失")
