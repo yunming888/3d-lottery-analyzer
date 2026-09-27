@@ -27,6 +27,12 @@ from analyze import (
 )
 from trading_day import is_trading_day, expected_qihao_for_date
 
+# 3D 出号模式（v6 直选定位 + 和值带，2026-09-27）
+try:
+    from fc3d.config import DIRECT_MODE, DIRECT_COUNT, DIRECT_PRIZE, DIRECT_COST
+except Exception:  # fc3d 子包缺失时回退旧组六模式，绝不影响旧链路
+    DIRECT_MODE, DIRECT_COUNT, DIRECT_PRIZE, DIRECT_COST = False, 10, 160, 2
+
 # 支持 --date YYYY-MM-DD 回溯运行 (用于补跑历史日期)
 parser = argparse.ArgumentParser()
 parser.add_argument("--date", help="回溯日期 YYYY-MM-DD (默认今天)")
@@ -113,29 +119,42 @@ def settle_pending(history, pl):
 
     # 结算
     draw_set = set(draw["nums"])
+    draw_tuple = tuple(draw["nums"])
+    # 直选模式：三位同位同值精确命中；组六模式：集合相等命中
+    is_direct = (pending.get("push_type") == "直选")
     hits = 0
     hit_list = []
     for rec_nums in pending["recommendations"]:
-        if set(rec_nums) == draw_set:
-            hits += 1
-            hit_list.append(rec_nums)
+        rt = tuple(rec_nums)
+        if is_direct:
+            if rt == draw_tuple:
+                hits += 1
+                hit_list.append(rt)
+        else:
+            if set(rt) == draw_set:
+                hits += 1
+                hit_list.append(rt)
 
     pending["draw"] = draw["qihao"]
     pending["draw_nums"] = draw["nums"]
     pending["draw_type"] = draw["type"]
     pending["hits"] = hits
-    # 动态奖金: 组三320 / 组六160 / 豹子1040
-    per = 320 if draw["type"] == "组三" else 160 if draw["type"] == "组六" else 1040
+    # 动态奖金: 直选 1040 / 组三 320 / 组六 160 / 豹子 1040
+    if is_direct:
+        per = DIRECT_PRIZE
+    else:
+        per = 320 if draw["type"] == "组三" else 160 if draw["type"] == "组六" else 1040
     pending["prize"] = hits * per
     pending["daily_pnl"] = hits * per - pending["cost"]
 
     draw_str = ''.join(map(str, draw["nums"]))
     ptype = draw["type"]
+    kind = "直选" if is_direct else ptype
     if hits > 0:
-        hit_strs = ['[' + ','.join(map(str, h)) + ']' for h in hit_list]
-        pending["reason"] = f"{ptype}{pending['notes']}注->{hits}命中{''.join(hit_strs)} 开奖{draw_str}{draw['type']}, 日盈亏{pending['daily_pnl']}元"
+        hit_strs = ['[' + ''.join(map(str, h)) + ']' for h in hit_list]
+        pending["reason"] = f"{kind}{pending['notes']}注->{hits}命中{''.join(hit_strs)} 开奖{draw_str}{ptype}, 日盈亏{pending['daily_pnl']}元"
     else:
-        pending["reason"] = f"{ptype}{pending['notes']}注->0命中 开奖{draw_str}{draw['type']}"
+        pending["reason"] = f"{kind}{pending['notes']}注->0命中 开奖{draw_str}{ptype}"
 
     print(f"  开奖: {draw['qihao']} = {draw_str} ({draw['type']})")
     print(f"  命中: {hits}注, 奖金: {pending['prize']}元, 当日盈亏: {pending['daily_pnl']}元")
@@ -320,7 +339,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
 | 项目 | 数值 |
 |------|------|
 | 开奖 | {draw['qihao']} → **{' '.join(map(str, draw['nums']))}** {draw['type']} |
-| 投注 | {rec_data['notes']}注组六 |
+| 投注 | {rec_data['notes']}注{rec_data.get('push_type', '组六')} |
 | 命中 | **{hits}注** {"🎯" if hits > 0 else ""} |
 | 成本 | {rec_data['cost']}元 |
 | 奖金 | {rec_data['prize']}元 |
@@ -573,12 +592,16 @@ def main():
             print("  熔断, 不推荐")
             reason = f"熔断触发({'; '.join(cb['rules_fired'])})"
         else:
-            info = {"stop": False, "push_type": cb["push_type"], "push_count": cb["push_count"]}
-            recs = generate_recommendations(history, info, count=cb["push_count"])
-            print(f"  生成{len(recs)}注{cb['push_type']}:")
+            if DIRECT_MODE:
+                # v6 直选定位 + 和值带：百/十/个各 2 候选 -> 8 注直选，和值带过滤
+                info = {"stop": False, "push_type": "直选", "push_count": DIRECT_COUNT, "mode": "direct"}
+            else:
+                info = {"stop": False, "push_type": cb["push_type"], "push_count": cb["push_count"]}
+            recs = generate_recommendations(history, info, count=info["push_count"])
+            print(f"  生成{len(recs)}注{info['push_type']}:")
             for i, r in enumerate(recs):
                 print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
-            reason = f"{cb['push_type']}{len(recs)}注随机采样 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常出号"])
+            reason = f"{info['push_type']}{len(recs)}注随机采样 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常出号"])
 
     # 计算目标期号 (休市或数据滞后则无)
     if is_suspension or data_stale:
@@ -609,7 +632,8 @@ def main():
                     if r.get("hits") is None and (not r.get("recommendations") or r.get("notes") != len(recs)):
                         r["recommendations"] = [rec["nums"] for rec in recs]
                         r["notes"] = len(recs)
-                        r["cost"] = len(recs) * 2
+                        r["cost"] = len(recs) * DIRECT_COST
+                        r["push_type"] = info["push_type"]
                         r["reason"] = reason
                         r["target_qihao"] = target_qihao
                 break
@@ -634,10 +658,11 @@ def main():
                 "draw_type": "",
                 "recommendations": [r["nums"] for r in recs],
                 "notes": len(recs),
-                "cost": len(recs) * 2,
+                "cost": len(recs) * DIRECT_COST,
                 "hits": None,
                 "prize": None,
                 "daily_pnl": None,
+                "push_type": info.get("push_type", "组六"),
                 "reason": reason
             }
         pl["records"].append(today_rec)
@@ -660,7 +685,8 @@ def main():
     if settlement:
         print(f"  昨日结算: {settlement[2]}注命中, {settlement[0]['daily_pnl']:+d}元")
     print(f"  累计盈亏: {summary['net_pnl']:+d}元 ({summary['total_hits']}注命中)")
-    print(f"  今日随机采样(等同机选): {len(recs)}注组六, 成本{len(recs)*2}元")
+    _ptype = "组六" if not recs else (info.get("push_type", "组六") if 'info' in locals() else "组六")
+    print(f"  今日随机采样(等同机选): {len(recs)}注{_ptype}, 成本{len(recs)*DIRECT_COST}元")
     print(f"  报告: {report_path}")
     print(f"  追踪期: {pl['start_date']} ~ {pl['end_date']}")
 

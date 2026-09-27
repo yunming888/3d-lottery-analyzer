@@ -113,6 +113,41 @@ def dantuo_notes(dan, tuo):
     return [sorted([dan] + list(c)) for c in combinations(sorted(tuo), 2)]
 
 
+def _compute_3d_position(records, window=WINDOW, n=2):
+    """直选定位候选：百/十/个 三位各自取近 window 期频率 TOP n。
+    与全号频率（_compute_3d）不同，这里按位置统计——每位 0-9 是独立随机变量，
+    定位候选用于「三位各 n 选 1」的直选注生成。"""
+    if not records or len(records) < MIN_RECORDS:
+        raise ValueError("历史数据不足(%d期)，拒绝计算定位候选" % (len(records or []),))
+    win = records[:window]
+    cnt = {"bai": Counter(), "shi": Counter(), "ge": Counter()}
+    for r in win:
+        cnt["bai"][r["bai"]] += 1
+        cnt["shi"][r["shi"]] += 1
+        cnt["ge"][r["ge"]] += 1
+    pos = {}
+    for p, c in (("bai", cnt["bai"]), ("shi", cnt["shi"]), ("ge", cnt["ge"])):
+        ranked = sorted(range(10), key=lambda d: (-c.get(d, 0), d))
+        pos[p] = sorted(ranked[:n])
+    return pos
+
+
+def get_3d_position(records, window=WINDOW, n=2):
+    """返回 {"bai":[..n..], "shi":[..n..], "ge":[..n..]}。按月缓存，月内固定。
+    独立 3d_pos 键，不动现有 dan/tuo。"""
+    state = _load()
+    rec = state.get("3d_pos")
+    if (not rec) or rec.get("ym") != _ym():
+        pos = _compute_3d_position(records, window, n)
+        state["3d_pos"] = {
+            "ym": _ym(), "updated": datetime.now().strftime("%Y-%m-%d"),
+            "pos": pos, "n": n,
+        }
+        _save(state)
+        rec = state["3d_pos"]
+    return rec["pos"], rec
+
+
 # ---------------- 大乐透 / 双色球：红球（前区）核心 ----------------
 def _compute_red(records, key, red_max, window=WINDOW, n=CORE_RED_N):
     """core = 近 window 期红球/前区频率 TOP n。"""

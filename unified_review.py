@@ -119,15 +119,18 @@ def wechat_block(today, yesterday, r3, rd, rs):
     lines.append("累计净盈亏：%+d元（%d命中/%d注）" % (s3["net_pnl"], s3["total_hits"], s3["total_bets"]))
     try:
         import hot_core
-        _c3 = hot_core.peek("3d") if hot_core.is_active() else None
-        if _c3:
-            lines.append("热号核心：胆%d 拖%s（每注必含，%s 锁定，每月1号重选）%s" % (
-                _c3["dan"], "/".join(str(x) for x in _c3["tuo"]), _c3.get("ym", ""), HOT_NOTE))
+        _c3p = hot_core.peek("3d_pos") if hot_core.is_active() else None
+        if _c3p and _c3p.get("pos"):
+            _pos = _c3p["pos"]
+            lines.append("热号核心：直选定位·百%s十%s个%s（每注必含，%s 锁定，每月1号重选）%s" % (
+                "/".join(str(x) for x in _pos.get("bai", [])),
+                "/".join(str(x) for x in _pos.get("shi", [])),
+                "/".join(str(x) for x in _pos.get("ge", [])), _c3p.get("ym", ""), HOT_NOTE))
     except Exception:
         pass
     recs3 = r3.get("recommendations", [])
     if recs3:
-        lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s】" % (len(recs3), cb.get("push_type", "组六"), r3.get("next_qihao"), FCD_VERSION))
+        lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s】" % (len(recs3), ("直选定位" if recs3 else "组六"), r3.get("next_qihao"), FCD_VERSION))
         for i, r in enumerate(recs3, 1):
             lines.append("  %d. %s" % (i, _fmt_3d_nums(r["nums"])))
     else:

@@ -186,10 +186,15 @@ def circuit_breaker(records, target_type="组六"):
             "suggest": "", "push_type": target_type, "push_count": 10, "signal_strength": "中"}
 
 
-# ===================== 选号引擎 v5（热号追号） =====================
-# v5 (2026-08-29): 胆1拖5 热号固定追号，每月1号重选胆拖组；组三形态回退 v4 边际采样。
-# v4 (2026-08-20): 经验边际采样 + 覆盖均衡 + 每日变化（现作为组三/异常回退路径保留）。
-ENGINE_VERSION = "v5"  # 选号引擎版本，供报告/推送标注（出号时附带说明）
+# ===================== 选号引擎 v6（直选定位 + 和值带） =====================
+# v6 (2026-09-27): 3D 直选定位 + 和值带过滤。百/十/个三位各取近100期频率 TOP2 热号作
+#   定位候选，三位各 2 选 1 组合出 2×2×2=8 注直选，再按和值带过滤（默认 10-17，
+#   覆盖钟形分布最密集的中区，约 46% 单期命中），实际出 6-8 注。
+#   结算口径改为「直选精确命中」（三位同位同值），每命中直选 1040 元，单注成本 2 元。
+#   红线不变：仍是随机采样·等同机选·无预测力——定位候选与和值带只是投注结构偏好，
+#   不提升每注中奖概率（单注直选命中恒为 1/1000），期望不变。
+# v5 (2026-08-29): 胆1拖5 热号固定追号；v4 (2026-08-20) 经验边际采样（现作组三/异常回退）。
+ENGINE_VERSION = "v6"  # 选号引擎版本，供报告/推送标注（出号时附带说明）
 
 
 def _digit_marginal(records):
@@ -301,6 +306,11 @@ def generate_recommendations(records, info, count=10):
         return []
 
     push_type = info.get("push_type", "组六")
+    mode = info.get("mode")  # 'direct' = 直选定位 + 和值带过滤；None = 旧组六/组三路径
+
+    if mode == "direct":
+        return _generate_direct(records, info, count)
+
     n = len(records)
     if n < 4:
         LAST_GEN.update({"engine": "数据不足", "note": "历史期数少于4期，拒绝出号"})
@@ -397,6 +407,81 @@ def last_gen_desc():
     return "%s：目标%d注/实出%d注（热号核心%d注，补全%d注）%s" % (
         g["engine"], g["target"], g["returned"], g["core_notes"], g["filled"],
         ("｜" + g["note"]) if g["note"] else "")
+
+
+# ===================== 直选定位 + 和值带（v6，2026-09-27） =====================
+def _sum_band_of(records, window=100):
+    """近 window 期和值分布峰值 ±2 的整数区间 [lo, hi]。
+    定位直选 8 注的和值天然聚在「候选和值均值」附近，取峰值±2 既保留典型组合、
+    又避免窄带（如 ±1）把 8 注砍到 3-4 注导致覆盖过窄。无数据时回退 10-17。"""
+    c = Counter()
+    for r in records[:window]:
+        c[r["sum_val"]] += 1
+    if not c:
+        return 10, 17
+    peak = max(s for s, n in c.items() if n == max(c.values()))
+    return max(0, peak - 2), min(27, peak + 2)
+
+
+def _generate_direct(records, info, count):
+    """3D 直选定位 + 和值带过滤。
+    百/十/个 各取近100期 TOP2 热号定位候选，组合 8 注直选，
+    保留和值落在 [lo,hi] 的注，实际出 6-8 注。
+    返回与组六同结构的 note list（nums 为 [百,十,个]，sum_val=三位和）。"""
+    global LAST_GEN
+    LAST_GEN = {"engine": "v6直选定位", "target": count, "returned": 0,
+                "core_notes": 0, "filled": 0, "note": ""}
+
+    try:
+        import hot_core
+        pos, _meta = hot_core.get_3d_position(records)
+        bai, shi, ge = pos["bai"], pos["shi"], pos["ge"]
+        if not bai or not shi or not ge:
+            raise ValueError("定位候选缺失")
+    except Exception as e:
+        LAST_GEN.update({"note": "定位候选不可用，回退 v4 组六出号：%s" % e})
+        info2 = dict(info); info2.pop("mode", None)
+        return generate_recommendations(records, info2, count=count)
+
+    lo, hi = _sum_band_of(records)
+    notes = []
+    seen = set()
+    for b in bai:
+        for s in shi:
+            for g in ge:
+                nums = [b, s, g]
+                sv = b + s + g
+                if not (lo <= sv <= hi):
+                    continue
+                key = (b, s, g)
+                if key in seen:
+                    continue
+                seen.add(key)
+                notes.append(_mk_note(nums, "直选定位·百%s十%s个%s·和值带%d-%d" % (b, s, g, lo, hi)))
+
+    # 定位候选 + 和值带过滤后注数可能偏少；不足则放宽到全和值范围补 8 注
+    if len(notes) < count:
+        notes2 = []
+        seen2 = set()
+        for b in bai:
+            for s in shi:
+                for g in ge:
+                    key = (b, s, g)
+                    if key in seen2:
+                        continue
+                    seen2.add(key)
+                    notes2.append(_mk_note([b, s, g], "直选定位·全和值补全"))
+        for n in notes2:
+            if any(n["nums"] == x["nums"] for x in notes):
+                continue
+            notes.append(n)
+        notes = notes[:count]
+
+    LAST_GEN.update({
+        "returned": len(notes), "core_notes": len(notes), "filled": 0,
+        "note": "直选8注，和值带%d-%d过滤后实出%d注（每注成本2元，命中1040元）" % (lo, hi, len(notes)),
+    })
+    return notes[:count]
 
 
 def trend_analysis(records, window=100):
