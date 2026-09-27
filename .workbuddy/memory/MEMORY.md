@@ -17,10 +17,16 @@
 
 ## 选号引擎（当前版本）
 - **福彩3D v6 / 大乐透 v3 / 双色球 v3**（`ENGINE_VERSION` 常量在 analyze.py、dlt/selector.py、ssq/selector.py；换引擎须同步更新）。
-- **3D v6 直选定位 + 和值带，2026-09-27 起生效**（`fc3d/config.py: DIRECT_MODE=True, DIRECT_POS_N=2, DIRECT_COUNT=8, SUM_BAND_PEAK=2, DIRECT_PRIZE=1040, DIRECT_COST=2`）。百/十/个各取近30期频率 TOP2 → 2³=8 注直选；和值带 = 近100期峰值±2（峰值漂移，需固定改 `SUM_BAND_PEAK`）。结算走**直选精确命中**（三位同位同值），`push_type="直选"` 分支，1040 元/注、成本 16 元/天。旧组六胆拖为 DIRECT_MODE=False 回退路径。
-  - 表述层已统一（2026-09-28）：`daily_review.DEFAULT_PUSH_TYPE = "直选" if DIRECT_MODE else "组六"`，熔断文案/push_count/报告/摘要全部随模式走。⚠️ **改文案后 pending 记录的 `reason` 不会自动刷新**（自动刷新只在注数变化时触发），需手工改当日待结算记录。
+- **3D 已改为「纯直选」，组六玩法于 2026-09-28 彻底移除**（commit 6b8bea7）。
+  - 规则：百/十/个**各自独立选号**，位置与顺序完全对应才算中奖；候选 = 各位置近 `POS_WINDOW=30` 期该位频次 TOP `DIRECT_POS_N=2`；**注数 = 各位候选数相乘**（2×2×2=8）；**金额 = 注数 × 2 元**（16 元/天）；中奖 = 直选精确命中（三位同位同值）`DIRECT_PRIZE=1040` 元/注。
+  - **去重按 (百,十,个) 位置元组，禁止组选集合归并**（032 与 320 是不同注）。新增 `analyze._validate_direct_notes()` 校验：每位 0-9、各注必须取自对应位置候选、位置元组互异、注数 ≤ 各位候选数之积；结果写入 `LAST_GEN` / `last_gen_desc()`。
+  - 已删除：组六胆拖(`hot_core.get_3d_core`/`dantuo_notes`/`_compute_3d`)、组六边际采样(`_valid_pool`/`_combo_weight`/`_sample_digits`/`_make_logic_simple`)、**组六连出熔断**(`analyze.circuit_breaker`、`daily_review.circuit_breaker_user_rules` → 改名 `direct_push_status`)、组选集合结算分支。`hot_core._load()` 会**自动清除旧键 `3d`**（玩法切换后状态重置）。
+  - 保留的"组六"字样仅为**开奖形态统计**（豹子/组三/组六占比、连出期数），仅供走势展示，不参与出号判定。
+  - ⚠️ **改文案后 pending 记录的 `reason` 不会自动刷新**（自动刷新只在注数变化时触发），需手工改当日待结算记录。
+  - ⚠️ 定位窗口口径：`hot_core.json` 的 `3d_pos` 用 `pos_window=30`；`get_3d_position(window=None)` 优先沿用缓存窗口，避免月内跳变。
+  - 历史脚本 `backtest.py`/`backtest_selectors.py`/`settle_and_report.py` 已加"过时/归档"头注释（假设组六口径，勿据此调参）；`fc3d_backtest.py` 自包含不依赖主链路。
 - 规则「热号固定追号」，**2026-09-01 起生效**（`hot_core.EFFECTIVE_FROM` + `is_active()`）；8/31 前仍走旧逻辑（3D v4 边际采样、dlt/ssq v2 无核心号），到点自动切换无需改码。
-  - 3D 热号：v6 下为**分位定位** `hot_core.json` 的 `3d_pos` 键（pos={bai,shi,ge}、pos_window=30、按 `ym` 每月1号重选）；旧模式为胆1拖5 = C(5,2)=10 注（胆=近100期频率TOP1，拖=其余TOP5）。
+  - 3D 热号：v6 下为**分位定位** `hot_core.json` 的 `3d_pos` 键（pos={bai,shi,ge}、pos_window=30、按 `ym` 每月1号重选）。
   - 大乐透/双色球：每注前区/红球必含核心热号 TOP2（后区/蓝球不锁），各 5 注。
   - 统一模块 `hot_core.py` + 状态 `data/hot_core.json`（按 `ym` 判跨月，`peek()` 只读）。dlt/ssq 走持久化 portfolio，settle 步骤3.5 有核心号校验：跨月变更或持仓有注不含核心号 → 立即重建组合（`st["core_ym"]` 记录已应用月份）。
   - 踩坑：① `hot_core.MIN_RECORDS=10` 防空数据污染缓存（**改 hot_core 后务必核对 hot_core.json 的 freq 非零**）；② 核心号可能与 `_valid_note` 和值区间冲突致候选池空、静默出0注，已加 `check_sum` 参数放宽重试。
@@ -30,8 +36,8 @@
 - 历史版本（均已废弃，勿恢复）：v4 经验边际采样（现为 3D 回退路径）/ v3 硬约束带 / v2 枚举打分 / v1 策略拼接。
 
 ## 规则与成本
-- 福彩3D：**v6 直选模式常态每天 8 注直选（16 元/天）**，每天更换；旧组六模式为 10 组组六（20 元/天）。
-- **组六连出 >= 7 期熔断暂停(0注)**，形态打断(出组三/豹子)即恢复；该熔断在 v6 直选模式下**仍保留**（判定逻辑两模式一致），是否取消待云明确认。
+- 福彩3D：**每天 8 注直选（16 元/天）**，每天更换（旧组六 10 组/20 元已于 2026-09-28 移除）。
+- **组六熔断已取消**（2026-09-28）：组六连出不再影响出号，形态统计仅展示；仍会停投的只有休市与数据滞后。取消后每天照常投注，成本从"有熔断年份少几天"变为固定 16 元/天。
 - 大乐透/双色球：各固定 5 组（`NOTES=5`），成本 10 元/期。持久化 portfolio，`_is_rotation_day` 以 2026-08-14 为锚点每14天轮换最冷2组（08-14/08-28/09-11/09-25…）。
 - 开奖日：3D 每日；大乐透 周一/三/六；双色球 周二/四/日。昨日无开奖的品种在报告中注明。
 - 结算：按 target=最新+1 结算 pending；一/二等奖浮动奖记为"浮动奖"不计 PnL（保守）。
