@@ -1,24 +1,20 @@
 """
 福彩3D数据分析引擎
 统计：频率热冷号、遗漏值、和值分布、跨度、形态
-选号引擎 v4（2026-08-20 重写）:
-  问题诊断(回测证实):
-    旧逻辑给"近30期热号"加0.3权重(近期热≠未来热, 赌徒谬误);
-    旧硬约束(和值9-20/跨度3-7/奇偶1-2)把120个组六集合砍到60个,
-    真实组六开奖46.75%落在约束带外 -> 近一半组六日命中率被锁死0%,
-    虽不改变数学期望(每注理论中奖率恒定), 但放大"全不中"方差、体验更差。
-  新逻辑:
-    1) 长期经验数位边际分布(全窗口 Laplace 平滑), 去除近期赌徒谬误权重;
-    2) 按边际分布无放回覆盖加权采样, 自然复现"和值/跨度典型"且不再硬剔除半数空间;
-    3) 覆盖均衡: 每数字出现次数趋向均衡, 提升数字覆盖;
-    4) 按最新期号派生随机种子 -> 同日确定、跨日自然变化、可复现。
-  仍属"分布对齐", 不改变负EV与理论中奖率; 真实开奖独立随机。
+现行玩法：直选（v6，2026-09-28 起为唯一玩法）
+  百位/十位/个位各自独立选号，位置与顺序完全对应才算中奖；
+  注数 = 各位候选数相乘；不做任何组选归并。详见 generate_recommendations。
+
+历史玩法（已移除，仅作记录，勿恢复）：
+  v5 组六胆拖、v4 组六边际采样、组六连出熔断。回测证实：
+  旧逻辑给"近30期热号"加0.3权重(赌徒谬误)；旧硬约束(和值9-20/跨度3-7/奇偶1-2)
+  把120个组六集合砍到60个，近一半组六日命中率被锁死0%——虽不改变期望，但放大"全不中"方差。
+  熔断（组六连出>=7期停投）只是"少投一天"，并非择时信号。
+  现行直选同样不改变负EV与理论中奖率(单注恒 1/1000)，真实开奖独立随机。
 """
 import json
 import os
-import random
 from collections import Counter, defaultdict
-from itertools import combinations
 
 DATA_FILE = "data/3d_history.json"
 
@@ -129,142 +125,39 @@ def type_analysis(records):
         }
     }
 
-def circuit_breaker(records, target_type="组六"):
-    """
-    熔断判定（保留旧接口；实际每日规则见 daily_review.circuit_breaker_user_rules）
-    """
-    n = len(records)
-    if n < 3:
-        return {"stop": False, "reason": "数据不足", "suggest": "",
-                "push_type": target_type, "push_count": 10, "signal_strength": "弱"}
-
-    types_all = [r["type"] for r in records]
-    sums_3 = [r["sum_val"] for r in records[:3]]
-
-    zl_streak = 0
-    for r in records:
-        if r["type"] == "组六":
-            zl_streak += 1
-        else:
-            break
-
-    streak_type = types_all[0]
-    streak_len = 1
-    for t in types_all[1:]:
-        if t == streak_type:
-            streak_len += 1
-        else:
-            break
-
-    if zl_streak >= 8:
-        p = 1 - (0.732 ** zl_streak)
-        return {"stop": True,
-                "reason": f"组六连续{zl_streak}期",
-                "suggest": f"组三概率已达{p*100:.0f}%，建议推10注组三搏回归。是否推？",
-                "push_type": "组三", "push_count": 10, "signal_strength": "极强"}
-
-    if streak_len >= 3:
-        reverse = "组六" if streak_type == "组三" else "组三"
-        return {"stop": True,
-                "reason": f"连续{streak_len}期{streak_type}",
-                "suggest": f"3连{streak_type}后形态切换率>80%，建议推10注{reverse}。是否推？",
-                "push_type": reverse, "push_count": 10,
-                "signal_strength": "极强" if streak_len >= 4 else "强"}
-
-    if all(s <= 5 for s in sums_3):
-        return {"stop": True,
-                "reason": f"近3期和值连续极端小({sums_3})",
-                "suggest": "和值异常走低，可能继续下行。建议观望或减量。是否推？",
-                "push_type": target_type, "push_count": 10, "signal_strength": ""}
-    if all(s >= 22 for s in sums_3):
-        return {"stop": True,
-                "reason": f"近3期和值连续极端大({sums_3})",
-                "suggest": "和值异常走高，可能均值回归。建议推均值附近10注组六。是否推？",
-                "push_type": target_type, "push_count": 10, "signal_strength": ""}
-
-    return {"stop": False, "reason": f"正常出号 (组六{zl_streak}连，{streak_len}连{streak_type})",
-            "suggest": "", "push_type": target_type, "push_count": 10, "signal_strength": "中"}
-
-
 # ===================== 选号引擎 v6（直选定位 + 和值带） =====================
-# v6 (2026-09-27): 3D 直选定位 + 和值带过滤。百/十/个三位各取近100期频率 TOP2 热号作
-#   定位候选，三位各 2 选 1 组合出 2×2×2=8 注直选，再按和值带过滤（默认 10-17，
-#   覆盖钟形分布最密集的中区，约 46% 单期命中），实际出 6-8 注。
-#   结算口径改为「直选精确命中」（三位同位同值），每命中直选 1040 元，单注成本 2 元。
-#   红线不变：仍是随机采样·等同机选·无预测力——定位候选与和值带只是投注结构偏好，
-#   不提升每注中奖概率（单注直选命中恒为 1/1000），期望不变。
-# v5 (2026-08-29): 胆1拖5 热号固定追号；v4 (2026-08-20) 经验边际采样（现作组三/异常回退）。
-ENGINE_VERSION = "v6"  # 选号引擎版本，供报告/推送标注（出号时附带说明）
+# v6（2026-09-27 定；2026-09-28 起为**唯一玩法**，旧组六玩法已移除）
+#
+# 玩法：**直选**。百位 / 十位 / 个位各自独立选号，号码顺序与位置必须完全对应才算中奖。
+# 不做任何组选归并——032 与 320 是两注不同的直选，不因数字集合相同而合并或去重。
+#
+# 规则：
+#   1) 定位候选：每个位置分别统计近 POS_WINDOW 期该位出现频次，取 TOP DIRECT_POS_N（默认 2）
+#   2) 组合：三位候选做位置笛卡尔积；**注数 = 百位候选数 × 十位候选数 × 个位候选数**
+#   3) 去重：按 (百,十,个) 位置元组去重，禁止组选集合去重
+#   4) 过滤：和值落在「近 30 期峰值 ± SUM_BAND_PEAK」带内的注优先保留
+#   5) 兜底：带内注数不足目标时，放宽到全和值范围补足（不做组选去重）
+#   6) 成本 = 注数 × 2 元；中奖口径 = 直选精确命中（三位同位同值），1040 元/注
+#
+# 红线不变：随机采样·等同机选·无预测力。定位候选与和值带只是投注结构偏好，
+# 不提升每注中奖概率（单注直选命中恒为 1/1000），期望不变。
+#
+# 历史玩法（已移除，勿恢复）：v5 组六胆拖(胆1拖5)、v4 组六边际采样、组六连出熔断。
+ENGINE_VERSION = "v6"                 # 选号引擎版本，供报告/推送标注
+
+DIRECT_POS_N = 2                      # 每个位置取几位候选
+DIRECT_POS_WINDOW = 30                # 定位候选统计窗口（与 hot_core 3d_pos 缓存口径一致）
+DIRECT_TARGET_NOTES = 8               # 目标注数（= 各位候选数之积 2×2×2）
 
 
 def _digit_marginal(records):
-    """长期经验数位边际分布（全窗口 Laplace 平滑）。
-    去除旧逻辑的'近30期热号0.3权重'——近期热≠未来热, 属赌徒谬误, 不提升期望。"""
+    """长期经验数位边际分布（全窗口 Laplace 平滑）——统计工具，供历史回测复用。"""
     total = Counter()
     for r in records:
         for num in r["nums"]:
             total[num] += 1
-    denom = len(records) * 3 + 10  # Laplace: 每数字 +1 先验
+    denom = len(records) * 3 + 10      # Laplace: 每数字 +1 先验
     return {i: (total.get(i, 0) + 1.0) / denom for i in range(10)}
-
-
-def _weighted_choice_dict(w, rng):
-    items = list(w.items())
-    tot = sum(v for _, v in items)
-    if tot <= 0:
-        return items[rng.randrange(len(items))][0]
-    r = rng.random() * tot
-    cum = 0.0
-    for d, v in items:
-        cum += v
-        if r <= cum:
-            return d
-    return items[-1][0]
-
-
-def _sample_digits(rng, marginal, used, target, k, exclude=()):
-    """无放回按'边际×覆盖均衡'权重抽 k 个互异数字。
-    - 边际: 经验频率越高越优先(自然复现典型和值/跨度)
-    - 覆盖均衡: 已超额使用的数字降权, 未达标的升权 -> 每数字出现次数趋向均衡
-    - exclude: 组三时排除已选的'对子数字'"""
-    chosen = []
-    avail = [d for d in range(10) if d not in exclude]
-    for _ in range(k):
-        w = {}
-        for d in avail:
-            if d in chosen:
-                continue
-            base = marginal[d]
-            util = used.get(d, 0)
-            if util >= target:
-                w[d] = base * 0.2          # 已达均衡目标, 大幅降权
-            else:
-                w[d] = base * (1.0 + 0.6 * (target - util) / max(1, target))
-        d = _weighted_choice_dict(w, rng)
-        chosen.append(d)
-        avail.remove(d)
-    return sorted(chosen)
-
-
-def _make_logic_simple(nums, push_type):
-    sv = sum(nums)
-    band = "和值中区" if 9 <= sv <= 20 else ("和值小" if sv < 9 else "和值大")
-    return f"经验边际·{band}{sv}·覆盖均衡"
-
-
-def _valid_pool(push_type):
-    """枚举该形态下的全部合法组合：组六 C(10,3)=120；组三 10×9=90。"""
-    if push_type == "组三":
-        return [sorted([d, d, s]) for d in range(10) for s in range(10) if s != d]
-    return [list(c) for c in combinations(range(10), 3)]
-
-
-def _combo_weight(nums, marginal):
-    """组合权重 = 三码边际概率之积，用于兜底补全时优先取典型组合。"""
-    w = 1.0
-    for x in nums:
-        w *= marginal[x]
-    return w
 
 
 def _mk_note(nums, logic):
@@ -277,213 +170,164 @@ LAST_GEN = {"engine": "未运行", "target": 0, "returned": 0,
             "core_notes": 0, "filled": 0, "note": ""}
 
 
-def generate_recommendations(records, info, count=10):
+def generate_recommendations(records, info, count=None):
     """
-    选号引擎 v5.1（热号追号：胆1拖5 固定守号，恒定满注）
-    info: {"stop": bool, "push_type": "组六"/"组三", "push_count": int}
-    返回: list of {"nums":[...], "sum_val":int, "span":int, "logic":str}
+    选号引擎 v6（直选定位 + 和值带）—— **唯一出号入口**。
 
-    规则（沿用用户 2026-08-29 定）：
-      - 胆码 = 近100期频率 TOP1，拖码 = 其余数字中频率 TOP5
-      - 胆1拖5 -> C(5,2)=10 注，每注必含胆码；每月1号重选，月内固定不动
-      - 组三形态下退化为 v4 的边际采样（胆拖只适用于组六）
+    玩法：直选。百/十/个三位各自独立选号，位置与顺序完全对应才算中奖；
+    同一位置内部数字互异，组合按位置元组去重，绝不按组选集合归并。
 
-    2026-09-24 改动（保持完整注数，移除静默压缩）：
-      旧版有一处「全有或全无」门控：只有当胆拖注数**恰好等于** count 时才采用热号方案，
-      否则整批丢弃、静默整体回退 v4；v4 采样若在有限次去重内凑不满，又会静默少给注数。
-      新版改为「热号胆拖打底 + 差额由边际采样/确定性枚举补全」，任何情况下都返回 count 注，
-      并把补全来源写进每条 note 的 logic 与 LAST_GEN，不再静默。
+    info: {"stop": bool}（stop=True 时不出号，如休市/数据滞后）
 
-    ⚠️ 诚实边界: 胆拖与随机选号在数学上等价（每注中奖概率恒定，每期最多中1注、无叠加）。
-    锁定热号属投注结构偏好，不提升任何概率优势，对外保持「等同机选·无预测力」标注。
+    规则（沿用用户 2026-09-27 定，2026-09-28 移除旧组六玩法后成为唯一规则）：
+      - 定位候选 = 各位置近 POS_WINDOW 期频次 TOP DIRECT_POS_N，月内锁定，每月 1 号重选
+      - 注数 = 百位候选数 × 十位候选数 × 个位候选数（缺省 2×2×2 = 8 注）
+      - 和值带 = 近30期峰值±2，带内注优先；不足则放宽到全和值补全至目标注数
+      - 成本 = 注数 × 2 元；中奖 = 直选精确命中 1040 元/注
+
+    ⚠️ 诚实边界：定位候选与和值带只是投注结构偏好，与机选数学等价，
+    不提升任何概率优势，对外保持「随机采样·等同机选·无预测力」标注。
     """
     global LAST_GEN
-    LAST_GEN = {"engine": "none", "target": count, "returned": 0,
+    if count is None:
+        count = DIRECT_TARGET_NOTES
+    LAST_GEN = {"engine": "v6直选定位", "target": count, "returned": 0,
                 "core_notes": 0, "filled": 0, "note": ""}
 
     if info.get("stop"):
-        LAST_GEN.update({"engine": "熔断/休市", "note": "规则拦截，不出号"})
+        LAST_GEN.update({"engine": "休市/暂停", "note": "规则拦截，不出号"})
         return []
-
-    push_type = info.get("push_type", "组六")
-    mode = info.get("mode")  # 'direct' = 直选定位 + 和值带过滤；None = 旧组六/组三路径
-
-    if mode == "direct":
-        return _generate_direct(records, info, count)
-
-    n = len(records)
-    if n < 4:
+    if not records or len(records) < 4:
         LAST_GEN.update({"engine": "数据不足", "note": "历史期数少于4期，拒绝出号"})
         return []
 
-    marginal = _digit_marginal(records)
-    # 每日变化种子: 用最新期号派生 -> 同日确定、跨日自然变化、可复现
-    try:
-        seed = int(records[0]["qihao"])
-    except Exception:
-        seed = 20260613
-    rng = random.Random(seed)
-
-    # 注数上限保护：目标注数超过该形态的组合总数时，按物理上限出号并显式记录
-    pool_size = len(_valid_pool(push_type))
-    if count > pool_size:
-        LAST_GEN["note"] = "目标 %d 注超过%s组合总数，已按物理上限 %d 注出号" % (
-            count, push_type, pool_size)
-        count = pool_size
-
-    selected = []
-    seen = set()
-    used = Counter()
-    engine = "v4边际采样"
-
-    # ---- 1) v5 热号胆拖打底（组六专用）；未到生效日/异常则跳过，进入下步补全 ----
-    if push_type == "组六":
-        try:
-            import hot_core
-            if not hot_core.is_active():
-                raise ValueError("未到生效日 %s，跳过胆拖" % hot_core.EFFECTIVE_FROM)
-            dan, tuo, _meta = hot_core.get_3d_core(records)
-            tag = "热号追号·胆%d拖%s" % (dan, "/".join(str(x) for x in tuo))
-            for nums in hot_core.dantuo_notes(dan, tuo):
-                if len(selected) >= count:
-                    break
-                key = tuple(nums)
-                if key in seen:
-                    continue
-                seen.add(key)
-                selected.append(_mk_note(nums, tag))
-                for x in nums:
-                    used[x] += 1
-            if selected:
-                engine = "v5热号胆拖"
-        except Exception:
-            LAST_GEN["note"] = "热号核心不可用，整批由边际采样出号"
-
-    n_core = len(selected)
-
-    # ---- 2) 差额用 v4 边际采样 + 覆盖均衡补全 ----
-    target = count * 3 / 10.0
-    attempts = 0
-    max_attempts = max(500, count * 500)
-    while len(selected) < count and attempts < max_attempts:
-        attempts += 1
-        if push_type == "组三":
-            d = _sample_digits(rng, marginal, used, target, 1)[0]   # 对子数字
-            s = _sample_digits(rng, marginal, used, target, 1, exclude=(d,))[0]  # 单数字
-            nums = sorted([d, d, s])
-        else:
-            nums = _sample_digits(rng, marginal, used, target, 3)
-        key = tuple(nums)
-        if key in seen:
-            continue
-        seen.add(key)
-        selected.append(_mk_note(nums, _make_logic_simple(nums, push_type)))
-        for x in nums:
-            used[x] += 1
-
-    # ---- 3) 确定性兜底：仍未满额则从剩余组合按边际权重降序补足，保证 count 注 ----
-    if len(selected) < count:
-        remain = [c for c in _valid_pool(push_type) if tuple(c) not in seen]
-        remain.sort(key=lambda c: -_combo_weight(c, marginal))
-        for nums in remain:
-            if len(selected) >= count:
-                break
-            seen.add(tuple(nums))
-            selected.append(_mk_note(nums, "确定性兜底补全·" + _make_logic_simple(nums, push_type)))
-
-    n_filled = len(selected) - n_core
-    LAST_GEN.update({
-        "engine": engine, "target": count, "returned": len(selected),
-        "core_notes": n_core, "filled": n_filled,
-        "note": (LAST_GEN["note"] + ("；" if LAST_GEN["note"] else "") +
-                 ("已由%s补全%d注" % ("边际采样/兜底", n_filled) if n_filled else "热号胆拖满额出号")),
-    })
-    return selected
+    return _generate_direct(records, info, count)
 
 
 def last_gen_desc():
     """给报告/推送用的一句话出号诊断（调用可选）。"""
     g = LAST_GEN
-    return "%s：目标%d注/实出%d注（热号核心%d注，补全%d注）%s" % (
+    return "%s：目标%d注/实出%d注（和值带内%d注，补全%d注）%s" % (
         g["engine"], g["target"], g["returned"], g["core_notes"], g["filled"],
         ("｜" + g["note"]) if g["note"] else "")
 
 
-# ===================== 直选定位 + 和值带（v6，2026-09-27） =====================
-def _sum_band_of(records, window=30):
-    """近 window 期和值峰值 ±2 的整数区间 [lo, hi]（v6.2，2026-09-27 18:45 修正）。
-    v6.1 误改用「近30期实际开出和值并集」，但近30期和值散在 2~26，并集无意义（等同不过滤）。
-    回退到「峰值±2」：定位直选 8 注和值天然聚在候选均值附近，峰值±2 既保留典型组合、
-    又避免把 8 注全砍光。无数据回退 10-17。"""
+def _direct_position_candidates(records, n=DIRECT_POS_N, window=DIRECT_POS_WINDOW):
+    """本地按位统计 TOP n（hot_core 不可用时的回退；口径与 hot_core 一致）。
+    返回 {"bai":[...], "shi":[...], "ge":[...]}，各位内数字互异且升序。"""
+    cnt = {"bai": Counter(), "shi": Counter(), "ge": Counter()}
+    for r in records[:window]:
+        nums = r["nums"]
+        cnt["bai"][nums[0]] += 1
+        cnt["shi"][nums[1]] += 1
+        cnt["ge"][nums[2]] += 1
+    pos = {}
+    for p, c in cnt.items():
+        ranked = sorted(range(10), key=lambda d: (-c.get(d, 0), d))
+        pos[p] = sorted(ranked[:n])
+    return pos
+
+
+def _validate_direct_notes(notes, pos):
+    """直选选号校验，返回 (ok, msg)。
+    ①每位数字 0-9；②每注各位必须取自对应位置的候选；
+    ③按 (百,十,个) 位置元组去重（禁止组选集合归并）；④注数 ≤ 各位候选数之积。"""
+    bai, shi, ge = pos["bai"], pos["shi"], pos["ge"]
+    cap = len(bai) * len(shi) * len(ge)
+    if len(notes) > cap:
+        return False, "注数 %d 超过各位候选数之积 %d" % (len(notes), cap)
+    seen = set()
+    for n in notes:
+        b, s, g = n["nums"]
+        if not all(isinstance(x, int) and 0 <= x <= 9 for x in (b, s, g)):
+            return False, "存在非法数字 %s" % (n["nums"],)
+        if b not in bai or s not in shi or g not in ge:
+            return False, "存在越位号码 %s（候选 百%s/十%s/个%s）" % (n["nums"], bai, shi, ge)
+        key = (b, s, g)
+        if key in seen:
+            return False, "重复注(位置元组) %s" % (key,)
+        seen.add(key)
+    return True, "校验通过：%d注，位置元组互异，未做组选归并" % len(notes)
+
+
+# ===================== 和值带（近30期峰值 ± SUM_BAND_PEAK） =====================
+def _sum_band_of(records, window=30, pad=2):
+    """近 window 期和值峰值 ± pad 的整数区间 [lo, hi]。无数据回退 10-17。"""
     c = Counter()
     for r in records[:window]:
         c[r["sum_val"]] += 1
     if not c:
         return 10, 17
     peak = max(s for s, n in c.items() if n == max(c.values()))
-    return max(0, peak - 2), min(27, peak + 2)
+    return max(0, peak - pad), min(27, peak + pad)
 
 
+# ===================== 直选出号主实现 =====================
 def _generate_direct(records, info, count):
-    """3D 直选定位 + 和值带过滤。
-    百/十/个 各取近100期 TOP2 热号定位候选，组合 8 注直选，
-    保留和值落在 [lo,hi] 的注，实际出 6-8 注。
-    返回与组六同结构的 note list（nums 为 [百,十,个]，sum_val=三位和）。"""
+    """3D 直选定位 + 和值带。
+    百/十/个 各取 TOP n 定位候选 → 位置笛卡尔积（注数 = 各位候选数相乘）
+    → 和值带内优先 → 不足则全和值补全 → 直选校验。
+    返回 note list（nums 为 [百,十,个]，sum_val = 三位和）。"""
     global LAST_GEN
     LAST_GEN = {"engine": "v6直选定位", "target": count, "returned": 0,
                 "core_notes": 0, "filled": 0, "note": ""}
 
+    # 1) 定位候选（优先 hot_core 月锁缓存；不可用时本地按位统计，绝不回退组六）
     try:
         import hot_core
-        # 定位候选 = 近100期按位热号 TOP2（月内锁定，每月1号重选，hot_core 3d_pos 键）
-        pos, _meta = hot_core.get_3d_position(records, n=2)
-        bai, shi, ge = pos["bai"], pos["shi"], pos["ge"]
-        if not bai or not shi or not ge:
-            raise ValueError("定位候选缺失")
+        pos, meta = hot_core.get_3d_position(records, n=DIRECT_POS_N)
+        source = "hot_core 月锁(%s)" % meta.get("ym", "?")
     except Exception as e:
-        LAST_GEN.update({"note": "定位候选不可用，回退 v4 组六出号：%s" % e})
-        info2 = dict(info); info2.pop("mode", None)
-        return generate_recommendations(records, info2, count=count)
+        pos = _direct_position_candidates(records)
+        source = "本地按位统计(回退：%s)" % e
 
+    bai, shi, ge = pos.get("bai", []), pos.get("shi", []), pos.get("ge", [])
+    if not (bai and shi and ge):
+        LAST_GEN.update({"note": "定位候选缺失，拒绝出号（不回退旧玩法）"})
+        return []
+
+    # 2) 注数 = 各位置所选号码数量相乘
+    total = len(bai) * len(shi) * len(ge)
     lo, hi = _sum_band_of(records)
-    notes = []
-    seen = set()
+
+    # 3) 位置笛卡尔积：和值带内优先
+    in_band, all_notes = [], []
     for b in bai:
         for s in shi:
             for g in ge:
-                nums = [b, s, g]
                 sv = b + s + g
-                if not (lo <= sv <= hi):
-                    continue
-                key = (b, s, g)
-                if key in seen:
-                    continue
-                seen.add(key)
-                notes.append(_mk_note(nums, "直选定位·百%s十%s个%s·和值带%d-%d" % (b, s, g, lo, hi)))
+                note = _mk_note([b, s, g], "直选定位·百%s十%s个%s" % (b, s, g))
+                all_notes.append(note)
+                if lo <= sv <= hi:
+                    note["logic"] += "·和值带%d-%d" % (lo, hi)
+                    in_band.append(note)
 
-    # 定位候选 + 和值带过滤后注数可能偏少；不足则放宽到全和值范围补 8 注
-    if len(notes) < count:
-        notes2 = []
-        seen2 = set()
-        for b in bai:
-            for s in shi:
-                for g in ge:
-                    key = (b, s, g)
-                    if key in seen2:
-                        continue
-                    seen2.add(key)
-                    notes2.append(_mk_note([b, s, g], "直选定位·全和值补全"))
-        for n in notes2:
-            if any(n["nums"] == x["nums"] for x in notes):
-                continue
-            notes.append(n)
-        notes = notes[:count]
+    # 4) 带内不足 → 放宽到全和值补全（按位置元组去重，不做组选归并）
+    notes = list(in_band)
+    for n in all_notes:
+        if len(notes) >= min(count, total):
+            break
+        if any(n["nums"] == x["nums"] for x in notes):
+            continue
+        n = dict(n)
+        n["logic"] = n["logic"].split("·和值带")[0] + "·全和值补全"
+        notes.append(n)
+    notes = notes[:min(count, total)]
 
+    # 5) 直选校验
+    ok, msg = _validate_direct_notes(notes, pos)
+    cost = len(notes) * 2
     LAST_GEN.update({
-        "returned": len(notes), "core_notes": len(notes), "filled": 0,
-        "note": "直选8注，和值带%d-%d过滤后实出%d注（每注成本2元，命中1040元）" % (lo, hi, len(notes)),
+        "returned": len(notes), "core_notes": len(in_band),
+        "filled": max(0, len(notes) - len(in_band)),
+        "note": ("%s；候选 百%s/十%s/个%s；注数=%d×%d×%d=%d，实出%d注（带内%d）；"
+                 "和值带%d-%d；成本%d元；%s" % (
+                     source, bai, shi, ge, len(bai), len(shi), len(ge), total,
+                     len(notes), len(in_band), lo, hi, cost, msg)),
     })
-    return notes[:count]
+    if not ok:
+        LAST_GEN["note"] = "⚠️校验失败：" + msg + "｜" + LAST_GEN["note"]
+    return notes
 
 
 def trend_analysis(records, window=100):
@@ -544,8 +388,8 @@ def full_report():
     if not records:
         return None
 
-    cb = circuit_breaker(records)
-    recs = generate_recommendations(records, cb)
+    info = {"stop": False}
+    recs = generate_recommendations(records, info)
 
     report = {
         "数据概览": {
@@ -559,7 +403,7 @@ def full_report():
         "和值分析": sum_value_analysis(records),
         "跨度分析": span_analysis(records),
         "形态分析": type_analysis(records),
-        "熔断判定": cb,
+        "出号诊断": last_gen_desc(),
         "推荐号码": recs,
         "推荐注数": len(recs)
     }
@@ -582,7 +426,7 @@ def print_summary(report):
     freq = report["频率分析"]
     miss = report["遗漏分析"]
     s = report["和值分析"]
-    cb = report.get("熔断判定", {})
+    diag = report.get("出号诊断", "")
 
     print("\n" + "=" * 50)
     print(f"  福彩3D 数据分析报告")
@@ -612,14 +456,8 @@ def print_summary(report):
     for k, v in t["recent_100"].items():
         print(f"    {k}: {v}次")
 
-    print(f"\n  [熔断判定 v4]")
-    print(f"    触发: {'🛑 是' if cb.get('stop') else '✅ 否'}")
-    print(f"    原因: {cb.get('reason', 'N/A')}")
-    if cb.get('suggest'):
-        print(f"    ⚠️ 建议: {cb.get('suggest')}")
-    if not cb.get('stop'):
-        print(f"    出号: {cb.get('push_type', '')} × {cb.get('push_count', 0)}")
-        print(f"    信号: {cb.get('signal_strength', '')}")
+    print(f"\n  [出号诊断]")
+    print(f"    {diag}")
 
     recs = report.get("推荐号码", [])
     if recs:

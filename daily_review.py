@@ -2,8 +2,8 @@
 福彩3D 每日复盘自动化脚本 (动态版)
 - 抓取最新数据
 - 结算昨日待结算号码 (修正: 按日期匹配开奖, 避免6/29期号错位bug)
-- 熔断判定 (用户规则 2026-08-07: 组六连出>6期熔断暂停; v6 直选模式下沿用该熔断, 表述改直选)
-- 生成随机采样(每天都换): v6 直选定位 8 注 / 旧模式 10 组组六
+- 出号判定 (v6 直选): 百/十/个定位候选 + 和值带; 注数 = 各位候选数相乘
+- 生成直选随机采样(每天都换): 8 注直选 = 16 元/天; 组六玩法已移除(含组六熔断)
 - ⚠️ 出号性质声明(2026-08-29 用户定): 采样等同机选、无预测力, 对外一律标注"随机采样"而非"推荐"
 - 更新 profit_loss.json
 - 生成 markdown 报告
@@ -29,12 +29,12 @@ from trading_day import is_trading_day, expected_qihao_for_date
 
 # 3D 出号模式（v6 直选定位 + 和值带，2026-09-27）
 try:
-    from fc3d.config import DIRECT_MODE, DIRECT_COUNT, DIRECT_PRIZE, DIRECT_COST
-except Exception:  # fc3d 子包缺失时回退旧组六模式，绝不影响旧链路
-    DIRECT_MODE, DIRECT_COUNT, DIRECT_PRIZE, DIRECT_COST = False, 10, 160, 2
+    from fc3d.config import DIRECT_COUNT, DIRECT_PRIZE, DIRECT_COST
+except Exception:  # fc3d 子包缺失时用直选内置默认值，绝不影响链路
+    DIRECT_COUNT, DIRECT_PRIZE, DIRECT_COST = 8, 1040, 2
 
-# 默认投注类型标签：v6 直选模式下为「直选」，旧模式为「组六」（仅表述，不影响逻辑）
-DEFAULT_PUSH_TYPE = "直选" if DIRECT_MODE else "组六"
+# 投注类型标签：玩法已统一为直选（组六玩法已移除）
+DEFAULT_PUSH_TYPE = "直选"
 
 # 支持 --date YYYY-MM-DD 回溯运行 (用于补跑历史日期)
 parser = argparse.ArgumentParser()
@@ -120,46 +120,33 @@ def settle_pending(history, pl):
         print(f"  ⚠️ 无法确定 {rec_date} 的开奖期号(无目标期号且日期缺失), 暂缓结算")
         return None
 
-    # 结算
-    draw_set = set(draw["nums"])
+    # 结算：直选口径——三位同位同值才算中奖（不做组选集合匹配）
     draw_tuple = tuple(draw["nums"])
-    # 直选模式：三位同位同值精确命中；组六模式：集合相等命中
-    is_direct = (pending.get("push_type") == "直选")
     hits = 0
     hit_list = []
-    near_hits = 0      # 擦边：直选命中2/3位（组选命中2码/3码但不对位）
+    near_hits = 0      # 擦边：命中 2/3 位但不对位（无奖金，仅记录）
     for rec_nums in pending["recommendations"]:
         rt = tuple(rec_nums)
-        if is_direct:
-            same_pos = sum(1 for a, b in zip(rt, draw_tuple) if a == b)
-            if same_pos == 3:
-                hits += 1
-                hit_list.append(rt)
-            elif same_pos >= 2:
-                near_hits += 1
-        else:
-            if set(rt) == draw_set:
-                hits += 1
-                hit_list.append(rt)
-            elif len(set(rt) & draw_set) == 3 and rt != draw_tuple:
-                near_hits += 1
+        same_pos = sum(1 for a, b in zip(rt, draw_tuple) if a == b)
+        if same_pos == 3:
+            hits += 1
+            hit_list.append(rt)
+        elif same_pos >= 2:
+            near_hits += 1
 
     pending["draw"] = draw["qihao"]
     pending["draw_nums"] = draw["nums"]
     pending["draw_type"] = draw["type"]
     pending["hits"] = hits
     pending["near_hits"] = near_hits
-    # 动态奖金: 直选 1040 / 组三 320 / 组六 160 / 豹子 1040
-    if is_direct:
-        per = DIRECT_PRIZE
-    else:
-        per = 320 if draw["type"] == "组三" else 160 if draw["type"] == "组六" else 1040
+    # 直选奖金：1040 元/注（与开奖形态无关）
+    per = DIRECT_PRIZE
     pending["prize"] = hits * per
     pending["daily_pnl"] = hits * per - pending["cost"]
 
     draw_str = ''.join(map(str, draw["nums"]))
     ptype = draw["type"]
-    kind = "直选" if is_direct else ptype
+    kind = "直选"
     if hits > 0:
         hit_strs = ['[' + ''.join(map(str, h)) + ']' for h in hit_list]
         pending["reason"] = f"{kind}{pending['notes']}注->{hits}命中{''.join(hit_strs)} 开奖{draw_str}{ptype}, 日盈亏{pending['daily_pnl']}元"
@@ -218,13 +205,13 @@ def calc_summary(pl):
     return pl["summary"]
 
 
-def circuit_breaker_user_rules(history):
+def direct_push_status(history):
     """
-    熔断规则 (用户规则 2026-08-07)
-    - 常态: v6 直选模式推 8 注直选定位; 旧模式每天推 10 组组六 (每天都换)
-    - 熔断: 当组六连续开出 > 6 期(即 >=7 期)时, 熔断暂停(0注),
-            回避极端连开风险, 直到形态打断(出组三/豹子)再恢复
-    - 注: 判定行为两种模式一致, 仅 push_type/push_count/文案随 DIRECT_MODE 变化
+    出号判定（v6 直选，2026-09-28 起）
+    - 常态: 推 DIRECT_COUNT 注直选（百/十/个定位候选 + 和值带），注数 = 各位候选数相乘
+    - 形态统计（组六连出等）**仅供参考，不再作为出号门槛**：
+      旧的「组六连出 >= 7 期熔断暂停」属组六玩法规则，已随组六玩法一并移除
+    - stop=True 仅由休市 / 数据滞后触发（在主流程中置位）
     """
     types_all = [r["type"] for r in history]
 
@@ -245,25 +232,17 @@ def circuit_breaker_user_rules(history):
         else:
             break
 
-    # 组三近30期次数 (信息留存, 不参与熔断决策)
+    # 组三近30期次数 (信息留存, 不参与出号决策)
     gs_count_30 = types_all[:30].count("组三")
     sums_3 = [r["sum_val"] for r in history[:3]]
 
-    rules_fired = []
-    # 熔断规则：组六连出 > 6 期 -> 暂停（判定行为两种模式一致）
-    if zl_streak > 6:
-        rules_fired.append(f"熔断: 组六已连出 {zl_streak} 期(>6) -> 暂停推送, 回避极端连开风险")
-        stop = True
-    else:
-        stop = False
-        if DIRECT_MODE:
-            rules_fired.append(
-                f"常态: 推 {DIRECT_COUNT} 注直选定位+和值带 (组六连出 {zl_streak} 期, 未达熔断阈值 7 期)")
-        else:
-            rules_fired.append(f"常态: 推 10 组组六 (组六连出 {zl_streak} 期, 未达熔断阈值 7 期)")
-
+    rules_fired = [
+        f"常态: 推 {DIRECT_COUNT} 注直选定位+和值带 (注数 = 百×十×个候选数)",
+        f"形态统计: 组六连出 {zl_streak} 期 (仅供走势参考, 不做出号门槛)",
+    ]
+    stop = False
     push_type = DEFAULT_PUSH_TYPE
-    push_count = 0 if stop else (DIRECT_COUNT if DIRECT_MODE else 10)
+    push_count = DIRECT_COUNT
 
     return {
         "stop": stop,
@@ -325,7 +304,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
     rec_rows = []
     for i, r in enumerate(recs):
         rec_rows.append(f"| {i+1} | {' '.join(map(str, r['nums']))} | {r['sum_val']} | {r['span']} | {r['logic']} |")
-    rec_table = "\n".join(rec_rows) if rec_rows else "| - | 休市/熔断未出号 | - | - | - |"
+    rec_table = "\n".join(rec_rows) if rec_rows else "| - | 休市/暂停未出号 | - | - | - |"
 
     # 形态走势 (近15期)
     trend_rows = []
@@ -334,7 +313,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
         trend_rows.append(f"| {r['qihao']} | {r.get('date', '?')} | {' '.join(map(str, r['nums']))} | {r['sum_val']} | {r['span']} | {tag} |")
     trend_table = "\n".join(trend_rows)
 
-    # 熔断详情
+    # 出号判定详情
     cb_detail = ""
     for rf in cb["rules_fired"]:
         cb_detail += f"- {rf}\n"
@@ -343,7 +322,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
     if any("休市" in rf for rf in cb["rules_fired"]):
         cb_status = "⏸ 休市(无新开奖)"
     elif cb["stop"]:
-        cb_status = "🛑 熔断(暂停)"
+        cb_status = "🛑 暂停(不出号)"
     else:
         cb_status = f"✅ 推{cb['push_count']}注{cb['push_type']}"
 
@@ -440,7 +419,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
 
 ---
 
-## 三、熔断判定
+## 三、出号判定（直选）
 
 **判定状态**: {cb_status}
 
@@ -569,7 +548,7 @@ def main():
     print(f"  总注数: {summary['total_bets']}, 总命中: {summary['total_hits']}")
     print(f"  净盈亏: {summary['net_pnl']:+d}元, 待结算: {summary['pending_bets']}注")
 
-    # 5. 熔断判定 + 6. 生成推荐 (休市或数据滞后时跳过)
+    # 5. 出号判定 + 6. 生成推荐 (休市或数据滞后时跳过)
     trend = None
     if is_suspension:
         cb = {"stop": True,
@@ -578,7 +557,7 @@ def main():
               "last2_both_gs": False, "sums_3": [0, 0, 0], "push_type": DEFAULT_PUSH_TYPE, "push_count": 0}
         recs = []
         reason = "福彩3D休市(官方休市期), 无推荐"
-        print("\n[5/7] 熔断判定: 休市, 跳过")
+        print("\n[5/7] 出号判定: 休市, 跳过")
         print("[6/7] 生成推荐: 休市, 无推荐")
     elif data_stale:
         cb = {"stop": True,
@@ -587,16 +566,16 @@ def main():
               "last2_both_gs": False, "sums_3": [0, 0, 0], "push_type": DEFAULT_PUSH_TYPE, "push_count": 0}
         recs = []
         reason = "数据滞后(抓取源过期), 暂停推荐, 待数据源恢复"
-        print("\n[5/7] 熔断判定: 数据滞后, 跳过")
+        print("\n[5/7] 出号判定: 数据滞后, 跳过")
         print("[6/7] 生成推荐: 数据滞后, 无推荐")
     else:
-        print("\n[5/7] 熔断判定...")
-        cb = circuit_breaker_user_rules(history)
+        print("\n[5/7] 出号判定...")
+        cb = direct_push_status(history)
         print(f"  形态: {cb['streak_type']}{cb['streak_len']}连, 组六{cb['zl_streak']}连")
         print(f"  组三近30期: {cb['gs_count_30']}次")
         for rf in cb["rules_fired"]:
             print(f"  🔴 {rf}")
-        status = "🛑 熔断, 0注" if cb["stop"] else f"✅ 推{cb['push_count']}注{cb['push_type']}"
+        status = "🛑 暂停, 0注" if cb["stop"] else f"✅ 推{cb['push_count']}注{cb['push_type']}"
         print(f"  {status}")
 
         # 5.5 100期走势研判（出号前必看）
@@ -607,14 +586,11 @@ def main():
         print("\n[6/7] 生成推荐...")
         if cb["stop"]:
             recs = []
-            print("  熔断, 不推荐")
-            reason = f"熔断触发({'; '.join(cb['rules_fired'])})"
+            print("  暂停, 不推荐")
+            reason = f"暂停触发({'; '.join(cb['rules_fired'])})"
         else:
-            if DIRECT_MODE:
-                # v6 直选定位 + 和值带：百/十/个各 2 候选 -> 8 注直选，和值带过滤
-                info = {"stop": False, "push_type": "直选", "push_count": DIRECT_COUNT, "mode": "direct"}
-            else:
-                info = {"stop": False, "push_type": cb["push_type"], "push_count": cb["push_count"]}
+            # 直选定位 + 和值带：百/十/个各取候选 -> 注数 = 各位候选数相乘
+            info = {"stop": False, "push_type": DEFAULT_PUSH_TYPE, "push_count": DIRECT_COUNT}
             recs = generate_recommendations(history, info, count=info["push_count"])
             print(f"  生成{len(recs)}注{info['push_type']}:")
             for i, r in enumerate(recs):
@@ -646,7 +622,7 @@ def main():
                               "reason": reason, "target_qihao": None})
                 else:
                     # 正常交易日: 若今日记录尚未结算(待开奖)且注数与当前规则(push_count)不符,
-                    # 则按新规则刷新(确保"8注直选/熔断暂停"等改动即时生效到今日记录)
+                    # 则按新规则刷新(确保"8注直选/暂停"等改动即时生效到今日记录)
                     if r.get("hits") is None and (not r.get("recommendations") or r.get("notes") != len(recs)):
                         r["recommendations"] = [rec["nums"] for rec in recs]
                         r["notes"] = len(recs)

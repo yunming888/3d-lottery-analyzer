@@ -70,7 +70,7 @@ def hot_cold(records: list, window: int = WINDOW) -> dict:
 
 
 def zuliu_streak(records: list) -> int:
-    """从最新一期起，连续“组六”的期数。"""
+    """从最新一期起，连续“组六”的期数（开奖形态统计，仅供走势展示，不参与出号判定）。"""
     s = 0
     for r in records:
         if r.get("type") == "组六":

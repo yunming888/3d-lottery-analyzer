@@ -3,7 +3,7 @@
 彩票每日复盘（统一编排器）
 ------------------------
 每日 07:00 运行：
-  1) 福彩3D 复盘 + 结算 + 选号 (daily_review.main)：v6 直选定位 8 注(旧模式 10 组组六)，组六连出>6期熔断暂停
+  1) 福彩3D 复盘 + 结算 + 选号 (daily_review.main)：v6 直选定位 8 注(注数=各位候选数相乘)；组六玩法与组六熔断已移除
   2) 大乐透 结算 + 选号 (dlt.settle.run_daily)：5组组合持有，每2周周五轮换最冷2组
   3) 双色球 结算 + 选号 (ssq.settle.run_daily)：5组组合持有，每2周周五轮换最冷2组
 汇总三品种「昨日数据摘要 / 复盘结论 / 具体盈亏」，写 unified_YYYY-MM-DD.md，
@@ -130,11 +130,11 @@ def wechat_block(today, yesterday, r3, rd, rs):
         pass
     recs3 = r3.get("recommendations", [])
     if recs3:
-        lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s】" % (len(recs3), ("直选定位" if recs3 else "组六"), r3.get("next_qihao"), FCD_VERSION))
+        lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s】" % (len(recs3), ("直选定位" if recs3 else "直选"), r3.get("next_qihao"), FCD_VERSION))
         for i, r in enumerate(recs3, 1):
             lines.append("  %d. %s" % (i, _fmt_3d_nums(r["nums"])))
     else:
-        lines.append("今日随机采样：休市/熔断，0注")
+        lines.append("今日随机采样：休市/暂停，0注")
 
     tr = r3.get("trend") or {}
     if tr.get("conclusion"):
