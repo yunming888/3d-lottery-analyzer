@@ -5822,9 +5822,13 @@
     {
       "date": "2026-09-27",
       "target_qihao": "2026260",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026260",
+      "draw_nums": [
+        6,
+        1,
+        9
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           6,
@@ -5869,26 +5873,83 @@
       ],
       "notes": 8,
       "cost": 16,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -16,
+      "reason": "直选8注->0命中 开奖619组六",
+      "push_type": "直选",
+      "near_hits": 0
+    },
+    {
+      "date": "2026-09-28",
+      "target_qihao": "2026261",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          6,
+          3,
+          9
+        ],
+        [
+          6,
+          5,
+          9
+        ],
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          3,
+          9
+        ],
+        [
+          0,
+          5,
+          2
+        ],
+        [
+          0,
+          5,
+          9
+        ],
+        [
+          6,
+          3,
+          2
+        ],
+        [
+          6,
+          5,
+          2
+        ]
+      ],
+      "notes": 8,
+      "cost": 16,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
-      "reason": "直选8注随机采样 | 常态: 推 10 组组六 (组六连出 4 期, 未达熔断阈值 7 期)",
-      "push_type": "直选"
+      "push_type": "直选",
+      "reason": "直选8注随机采样 | 常态: 推 10 组组六 (组六连出 5 期, 未达熔断阈值 7 期)"
     }
   ],
   "summary": {
-    "total_days": 101,
-    "settled_days": 100,
-    "active_days": 82,
-    "total_bets": 788,
-    "total_cost": 1576,
+    "total_days": 102,
+    "settled_days": 101,
+    "active_days": 83,
+    "total_bets": 796,
+    "total_cost": 1592,
     "total_hits": 3,
     "total_prize": 480,
-    "net_pnl": -1096,
+    "net_pnl": -1112,
     "pending_bets": 8,
     "pending_cost": 16,
-    "last_settled": "2026-09-27",
-    "last_hit": "2026-09-27 3注"
+    "last_settled": "2026-09-28",
+    "last_hit": "2026-09-28 3注"
   },
-  "last_draw_qihao": "2026259"
+  "last_draw_qihao": "2026260"
 }
