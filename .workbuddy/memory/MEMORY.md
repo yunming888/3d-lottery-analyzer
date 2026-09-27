@@ -16,9 +16,11 @@
 - ⚠️ 改自动化时间的正确流程：改 rrule → **PAUSED → ACTIVE**（强制重算 nextRunAt）→ 用 python 把 nextRunAt 换算成北京时间核对。只改 rrule 时 nextRunAt 不刷新，会导致当日按旧时间重复触发一次。
 
 ## 选号引擎（当前版本）
-- **福彩3D v5 / 大乐透 v3 / 双色球 v3**（`ENGINE_VERSION` 常量在 analyze.py、dlt/selector.py、ssq/selector.py；换引擎须同步更新）。
+- **福彩3D v6 / 大乐透 v3 / 双色球 v3**（`ENGINE_VERSION` 常量在 analyze.py、dlt/selector.py、ssq/selector.py；换引擎须同步更新）。
+- **3D v6 直选定位 + 和值带，2026-09-27 起生效**（`fc3d/config.py: DIRECT_MODE=True, DIRECT_POS_N=2, DIRECT_COUNT=8, SUM_BAND_PEAK=2, DIRECT_PRIZE=1040, DIRECT_COST=2`）。百/十/个各取近30期频率 TOP2 → 2³=8 注直选；和值带 = 近100期峰值±2（峰值漂移，需固定改 `SUM_BAND_PEAK`）。结算走**直选精确命中**（三位同位同值），`push_type="直选"` 分支，1040 元/注、成本 16 元/天。旧组六胆拖为 DIRECT_MODE=False 回退路径。
+  - 表述层已统一（2026-09-28）：`daily_review.DEFAULT_PUSH_TYPE = "直选" if DIRECT_MODE else "组六"`，熔断文案/push_count/报告/摘要全部随模式走。⚠️ **改文案后 pending 记录的 `reason` 不会自动刷新**（自动刷新只在注数变化时触发），需手工改当日待结算记录。
 - 规则「热号固定追号」，**2026-09-01 起生效**（`hot_core.EFFECTIVE_FROM` + `is_active()`）；8/31 前仍走旧逻辑（3D v4 边际采样、dlt/ssq v2 无核心号），到点自动切换无需改码。
-  - 3D：胆1拖5 = C(5,2)=10 注，每注必含胆码；胆=近100期频率TOP1，拖=其余TOP5；组三/异常回退 v4。
+  - 3D 热号：v6 下为**分位定位** `hot_core.json` 的 `3d_pos` 键（pos={bai,shi,ge}、pos_window=30、按 `ym` 每月1号重选）；旧模式为胆1拖5 = C(5,2)=10 注（胆=近100期频率TOP1，拖=其余TOP5）。
   - 大乐透/双色球：每注前区/红球必含核心热号 TOP2（后区/蓝球不锁），各 5 注。
   - 统一模块 `hot_core.py` + 状态 `data/hot_core.json`（按 `ym` 判跨月，`peek()` 只读）。dlt/ssq 走持久化 portfolio，settle 步骤3.5 有核心号校验：跨月变更或持仓有注不含核心号 → 立即重建组合（`st["core_ym"]` 记录已应用月份）。
   - 踩坑：① `hot_core.MIN_RECORDS=10` 防空数据污染缓存（**改 hot_core 后务必核对 hot_core.json 的 freq 非零**）；② 核心号可能与 `_valid_note` 和值区间冲突致候选池空、静默出0注，已加 `check_sum` 参数放宽重试。
@@ -28,7 +30,8 @@
 - 历史版本（均已废弃，勿恢复）：v4 经验边际采样（现为 3D 回退路径）/ v3 硬约束带 / v2 枚举打分 / v1 策略拼接。
 
 ## 规则与成本
-- 福彩3D：常态每天 10 组组六（每天更换）；**组六连出 >= 7 期熔断暂停(0注)**，形态打断(出组三/豹子)即恢复。只推组六，不推组三。成本 20 元/天。
+- 福彩3D：**v6 直选模式常态每天 8 注直选（16 元/天）**，每天更换；旧组六模式为 10 组组六（20 元/天）。
+- **组六连出 >= 7 期熔断暂停(0注)**，形态打断(出组三/豹子)即恢复；该熔断在 v6 直选模式下**仍保留**（判定逻辑两模式一致），是否取消待云明确认。
 - 大乐透/双色球：各固定 5 组（`NOTES=5`），成本 10 元/期。持久化 portfolio，`_is_rotation_day` 以 2026-08-14 为锚点每14天轮换最冷2组（08-14/08-28/09-11/09-25…）。
 - 开奖日：3D 每日；大乐透 周一/三/六；双色球 周二/四/日。昨日无开奖的品种在报告中注明。
 - 结算：按 target=最新+1 结算 pending；一/二等奖浮动奖记为"浮动奖"不计 PnL（保守）。
