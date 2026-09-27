@@ -2,8 +2,8 @@
 福彩3D 每日复盘自动化脚本 (动态版)
 - 抓取最新数据
 - 结算昨日待结算号码 (修正: 按日期匹配开奖, 避免6/29期号错位bug)
-- 熔断判定 (用户新规则 2026-08-07: 每天10组组六, 组六连出>6期熔断暂停)
-- 生成10组组六随机采样(每天都换)
+- 熔断判定 (用户规则 2026-08-07: 组六连出>6期熔断暂停; v6 直选模式下沿用该熔断, 表述改直选)
+- 生成随机采样(每天都换): v6 直选定位 8 注 / 旧模式 10 组组六
 - ⚠️ 出号性质声明(2026-08-29 用户定): 采样等同机选、无预测力, 对外一律标注"随机采样"而非"推荐"
 - 更新 profit_loss.json
 - 生成 markdown 报告
@@ -32,6 +32,9 @@ try:
     from fc3d.config import DIRECT_MODE, DIRECT_COUNT, DIRECT_PRIZE, DIRECT_COST
 except Exception:  # fc3d 子包缺失时回退旧组六模式，绝不影响旧链路
     DIRECT_MODE, DIRECT_COUNT, DIRECT_PRIZE, DIRECT_COST = False, 10, 160, 2
+
+# 默认投注类型标签：v6 直选模式下为「直选」，旧模式为「组六」（仅表述，不影响逻辑）
+DEFAULT_PUSH_TYPE = "直选" if DIRECT_MODE else "组六"
 
 # 支持 --date YYYY-MM-DD 回溯运行 (用于补跑历史日期)
 parser = argparse.ArgumentParser()
@@ -217,10 +220,11 @@ def calc_summary(pl):
 
 def circuit_breaker_user_rules(history):
     """
-    熔断规则 (用户新规则 2026-08-07)
-    - 常态: 每天推 10 组组六 (每天都换)
+    熔断规则 (用户规则 2026-08-07)
+    - 常态: v6 直选模式推 8 注直选定位; 旧模式每天推 10 组组六 (每天都换)
     - 熔断: 当组六连续开出 > 6 期(即 >=7 期)时, 熔断暂停(0注),
             回避极端连开风险, 直到形态打断(出组三/豹子)再恢复
+    - 注: 判定行为两种模式一致, 仅 push_type/push_count/文案随 DIRECT_MODE 变化
     """
     types_all = [r["type"] for r in history]
 
@@ -246,16 +250,20 @@ def circuit_breaker_user_rules(history):
     sums_3 = [r["sum_val"] for r in history[:3]]
 
     rules_fired = []
-    # 熔断规则：组六连出 > 6 期 -> 暂停
+    # 熔断规则：组六连出 > 6 期 -> 暂停（判定行为两种模式一致）
     if zl_streak > 6:
         rules_fired.append(f"熔断: 组六已连出 {zl_streak} 期(>6) -> 暂停推送, 回避极端连开风险")
         stop = True
     else:
         stop = False
-        rules_fired.append(f"常态: 推 10 组组六 (组六连出 {zl_streak} 期, 未达熔断阈值 7 期)")
+        if DIRECT_MODE:
+            rules_fired.append(
+                f"常态: 推 {DIRECT_COUNT} 注直选定位+和值带 (组六连出 {zl_streak} 期, 未达熔断阈值 7 期)")
+        else:
+            rules_fired.append(f"常态: 推 10 组组六 (组六连出 {zl_streak} 期, 未达熔断阈值 7 期)")
 
-    push_type = "组六"
-    push_count = 0 if stop else 10
+    push_type = DEFAULT_PUSH_TYPE
+    push_count = 0 if stop else (DIRECT_COUNT if DIRECT_MODE else 10)
 
     return {
         "stop": stop,
@@ -349,7 +357,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
 | 项目 | 数值 |
 |------|------|
 | 开奖 | {draw['qihao']} → **{' '.join(map(str, draw['nums']))}** {draw['type']} |
-| 投注 | {rec_data['notes']}注{rec_data.get('push_type', '组六')} |
+| 投注 | {rec_data['notes']}注{rec_data.get('push_type', DEFAULT_PUSH_TYPE)} |
 | 命中 | **{hits}注** {"🎯" if hits > 0 else ""} |
 | 成本 | {rec_data['cost']}元 |
 | 奖金 | {rec_data['prize']}元 |
@@ -567,7 +575,7 @@ def main():
         cb = {"stop": True,
               "rules_fired": [f"休市: 今日为官方休市期, 无新开奖"],
               "streak_type": "-", "streak_len": 0, "zl_streak": 0, "gs_count_30": 0,
-              "last2_both_gs": False, "sums_3": [0, 0, 0], "push_type": "组六", "push_count": 0}
+              "last2_both_gs": False, "sums_3": [0, 0, 0], "push_type": DEFAULT_PUSH_TYPE, "push_count": 0}
         recs = []
         reason = "福彩3D休市(官方休市期), 无推荐"
         print("\n[5/7] 熔断判定: 休市, 跳过")
@@ -576,7 +584,7 @@ def main():
         cb = {"stop": True,
               "rules_fired": [f"数据滞后: 本地最新 {current_latest} 落后预期期号, 抓取源过期, 暂停推荐"],
               "streak_type": "-", "streak_len": 0, "zl_streak": 0, "gs_count_30": 0,
-              "last2_both_gs": False, "sums_3": [0, 0, 0], "push_type": "组六", "push_count": 0}
+              "last2_both_gs": False, "sums_3": [0, 0, 0], "push_type": DEFAULT_PUSH_TYPE, "push_count": 0}
         recs = []
         reason = "数据滞后(抓取源过期), 暂停推荐, 待数据源恢复"
         print("\n[5/7] 熔断判定: 数据滞后, 跳过")
@@ -638,7 +646,7 @@ def main():
                               "reason": reason, "target_qihao": None})
                 else:
                     # 正常交易日: 若今日记录尚未结算(待开奖)且注数与当前规则(push_count)不符,
-                    # 则按新规则刷新(确保"10组组六/熔断暂停"等改动即时生效到今日记录)
+                    # 则按新规则刷新(确保"8注直选/熔断暂停"等改动即时生效到今日记录)
                     if r.get("hits") is None and (not r.get("recommendations") or r.get("notes") != len(recs)):
                         r["recommendations"] = [rec["nums"] for rec in recs]
                         r["notes"] = len(recs)
@@ -672,7 +680,7 @@ def main():
                 "hits": None,
                 "prize": None,
                 "daily_pnl": None,
-                "push_type": info.get("push_type", "组六"),
+                "push_type": info.get("push_type", DEFAULT_PUSH_TYPE),
                 "reason": reason
             }
         pl["records"].append(today_rec)
@@ -695,7 +703,7 @@ def main():
     if settlement:
         print(f"  昨日结算: {settlement[2]}注命中, {settlement[0]['daily_pnl']:+d}元")
     print(f"  累计盈亏: {summary['net_pnl']:+d}元 ({summary['total_hits']}注命中)")
-    _ptype = "组六" if not recs else (info.get("push_type", "组六") if 'info' in locals() else "组六")
+    _ptype = DEFAULT_PUSH_TYPE if not recs else (info.get("push_type", DEFAULT_PUSH_TYPE) if 'info' in locals() else DEFAULT_PUSH_TYPE)
     print(f"  今日随机采样(等同机选): {len(recs)}注{_ptype}, 成本{len(recs)*DIRECT_COST}元")
     print(f"  报告: {report_path}")
     print(f"  追踪期: {pl['start_date']} ~ {pl['end_date']}")
