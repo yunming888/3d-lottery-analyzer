@@ -143,7 +143,8 @@ def type_analysis(records):
 # 不提升每注中奖概率（单注直选命中恒为 1/1000），期望不变。
 #
 # 历史玩法（已移除，勿恢复）：v5 组六胆拖(胆1拖5)、v4 组六边际采样、组六连出熔断。
-ENGINE_VERSION = "v2"                 # 选号引擎版本，供报告/推送标注
+ENGINE_VERSION = "钟摆v2"             # 3D 选号引擎对外标注（钟摆引擎族，独立编号；不与旧"直选定位 v1-v6"或大乐透/双色球 v3 混编）
+PENDULUM_MODE = True                  # 出号逻辑开关：True=钟摆直选(pendulum_v2)，False=旧直选定位+和值带(v6)
 
 DIRECT_POS_N = 2                      # 每个位置取几位候选
 DIRECT_POS_WINDOW = 30                # 定位候选统计窗口（与 hot_core 3d_pos 缓存口径一致）
@@ -172,7 +173,7 @@ LAST_GEN = {"engine": "未运行", "target": 0, "returned": 0,
 
 def generate_recommendations(records, info, count=None):
     """
-    选号引擎 v6（直选定位 + 和值带）—— **唯一出号入口**。
+    3D 出号唯一入口；PENDULUM_MODE=True 走钟摆直选（pendulum_v2 多窗口融合），False 回退旧直选定位+和值带 v6（仅历史对照）。
 
     玩法：直选。百/十/个三位各自独立选号，位置与顺序完全对应才算中奖；
     同一位置内部数字互异，组合按位置元组去重，绝不按组选集合归并。
@@ -201,7 +202,7 @@ def generate_recommendations(records, info, count=None):
         LAST_GEN.update({"engine": "数据不足", "note": "历史期数少于4期，拒绝出号"})
         return []
 
-    if ENGINE_VERSION == "v2":
+    if PENDULUM_MODE:
         return _generate_v2(records, info)
     return _generate_direct(records, info, count)
 

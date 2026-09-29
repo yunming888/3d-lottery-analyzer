@@ -27,7 +27,7 @@ from analyze import (
 )
 from trading_day import is_trading_day, expected_qihao_for_date
 
-# 3D 出号模式（v6 直选定位 + 和值带，2026-09-27）
+# 3D 出号模式（钟摆直选，2026-09-29 起；旧 v6 直选定位+和值带已替换）
 try:
     from fc3d.config import DIRECT_COUNT, DIRECT_PRIZE, DIRECT_COST
 except Exception:  # fc3d 子包缺失时用直选内置默认值，绝不影响链路
@@ -207,7 +207,7 @@ def calc_summary(pl):
 
 def direct_push_status(history):
     """
-    出号判定（v2 钟摆直选，2026-09-29 起，替代 v6）
+    出号判定（钟摆直选引擎 v2，2026-09-29 起，替代直选定位 v6）
     - 常态: 推 ~12 注钟摆直选（多窗口融合 U1 + z值标准化 U2 + 极值回撤 U3 + 和值分位带 U4 + 跨区约束 U5）
     - 形态统计（组六连出等）**仅供参考，不再作为出号门槛**：
       旧的「组六连出 >= 7 期熔断暂停」属组六玩法规则，已随组六玩法一并移除
