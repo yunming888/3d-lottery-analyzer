@@ -3,7 +3,7 @@
 彩票每日复盘（统一编排器）
 ------------------------
 每日 07:00 运行：
-  1) 福彩3D 复盘 + 结算 + 选号 (daily_review.main)：v6 直选定位 8 注(注数=各位候选数相乘)；组六玩法与组六熔断已移除
+  1) 福彩3D 复盘 + 结算 + 选号 (daily_review.main)：v2 钟摆直选（多窗口融合，动态~12注）；组六玩法与组六熔断已移除
   2) 大乐透 结算 + 选号 (dlt.settle.run_daily)：5组组合持有，每2周周五轮换最冷2组
   3) 双色球 结算 + 选号 (ssq.settle.run_daily)：5组组合持有，每2周周五轮换最冷2组
 汇总三品种「昨日数据摘要 / 复盘结论 / 具体盈亏」，写 unified_YYYY-MM-DD.md，
@@ -119,18 +119,24 @@ def wechat_block(today, yesterday, r3, rd, rs):
     lines.append("累计净盈亏：%+d元（%d命中/%d注）" % (s3["net_pnl"], s3["total_hits"], s3["total_bets"]))
     try:
         import hot_core
-        _c3p = hot_core.peek("3d_pos") if hot_core.is_active() else None
-        if _c3p and _c3p.get("pos"):
-            _pos = _c3p["pos"]
-            lines.append("热号核心：直选定位·百%s十%s个%s（每注必含，%s 锁定，每月1号重选）%s" % (
-                "/".join(str(x) for x in _pos.get("bai", [])),
-                "/".join(str(x) for x in _pos.get("shi", [])),
-                "/".join(str(x) for x in _pos.get("ge", [])), _c3p.get("ym", ""), HOT_NOTE))
+        if FCD_VERSION == "v2":
+            # 钟摆引擎候选来自多窗口分区域融合，不锁月内热号，
+            # 此处置不展示"每注必含热号"以免误导（与 v2 实际出号口径不一致）
+            lines.append("选号依据：钟摆多窗口融合·分区域回摆评分（仅投注结构偏好，无预测力）")
+        elif hot_core.is_active():
+            _c3p = hot_core.peek("3d_pos")
+            if _c3p and _c3p.get("pos"):
+                _pos = _c3p["pos"]
+                lines.append("热号核心：直选定位·百%s十%s个%s（每注必含，%s 锁定，每月1号重选）%s" % (
+                    "/".join(str(x) for x in _pos.get("bai", [])),
+                    "/".join(str(x) for x in _pos.get("shi", [])),
+                    "/".join(str(x) for x in _pos.get("ge", [])), _c3p.get("ym", ""), HOT_NOTE))
     except Exception:
         pass
     recs3 = r3.get("recommendations", [])
+    _3d_label = "钟摆直选" if FCD_VERSION == "v2" else "直选定位"
     if recs3:
-        lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s】" % (len(recs3), ("直选定位" if recs3 else "直选"), r3.get("next_qihao"), FCD_VERSION))
+        lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s】" % (len(recs3), _3d_label, r3.get("next_qihao"), FCD_VERSION))
         for i, r in enumerate(recs3, 1):
             lines.append("  %d. %s" % (i, _fmt_3d_nums(r["nums"])))
     else:

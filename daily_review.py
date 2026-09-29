@@ -34,7 +34,7 @@ except Exception:  # fc3d 子包缺失时用直选内置默认值，绝不影响
     DIRECT_COUNT, DIRECT_PRIZE, DIRECT_COST = 8, 1040, 2
 
 # 投注类型标签：玩法已统一为直选（组六玩法已移除）
-DEFAULT_PUSH_TYPE = "直选"
+DEFAULT_PUSH_TYPE = "钟摆直选"
 
 # 支持 --date YYYY-MM-DD 回溯运行 (用于补跑历史日期)
 parser = argparse.ArgumentParser()
@@ -207,8 +207,8 @@ def calc_summary(pl):
 
 def direct_push_status(history):
     """
-    出号判定（v6 直选，2026-09-28 起）
-    - 常态: 推 DIRECT_COUNT 注直选（百/十/个定位候选 + 和值带），注数 = 各位候选数相乘
+    出号判定（v2 钟摆直选，2026-09-29 起，替代 v6）
+    - 常态: 推 ~12 注钟摆直选（多窗口融合 U1 + z值标准化 U2 + 极值回撤 U3 + 和值分位带 U4 + 跨区约束 U5）
     - 形态统计（组六连出等）**仅供参考，不再作为出号门槛**：
       旧的「组六连出 >= 7 期熔断暂停」属组六玩法规则，已随组六玩法一并移除
     - stop=True 仅由休市 / 数据滞后触发（在主流程中置位）
@@ -237,7 +237,7 @@ def direct_push_status(history):
     sums_3 = [r["sum_val"] for r in history[:3]]
 
     rules_fired = [
-        f"常态: 推 {DIRECT_COUNT} 注直选定位+和值带 (注数 = 百×十×个候选数)",
+        f"常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注)",
         f"形态统计: 组六连出 {zl_streak} 期 (仅供走势参考, 不做出号门槛)",
     ]
     stop = False
@@ -591,7 +591,9 @@ def main():
         else:
             # 直选定位 + 和值带：百/十/个各取候选 -> 注数 = 各位候选数相乘
             info = {"stop": False, "push_type": DEFAULT_PUSH_TYPE, "push_count": DIRECT_COUNT}
-            recs = generate_recommendations(history, info, count=info["push_count"])
+            recs = generate_recommendations(history, info)
+            info["push_count"] = len(recs)
+            cb["push_count"] = len(recs)
             print(f"  生成{len(recs)}注{info['push_type']}:")
             for i, r in enumerate(recs):
                 print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")

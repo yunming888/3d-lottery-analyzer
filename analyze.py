@@ -143,7 +143,7 @@ def type_analysis(records):
 # 不提升每注中奖概率（单注直选命中恒为 1/1000），期望不变。
 #
 # 历史玩法（已移除，勿恢复）：v5 组六胆拖(胆1拖5)、v4 组六边际采样、组六连出熔断。
-ENGINE_VERSION = "v6"                 # 选号引擎版本，供报告/推送标注
+ENGINE_VERSION = "v2"                 # 选号引擎版本，供报告/推送标注
 
 DIRECT_POS_N = 2                      # 每个位置取几位候选
 DIRECT_POS_WINDOW = 30                # 定位候选统计窗口（与 hot_core 3d_pos 缓存口径一致）
@@ -201,6 +201,8 @@ def generate_recommendations(records, info, count=None):
         LAST_GEN.update({"engine": "数据不足", "note": "历史期数少于4期，拒绝出号"})
         return []
 
+    if ENGINE_VERSION == "v2":
+        return _generate_v2(records, info)
     return _generate_direct(records, info, count)
 
 
@@ -263,6 +265,47 @@ def _sum_band_of(records, window=30, pad=2):
 
 
 # ===================== 直选出号主实现 =====================
+def _to_asc_records(records):
+    """每日链路的 history 为降序(最新在前)，转成 pendulum_v2 需要的升序兼容记录。"""
+    out = []
+    for r in records:
+        if "bai" in r and "shi" in r and "ge" in r:
+            out.append(r)
+        else:
+            nums = r.get("nums") or [int(r.get("bai", 0)), int(r.get("shi", 0)), int(r.get("ge", 0))]
+            out.append({"bai": nums[0], "shi": nums[1], "ge": nums[2],
+                        "sum_val": sum(nums), "nums": nums})
+    return list(reversed(out))  # 升序(最旧在前)
+
+
+def _generate_v2(records, info):
+    """引擎 v2：钟摆多窗口融合 + z值标准化 + 极值回撤 + 和值分位带 + 跨区约束。"""
+    global LAST_GEN
+    if info.get("stop"):
+        LAST_GEN.update({"engine": "休市/暂停", "note": "规则拦截，不出号"})
+        return []
+    if not records or len(records) < 4:
+        LAST_GEN.update({"engine": "数据不足", "note": "历史期数少于4期，拒绝出号"})
+        return []
+    try:
+        import pendulum_v2 as P2
+    except Exception as e:           # 兜底：v2 不可用则回退 v6 直选
+        LAST_GEN.update({"engine": "v2导入失败-回退v6", "note": str(e)})
+        return _generate_direct(records, info, DIRECT_TARGET_NOTES)
+    asc = _to_asc_records(records)
+    res = P2.analyze_v2(asc, per_pos=P2.PER_POS, max_notes=20)
+    notes = []
+    for n in res["notes"]:
+        b, s_, g = n["nums"]
+        logic = "钟摆v2 " + "/".join(n["zones"]) + (" 和%d" % n["sum_val"])
+        notes.append(_mk_note([b, s_, g], logic))
+    LAST_GEN = {"engine": "v2钟摆直选", "target": res["note_count"], "returned": len(notes),
+                "core_notes": 0, "filled": 0,
+                "note": "和值带%d-%d; 候选%d→%d注" % (res["sum_band"][0], res["sum_band"][1],
+                                                      res["candidate_pool"], res["note_count"])}
+    return notes
+
+
 def _generate_direct(records, info, count):
     """3D 直选定位 + 和值带。
     百/十/个 各取 TOP n 定位候选 → 位置笛卡尔积（注数 = 各位候选数相乘）
