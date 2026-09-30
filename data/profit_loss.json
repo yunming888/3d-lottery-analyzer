@@ -6025,9 +6025,13 @@
     {
       "date": "2026-09-30",
       "target_qihao": "2026263",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026263",
+      "draw_nums": [
+        9,
+        8,
+        7
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           0,
@@ -6097,26 +6101,41 @@
       ],
       "notes": 13,
       "cost": 26,
-      "hits": null,
-      "prize": null,
-      "daily_pnl": null,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -26,
       "push_type": "钟摆直选",
-      "reason": "钟摆直选13注随机采样 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 1 期 (仅供走势参考, 不做出号门槛)"
+      "reason": "直选13注->0命中 开奖987组六",
+      "near_hits": 0
+    },
+    {
+      "date": "2026-10-01",
+      "target_qihao": null,
+      "draw": "休市",
+      "draw_nums": [],
+      "draw_type": "休市",
+      "recommendations": [],
+      "notes": 0,
+      "cost": 0,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": 0,
+      "reason": "福彩3D休市(官方休市期), 无推荐"
     }
   ],
   "summary": {
-    "total_days": 104,
-    "settled_days": 103,
-    "active_days": 85,
-    "total_bets": 816,
-    "total_cost": 1632,
+    "total_days": 105,
+    "settled_days": 105,
+    "active_days": 86,
+    "total_bets": 829,
+    "total_cost": 1658,
     "total_hits": 3,
     "total_prize": 480,
-    "net_pnl": -1152,
-    "pending_bets": 13,
-    "pending_cost": 26,
-    "last_settled": "2026-09-30",
-    "last_hit": "2026-09-30 3注"
+    "net_pnl": -1178,
+    "pending_bets": 0,
+    "pending_cost": 0,
+    "last_settled": "2026-10-01",
+    "last_hit": "2026-10-01 3注"
   },
   "last_draw_qihao": "2026262"
 }
