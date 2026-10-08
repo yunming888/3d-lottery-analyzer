@@ -2141,6 +2141,102 @@
         }
       ],
       "cost": 10,
+      "status": "settled",
+      "draw_issue": "26115",
+      "draw_date": "2026-10-08",
+      "draw_reds": [
+        4,
+        13,
+        14,
+        18,
+        22,
+        24
+      ],
+      "draw_blues": [
+        3
+      ],
+      "win_notes": 1,
+      "best_tier": 6,
+      "float_win": false,
+      "prize": 5,
+      "daily_pnl": -5
+    },
+    {
+      "date": "2026-10-09",
+      "target_issue": "26116",
+      "notes": [
+        {
+          "reds": [
+            8,
+            12,
+            21,
+            24,
+            27,
+            30
+          ],
+          "blues": [
+            12
+          ],
+          "score": 1.2163322241845103
+        },
+        {
+          "reds": [
+            1,
+            13,
+            22,
+            23,
+            24,
+            30
+          ],
+          "blues": [
+            15
+          ],
+          "score": 0.976146303788372
+        },
+        {
+          "reds": [
+            10,
+            11,
+            17,
+            24,
+            29,
+            30
+          ],
+          "blues": [
+            14
+          ],
+          "score": 0.9392766093378024
+        },
+        {
+          "reds": [
+            5,
+            7,
+            14,
+            24,
+            28,
+            30
+          ],
+          "blues": [
+            3
+          ],
+          "score": 0.6037087905632298
+        },
+        {
+          "reds": [
+            3,
+            7,
+            20,
+            24,
+            30,
+            33
+          ],
+          "blues": [
+            8
+          ],
+          "score": 0.37711877360840007
+        }
+      ],
+      "cost": 10,
       "status": "pending",
       "draw_issue": null,
       "draw_date": "",
@@ -2154,28 +2250,28 @@
     }
   ],
   "summary": {
-    "rounds": 22,
-    "total_notes": 110,
-    "total_cost": 230,
-    "total_prize": 30,
-    "net_pnl": -200,
-    "total_win_notes": 6,
+    "rounds": 23,
+    "total_notes": 115,
+    "total_cost": 240,
+    "total_prize": 35,
+    "net_pnl": -205,
+    "total_win_notes": 7,
     "pending_rounds": 1
   },
   "portfolio": [
     {
       "reds": [
-        7,
         8,
+        12,
         21,
         24,
         27,
         30
       ],
       "blues": [
-        1
+        12
       ],
-      "score": 1.1273390416721627
+      "score": 1.2163322241845103
     },
     {
       "reds": [
@@ -2193,17 +2289,17 @@
     },
     {
       "reds": [
-        9,
-        15,
-        23,
+        10,
+        11,
+        17,
         24,
-        26,
+        29,
         30
       ],
       "blues": [
-        7
+        14
       ],
-      "score": 0.8593337635721732
+      "score": 0.9392766093378024
     },
     {
       "reds": [
@@ -2234,6 +2330,6 @@
       "score": 0.37711877360840007
     }
   ],
-  "last_rotation_date": "2026-09-25",
+  "last_rotation_date": "2026-10-09",
   "core_ym": "2026-10"
 }

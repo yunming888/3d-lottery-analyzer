@@ -6385,9 +6385,13 @@
     {
       "date": "2026-10-08",
       "target_qihao": "2026267",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026267",
+      "draw_nums": [
+        8,
+        5,
+        7
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           5,
@@ -6432,26 +6436,58 @@
       ],
       "notes": 8,
       "cost": 16,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -16,
+      "push_type": "钟摆直选",
+      "reason": "直选8注->0命中 开奖857组六 (擦边2注)",
+      "near_hits": 2
+    },
+    {
+      "date": "2026-10-09",
+      "target_qihao": "2026268",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          5,
+          5,
+          2
+        ],
+        [
+          6,
+          1,
+          4
+        ],
+        [
+          6,
+          5,
+          2
+        ]
+      ],
+      "notes": 3,
+      "cost": 6,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
       "push_type": "钟摆直选",
-      "reason": "钟摆直选8注随机采样 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 1 期 (仅供走势参考, 不做出号门槛)"
+      "reason": "钟摆直选3注随机采样 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 2 期 (仅供走势参考, 不做出号门槛)"
     }
   ],
   "summary": {
-    "total_days": 112,
-    "settled_days": 111,
-    "active_days": 89,
-    "total_bets": 860,
-    "total_cost": 1720,
+    "total_days": 113,
+    "settled_days": 112,
+    "active_days": 90,
+    "total_bets": 868,
+    "total_cost": 1736,
     "total_hits": 3,
     "total_prize": 480,
-    "net_pnl": -1240,
-    "pending_bets": 8,
-    "pending_cost": 16,
-    "last_settled": "2026-10-08",
-    "last_hit": "2026-10-08 3注"
+    "net_pnl": -1256,
+    "pending_bets": 3,
+    "pending_cost": 6,
+    "last_settled": "2026-10-09",
+    "last_hit": "2026-10-09 3注"
   },
-  "last_draw_qihao": "2026266"
+  "last_draw_qihao": "2026267"
 }
