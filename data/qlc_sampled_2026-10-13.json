@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-10-13 10:33:37",
+  "data_source": "huiniao qlc 500期(2023069~2026117)",
+  "note": "随机采样，等同机选，无预测力；统计仅用于结构偏好，不改变每注1/2035800概率",
+  "A_pure_random": {
+    "basic": [
+      6,
+      9,
+      11,
+      16,
+      24,
+      25,
+      26
+    ],
+    "special_official": [
+      29
+    ],
+    "special_user2": [
+      2,
+      7
+    ]
+  },
+  "B_stat_weighted": {
+    "basic": [
+      5,
+      10,
+      13,
+      18,
+      23,
+      25,
+      26
+    ],
+    "special_official": [
+      16
+    ],
+    "special_user2": [
+      2,
+      7
+    ]
+  }
+}

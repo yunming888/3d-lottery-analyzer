@@ -6,7 +6,8 @@
   1) 福彩3D 复盘 + 结算 + 选号 (daily_review.main)：钟摆直选（钟摆引擎 v2，多窗口融合，动态~12注）；组六玩法与组六熔断已移除
   2) 大乐透 结算 + 选号 (dlt.settle.run_daily)：5组组合持有，每2周周五轮换最冷2组
   3) 双色球 结算 + 选号 (ssq.settle.run_daily)：5组组合持有，每2周周五轮换最冷2组
-汇总三品种「昨日数据摘要 / 复盘结论 / 具体盈亏」，写 unified_YYYY-MM-DD.md，
+  4) 七乐彩 结算 + 选号 (qlc.settle.run_daily)：30选7+特别号，开奖日 周一/三/五，5组持有
+汇总四品种「昨日数据摘要 / 复盘结论 / 具体盈亏」，写 unified_YYYY-MM-DD.md，
 并打印唯一【微信推送摘要】供自动化抓取推送。
 每月1号额外生成上月月度盈亏报告（替代已删除的月度盈亏自动化）。
 
@@ -23,10 +24,12 @@ sys.path.insert(0, ROOT)
 import daily_review
 from dlt.settle import run_daily as dlt_run
 from ssq.settle import run_daily as ssq_run
+from qlc.settle import run_daily as qlc_run
 from alerts import ALERTS
 from analyze import ENGINE_VERSION as FCD_VERSION
 from dlt.selector import ENGINE_VERSION as DLT_VERSION
 from ssq.selector import ENGINE_VERSION as SSQ_VERSION
+from qlc.selector import ENGINE_VERSION as QLC_VERSION
 
 REPORT_DIR = os.path.join(ROOT, "data", "reports")
 PL_FILE = os.path.join(ROOT, "data", "profit_loss.json")
@@ -49,6 +52,12 @@ def _fmt_ssq(note):
     return "红球 %s  蓝球 %s" % (
         " ".join("%02d" % d for d in note["reds"]),
         " ".join("%02d" % d for d in note["blues"]))
+
+
+def _fmt_qlc(note):
+    return "基本号 %s  特别号 %s" % (
+        " ".join("%02d" % d for d in note["reds"]),
+        " ".join("%02d" % d for d in note.get("blues", [])))
 
 
 def _resolve_3d_settlement(r3):
@@ -106,20 +115,22 @@ def build_summary():
     today = date.today().isoformat()
     yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 
-    print("\n########## [1/3] 福彩3D 复盘 ##########")
+    print("\n########## [1/4] 福彩3D 复盘 ##########")
     r3 = _stage("福彩3D", daily_review.main)
-    print("\n########## [2/3] 大乐透 复盘 ##########")
+    print("\n########## [2/4] 大乐透 复盘 ##########")
     rd = _stage("大乐透", dlt_run)
-    print("\n########## [3/3] 双色球 复盘 ##########")
+    print("\n########## [3/4] 双色球 复盘 ##########")
     rs = _stage("双色球", ssq_run)
+    print("\n########## [4/4] 七乐彩 复盘 ##########")
+    rq = _stage("七乐彩", qlc_run)
 
-    return today, yesterday, r3, rd, rs
+    return today, yesterday, r3, rd, rs, rq
 
 
-def wechat_block(today, yesterday, r3, rd, rs):
+def wechat_block(today, yesterday, r3, rd, rs, rq):
     lines = []
     lines.append("【微信推送摘要】")
-    lines.append("📊 彩票每日复盘 %s（福彩3D + 大乐透 + 双色球）" % today)
+    lines.append("📊 彩票每日复盘 %s（福彩3D + 大乐透 + 双色球 + 七乐彩）" % today)
     lines.append("（前一自然日：%s）" % yesterday)
 
     # ===== 福彩3D =====
@@ -281,13 +292,64 @@ def wechat_block(today, yesterday, r3, rd, rs):
             b_s.get("r_odd", 0), b_s.get("r_even", 0), b_s.get("r_big", 0), b_s.get("r_small", 0),
             b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
 
-    # ===== 合计 =====
-    total = s3["net_pnl"] + s_d["net_pnl"] + s_s["net_pnl"]
+    # ===== 七乐彩 =====
     lines.append("")
-    lines.append("━━ 🧾 三品种合计 ━━")
-    lines.append("累计净盈亏合计：%+d元（福彩3D %+d + 大乐透 %+d + 双色球 %+d）" % (
-        total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"]))
-    _failed = [g.get("name") or g.get("game") for g in (r3, rd, rs) if g.get("failed")]
+    lines.append("━━ 🎱 七乐彩 ━━")
+    yq = rq.get("yesterday_draw")
+    if yq:
+        lines.append("昨日开奖：%s 基本号 %s 特别号 %s" % (
+            yq["issue"], " ".join("%02d" % d for d in yq["reds"]),
+            " ".join("%02d" % d for d in yq.get("blues", []))))
+    else:
+        lines.append("昨日(%s)：无开奖（开奖日 周一/三/五）｜最新 %s 期" % (yesterday, rq.get("latest_issue")))
+    sq_ = rq.get("settled") or []
+    if rq.get("failed"):
+        lines.append("结算：⚠️ 本品种运行失败，无法结算")
+    elif sq_:
+        for x in sq_:
+            lines.append("结算：%s期 → %d命中，奖金%d元，日盈亏%+d元" % (
+                x["draw_issue"], x["win_notes"], x["prize"], x["daily_pnl"]))
+    else:
+        lines.append("结算：今日无待结算（待%s期开奖）" % rq.get("target"))
+    s_q = rq["summary"]
+    rot_q = rq.get("rotation")
+    lines.append("复盘：每周一/三/五开奖·5组持有·每2周周五轮换最冷2组" + ("；" + rot_q if rot_q else "；热号为主+冷号补足，奇偶/大小均衡"))
+    try:
+        import hot_core
+        _cq = hot_core.peek("qlc") if hot_core.is_active() else None
+        if _cq:
+            lines.append("热号核心：基本号 %s（每注必含，%s 锁定，每月1号重选）%s" % (
+                " / ".join("%02d" % d for d in _cq["core_red"]), _cq.get("ym", ""), HOT_NOTE))
+    except Exception:
+        pass
+    lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
+        s_q["net_pnl"], s_q["rounds"], s_q["pending_rounds"]))
+    nq = rq.get("notes", [])
+    if nq:
+        lines.append("今日随机采样：%d注（押%s期）｜等同机选·无预测力【选号引擎 %s】" % (len(nq), rq.get("target"), QLC_VERSION))
+        for _i, n in enumerate(nq, 1):
+            lines.append("  %d. %s" % (_i, _fmt_qlc(n)))
+        if rq.get("rotation"):
+            lines.append("  🔄 %s" % rq["rotation"])
+    elif rq.get("failed"):
+        lines.append("今日随机采样：⚠️ 运行失败，无")
+    else:
+        lines.append("今日随机采样：无")
+    tr_q = rq.get("trend") or {}
+    if tr_q:
+        b_q = tr_q.get("bal", {})
+        lines.append("走势研判：热号 基本号[%s]/特别号[%s]；冷号 基本号[%s]" % (
+            tr_q.get("hot_red", ""), tr_q.get("hot_blue", ""), tr_q.get("cold_red", "")))
+        lines.append("  采样均衡：基本号奇%d/偶%d、大%d/小%d" % (
+            b_q.get("r_odd", 0), b_q.get("r_even", 0), b_q.get("r_big", 0), b_q.get("r_small", 0)))
+
+    # ===== 合计 =====
+    total = s3["net_pnl"] + s_d["net_pnl"] + s_s["net_pnl"] + s_q["net_pnl"]
+    lines.append("")
+    lines.append("━━ 🧾 四品种合计 ━━")
+    lines.append("累计净盈亏合计：%+d元（福彩3D %+d + 大乐透 %+d + 双色球 %+d + 七乐彩 %+d）" % (
+        total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"], s_q["net_pnl"]))
+    _failed = [g.get("name") or g.get("game") for g in (r3, rd, rs, rq) if g.get("failed")]
     if _failed:
         lines.append("⚠️ 本日失败品种：%s（其数据未计入合计，合计偏低）" % "、".join(_failed))
     try:
@@ -301,13 +363,14 @@ def wechat_block(today, yesterday, r3, rd, rs):
     return "\n".join(lines)
 
 
-def write_unified_report(today, yesterday, r3, rd, rs, wechat):
+def write_unified_report(today, yesterday, r3, rd, rs, rq, wechat):
     os.makedirs(REPORT_DIR, exist_ok=True)
     path = os.path.join(REPORT_DIR, "unified_%s.md" % today)
     s3 = r3["summary"]
     s_d = rd["summary"]
     s_s = rs["summary"]
-    total = s3["net_pnl"] + s_d["net_pnl"] + s_s["net_pnl"]
+    s_q = rq["summary"]
+    total = s3["net_pnl"] + s_d["net_pnl"] + s_s["net_pnl"] + s_q["net_pnl"]
     s3set = _resolve_3d_settlement(r3)
 
     L = []
@@ -380,8 +443,26 @@ def write_unified_report(today, yesterday, r3, rd, rs, wechat):
         for n in _ns:
             L.append("  - %s\n" % _fmt_ssq(n))
 
-    L.append("\n## 三品种合计\n")
-    L.append("- 累计净盈亏合计：**%+d元**\n" % total)
+    L.append("\n## 七乐彩\n")
+    if rq.get("yesterday_draw"):
+        yq = rq["yesterday_draw"]
+        L.append("- 昨日开奖：%s 基本号 %s 特别号 %s\n" % (
+            yq["issue"], " ".join("%02d" % d for d in yq["reds"]),
+            " ".join("%02d" % d for d in yq.get("blues", []))))
+    else:
+        L.append("- 昨日：无开奖（开奖日 周一/三/五）｜最新 %s 期\n" % rq.get("latest_issue"))
+    for x in (rq.get("settled") or []):
+        L.append("- 结算：%s期 → %d命中，日盈亏%+d元\n" % (x["draw_issue"], x["win_notes"], x["daily_pnl"]))
+    L.append("- 累计净盈亏：%+d元（已结算%d轮，待结算%d轮）\n" % (s_q["net_pnl"], s_q["rounds"], s_q["pending_rounds"]))
+    _nq = rq.get("notes", [])
+    if _nq:
+        L.append("- 今日随机采样（押%s期，%d注）｜等同机选·无预测力【选号引擎 %s】：\n" % (rq.get("target"), len(_nq), QLC_VERSION))
+        for n in _nq:
+            L.append("  - %s\n" % _fmt_qlc(n))
+
+    L.append("\n## 四品种合计\n")
+    L.append("- 累计净盈亏合计：**%+d元**（3D %+d / 大乐透 %+d / 双色球 %+d / 七乐彩 %+d）\n" % (
+        total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"], s_q["net_pnl"]))
 
     L.append("\n---\n*生成时间 %s*\n" % datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     L.append("\n## 微信推送摘要\n\n```\n%s\n```\n" % wechat)
@@ -425,7 +506,9 @@ def _monthly_pnl():
 
     pnl_d, r_d = _agg_state(os.path.join(ROOT, "data", "dlt_state.json"))
     pnl_s, r_s = _agg_state(os.path.join(ROOT, "data", "ssq_state.json"))
-    return ym, {"3D": (pnl3, bets3, hits3), "dlt": (pnl_d, r_d), "ssq": (pnl_s, r_s)}
+    pnl_q, r_q = _agg_state(os.path.join(ROOT, "data", "qlc_state.json"))
+    return ym, {"3D": (pnl3, bets3, hits3), "dlt": (pnl_d, r_d),
+                "ssq": (pnl_s, r_s), "qlc": (pnl_q, r_q)}
 
 
 def write_monthly_report():
@@ -434,7 +517,8 @@ def write_monthly_report():
     p3, b3, h3 = det["3D"]
     p_d, r_d = det["dlt"]
     p_s, r_s = det["ssq"]
-    total = p3 + p_d + p_s
+    p_q, r_q = det["qlc"]
+    total = p3 + p_d + p_s + p_q
     L = []
     L.append("# 彩票月度盈亏报告 %s\n" % ym)
     L.append("\n## 福彩3D\n")
@@ -443,7 +527,9 @@ def write_monthly_report():
     L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_d, r_d))
     L.append("\n## 双色球\n")
     L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_s, r_s))
-    L.append("\n## 三品种合计\n")
+    L.append("\n## 七乐彩\n")
+    L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_q, r_q))
+    L.append("\n## 四品种合计\n")
     L.append("- 月度净盈亏合计：**%+d元**\n" % total)
     L.append("\n---\n*本报告由每日复盘自动化于次月1号汇总生成。仅供学习研究，不构成投注建议。*\n")
     with open(path, "w", encoding="utf-8") as f:
@@ -452,9 +538,9 @@ def write_monthly_report():
 
 
 def main():
-    today, yesterday, r3, rd, rs = build_summary()
-    wechat = wechat_block(today, yesterday, r3, rd, rs)
-    report_path = write_unified_report(today, yesterday, r3, rd, rs, wechat)
+    today, yesterday, r3, rd, rs, rq = build_summary()
+    wechat = wechat_block(today, yesterday, r3, rd, rs, rq)
+    report_path = write_unified_report(today, yesterday, r3, rd, rs, rq, wechat)
     print("\n" + "=" * 60)
     print(wechat)
     print("=" * 60)

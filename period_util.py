@@ -24,6 +24,8 @@ from datetime import datetime, timedelta
 DLT_DRAW_DOWS = (0, 2, 5)
 # 双色球开奖星期：周二/四/日
 SSQ_DRAW_DOWS = (1, 3, 6)
+# 七乐彩开奖星期：周一/三/五
+QLC_DRAW_DOWS = (0, 2, 4)
 
 
 def _to_date(d):
@@ -84,6 +86,21 @@ def next_issue_yy(cur_issue, cur_date=None, draw_dows=None, game="", warn=True):
     return str(cur + 1)
 
 
+def next_qlc_qihao(cur_qihao, cur_date=None, warn=True):
+    """七乐彩 下一期期号（YYYYNNN，如 2026117 → 2026118；跨年 → 2027001）。
+    开奖日周一/三/五，每年约 156 期。注意不能复用 next_issue_yy（那是 YYNNN 格式）。"""
+    cur = int(str(cur_qihao))
+    d = _to_date(cur_date)
+    if d is None:
+        if warn:
+            print("  ⚠️ period_util: 七乐彩最新开奖日期缺失，期号推算退化为 %d+1（跨年场景可能失配）" % cur)
+        return str(cur + 1)
+    nd = _next_draw_date(d, QLC_DRAW_DOWS)
+    if nd.year > d.year:
+        return "%d001" % nd.year
+    return str(cur + 1)
+
+
 def next_dlt_issue(cur_issue, cur_date=None, warn=True):
     return next_issue_yy(cur_issue, cur_date, DLT_DRAW_DOWS, game="大乐透", warn=warn)
 
@@ -100,6 +117,9 @@ if __name__ == "__main__":
         ("3D 年末→跨年(元旦开奖)", next_3d_qihao, ("2026355", "2026-12-31"), "2027001"),
         ("3D 年末(12/30开奖,次日跨年前)", next_3d_qihao, ("2026354", "2026-12-30"), "2026355"),
         ("3D 12/31开奖但date缺失→退化+1", next_3d_qihao, ("2026355", None), "2026356"),
+        ("七乐彩 年内: 10-12(周一)开奖→10-14周三", next_qlc_qihao, ("2026117", "2026-10-12"), "2026118"),
+        ("七乐彩 年末: 12-30(周三)开奖→2027-01-01周五跨年", next_qlc_qihao, ("2026155", "2026-12-30"), "2027001"),
+        ("七乐彩 date缺失→退化+1", next_qlc_qihao, ("2026117", None), "2026118"),
         ("大乐透 年内", next_dlt_issue, ("26116", "2026-10-12"), "26117"),
         ("大乐透 年末: 12-28(周一)开奖→下期12-30周三年内", next_dlt_issue, ("26154", "2026-12-28"), "26155"),
         ("大乐透 年末最后一期12-30(周三)→2027-01-02周六跨年", next_dlt_issue, ("26155", "2026-12-30"), "27001"),

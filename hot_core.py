@@ -175,6 +175,18 @@ def get_ssq_core(records, window=WINDOW):
     return rec["core_red"], rec
 
 
+def get_qlc_core(records, window=WINDOW):
+    """七乐彩：基本号码（01-30）核心热号 TOP2。2026-10-13 新增。"""
+    state = _load()
+    if _fresh("qlc", state):
+        core = _compute_red(records, "reds", 30, window)
+        state["qlc"] = {"ym": _ym(), "updated": datetime.now().strftime("%Y-%m-%d"),
+                        **core}
+        _save(state)
+    rec = state["qlc"]
+    return rec["core_red"], rec
+
+
 def peek(game):
     """只读缓存（不触发计算、不写盘）。返回已锁定的记录 dict；无则返回 None。"""
     return _load().get(game)
@@ -194,6 +206,8 @@ def summary_line():
         parts.append("大乐透核心%s" % "/".join("%02d" % d for d in state["dlt"]["core_red"]))
     if state.get("ssq"):
         parts.append("双色球核心%s" % "/".join("%02d" % d for d in state["ssq"]["core_red"]))
+    if state.get("qlc"):
+        parts.append("七乐彩核心%s" % "/".join("%02d" % d for d in state["qlc"]["core_red"]))
     if not parts:
         return ""
     ym = (state.get("3d_pos") or state.get("dlt") or state.get("ssq") or {}).get("ym", "")
