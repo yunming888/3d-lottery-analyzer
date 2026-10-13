@@ -23,6 +23,7 @@ sys.path.insert(0, ROOT)
 import daily_review
 from dlt.settle import run_daily as dlt_run
 from ssq.settle import run_daily as ssq_run
+from alerts import ALERTS
 from analyze import ENGINE_VERSION as FCD_VERSION
 from dlt.selector import ENGINE_VERSION as DLT_VERSION
 from ssq.selector import ENGINE_VERSION as SSQ_VERSION
@@ -77,16 +78,40 @@ def _resolve_3d_settlement(r3):
     return None
 
 
+def _err(name):
+    """品种运行失败时的占位结果：语义明确为"运行失败"，绝不复用"无待结算"（审计 P1-1）。
+    带全 wechat_block / write_unified_report 所需键。"""
+    return {"game": name, "failed": True, "today": date.today().isoformat(),
+            "yesterday_draw": None, "settlement": None, "settled": [],
+            "recommendations": [], "notes": [], "rotation": None, "trend": None,
+            "latest_issue": None, "target": None,
+            "summary": {"net_pnl": 0, "total_hits": 0, "total_bets": 0,
+                        "rounds": 0, "pending_rounds": 0}}
+
+
+def _stage(name, fn):
+    """阶段化执行：单品种异常不再拖垮全局——旧版任一品种抛异常 → 整脚本非零退出，
+    统一报告与微信摘要全部消失，形成"静默失联"（审计 P1-1）。"""
+    try:
+        return fn()
+    except Exception as e:
+        import traceback
+        print("  ❌ %s 运行失败：%s: %s" % (name, type(e).__name__, e))
+        traceback.print_exc()
+        ALERTS.add("ERROR", name, "运行失败：%s: %s" % (type(e).__name__, e))
+        return _err(name)
+
+
 def build_summary():
     today = date.today().isoformat()
     yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 
     print("\n########## [1/3] 福彩3D 复盘 ##########")
-    r3 = daily_review.main()
+    r3 = _stage("福彩3D", daily_review.main)
     print("\n########## [2/3] 大乐透 复盘 ##########")
-    rd = dlt_run()
+    rd = _stage("大乐透", dlt_run)
     print("\n########## [3/3] 双色球 复盘 ##########")
-    rs = ssq_run()
+    rs = _stage("双色球", ssq_run)
 
     return today, yesterday, r3, rd, rs
 
@@ -107,7 +132,9 @@ def wechat_block(today, yesterday, r3, rd, rs):
     else:
         lines.append("昨日(%s)：无开奖（每日开奖）" % yesterday)
     s3set = _resolve_3d_settlement(r3)
-    if s3set:
+    if r3.get("failed"):
+        lines.append("结算：⚠️ 本品种运行失败，无法结算")
+    elif s3set:
         lines.append("结算：押%s(%s) %d命中，奖金%d元，日盈亏%+d元" % (
             s3set["draw_qihao"], _fmt_3d_nums(s3set["draw_nums"]),
             s3set["hits"], s3set["prize"], s3set["daily_pnl"]))
@@ -139,6 +166,8 @@ def wechat_block(today, yesterday, r3, rd, rs):
         lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s】" % (len(recs3), _3d_label, r3.get("next_qihao"), FCD_VERSION))
         for i, r in enumerate(recs3, 1):
             lines.append("  %d. %s" % (i, _fmt_3d_nums(r["nums"])))
+    elif r3.get("failed"):
+        lines.append("今日随机采样：⚠️ 运行失败，0注")
     else:
         lines.append("今日随机采样：休市/暂停，0注")
 
@@ -157,7 +186,9 @@ def wechat_block(today, yesterday, r3, rd, rs):
     else:
         lines.append("昨日(%s)：无开奖（开奖日 周一/三/六）｜最新 %s 期" % (yesterday, rd.get("latest_issue")))
     sd = rd.get("settled") or []
-    if sd:
+    if rd.get("failed"):
+        lines.append("结算：⚠️ 本品种运行失败，无法结算")
+    elif sd:
         for x in sd:
             lines.append("结算：%s期 → %d命中，奖金%d元，日盈亏%+d元" % (
                 x["draw_issue"], x["win_notes"], x["prize"], x["daily_pnl"]))
@@ -183,6 +214,8 @@ def wechat_block(today, yesterday, r3, rd, rs):
             lines.append("  %d. %s" % (_i, _fmt_dlt(n)))
         if rd.get("rotation"):
             lines.append("  🔄 %s" % rd["rotation"])
+    elif rd.get("failed"):
+        lines.append("今日随机采样：⚠️ 运行失败，无")
     else:
         lines.append("今日随机采样：无")
     tr_d = rd.get("trend") or {}
@@ -206,7 +239,9 @@ def wechat_block(today, yesterday, r3, rd, rs):
     else:
         lines.append("昨日(%s)：无开奖（开奖日 周二/四/日）｜最新 %s 期" % (yesterday, rs.get("latest_issue")))
     ss = rs.get("settled") or []
-    if ss:
+    if rs.get("failed"):
+        lines.append("结算：⚠️ 本品种运行失败，无法结算")
+    elif ss:
         for x in ss:
             lines.append("结算：%s期 → %d命中，奖金%d元，日盈亏%+d元" % (
                 x["draw_issue"], x["win_notes"], x["prize"], x["daily_pnl"]))
@@ -232,6 +267,8 @@ def wechat_block(today, yesterday, r3, rd, rs):
             lines.append("  %d. %s" % (_i, _fmt_ssq(n)))
         if rs.get("rotation"):
             lines.append("  🔄 %s" % rs["rotation"])
+    elif rs.get("failed"):
+        lines.append("今日随机采样：⚠️ 运行失败，无")
     else:
         lines.append("今日随机采样：无")
     tr_s = rs.get("trend") or {}
@@ -250,11 +287,15 @@ def wechat_block(today, yesterday, r3, rd, rs):
     lines.append("━━ 🧾 三品种合计 ━━")
     lines.append("累计净盈亏合计：%+d元（福彩3D %+d + 大乐透 %+d + 双色球 %+d）" % (
         total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"]))
+    _failed = [g.get("name") or g.get("game") for g in (r3, rd, rs) if g.get("failed")]
+    if _failed:
+        lines.append("⚠️ 本日失败品种：%s（其数据未计入合计，合计偏低）" % "、".join(_failed))
     try:
         import hot_core
         lines.append("ℹ️ %s" % hot_core.effective_desc())
     except Exception:
         pass
+    lines += ALERTS.render()   # 运行告警（审计 A2/A5）：数据源回退/核心号异常/失败品种等
     lines.append("⚠️ 上述号码均为随机采样，等同机选、无预测力；开奖随机且每期独立，不存在可推算的下期号码。")
     lines.append("⚠️ 仅供学习研究，不构成投注建议；任何收费荐号均属诈骗，切勿转账。彩票为负EV，理性购彩。")
     return "\n".join(lines)

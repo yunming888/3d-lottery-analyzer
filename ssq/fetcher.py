@@ -116,10 +116,11 @@ def fetch_history(window: int = config.WINDOW, force_refresh: bool = False):
         # 写缓存
         try:
             os.makedirs(os.path.dirname(cache_path), exist_ok=True)
-            with open(cache_path, "w", encoding="utf-8") as f:
-                json.dump({"meta": meta, "draws": draws}, f,
-                          ensure_ascii=False, indent=2)
-        except Exception:
+            from atomic_io import save_json_atomic
+            save_json_atomic(cache_path, {"meta": meta, "draws": draws})
+        except Exception as _e:
+            from alerts import ALERTS
+            ALERTS.add("WARN", "双色球", "缓存写盘失败：%s" % _e)
             pass
         return draws, meta
     except Exception as e:

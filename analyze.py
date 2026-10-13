@@ -291,6 +291,13 @@ def _generate_v2(records, info):
     try:
         import pendulum_v2 as P2
     except Exception as e:           # 兜底：v2 不可用则回退 v6 直选
+        # 审计 A5：引擎降级必须可见——旧版只写 LAST_GEN（无人读取），10月会静默用9月热号出号
+        try:
+            from alerts import ALERTS
+            ALERTS.add("ERROR", "福彩3D",
+                       "pendulum_v2 导入失败，已回退 v6 直选（会使用 hot_core 3d_pos 月锁热号）：%s" % e)
+        except Exception:
+            pass
         LAST_GEN.update({"engine": "v2导入失败-回退v6", "note": str(e)})
         return _generate_direct(records, info, DIRECT_TARGET_NOTES)
     asc = _to_asc_records(records)

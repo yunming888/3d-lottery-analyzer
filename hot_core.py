@@ -26,6 +26,9 @@ import json
 from datetime import datetime, date
 from collections import Counter
 
+from atomic_io import save_json_atomic
+from alerts import ALERTS
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(BASE_DIR, "data", "hot_core.json")
 
@@ -54,14 +57,23 @@ LEGACY_KEYS = ("3d",)
 
 
 def _load():
-    """读取状态；若发现旧玩法(组六胆拖)残留键则立即清除并落盘（玩法切换后状态重置）。"""
+    """读取状态；若发现旧玩法(组六胆拖)残留键则立即清除并落盘（玩法切换后状态重置）。
+    文件损坏时备份为 *.corrupt-<ts> 并告警（审计 P0-2/A5：旧版 except 静默返回 {}
+    会导致核心号缓存无声丢失并覆盖写回）。"""
     state = {}
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r", encoding="utf-8") as f:
                 state = json.load(f)
-        except Exception:
-            return {}
+        except Exception as e:
+            import time as _t
+            bak = "%s.corrupt-%s" % (STATE_FILE, _t.strftime("%Y%m%d%H%M%S"))
+            try:
+                os.replace(STATE_FILE, bak)
+            except Exception:
+                bak = "(备份失败)"
+            ALERTS.add("ERROR", "hot_core", "状态文件损坏已备份至 %s：%s" % (bak, e))
+            state = {}
     if any(k in state for k in LEGACY_KEYS):
         for k in LEGACY_KEYS:
             state.pop(k, None)
@@ -70,9 +82,7 @@ def _load():
 
 
 def _save(state):
-    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
-        json.dump(state, f, ensure_ascii=False, indent=2)
+    save_json_atomic(STATE_FILE, state)
 
 
 def _ym():

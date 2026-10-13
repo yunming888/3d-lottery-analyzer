@@ -23,9 +23,13 @@ sys.path.insert(0, os.path.dirname(__file__))
 from fetch_data import load_or_fetch
 from analyze import (
     frequency_analysis, missing_analysis, sum_value_analysis,
-    span_analysis, type_analysis, generate_recommendations, trend_analysis, ENGINE_VERSION
+    span_analysis, type_analysis, generate_recommendations, trend_analysis, ENGINE_VERSION,
+    last_gen_desc
 )
 from trading_day import is_trading_day, expected_qihao_for_date
+import period_util
+from atomic_io import save_json_atomic, load_json_checked
+from alerts import ALERTS
 
 # 3D 出号模式（钟摆直选，2026-09-29 起；旧 v6 直选定位+和值带已替换）
 try:
@@ -57,14 +61,13 @@ HISTORY_FILE = os.path.join(DATA_DIR, "3d_history.json")
 
 
 def load_json(path):
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    """读取 JSON。损坏时备份为 *.corrupt-<ts> 并抛错（审计 P0-2：绝不让坏文件被静默覆盖）。"""
+    return load_json_checked(path)
 
 
 def save_json(path, data):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    """原子写（tmp + os.replace，审计 P1-3）。"""
+    save_json_atomic(path, data)
 
 
 def settle_pending(history, pl):
@@ -346,7 +349,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
             settle_section += f"\n> 🎯 命中号码: {hit_list[0]}\n"
 
     s = pl["summary"]
-    next_qihao = str(int(latest["qihao"]) + 1)
+    next_qihao = period_util.next_3d_qihao(latest["qihao"], latest.get("date"))
 
     # 100期走势研判段落（出号前必看）
     trend_section = ""
@@ -480,7 +483,21 @@ def main():
     history = load_or_fetch()
     if not history:
         print("❌ 数据抓取失败, 退出")
-        return
+        ALERTS.add("ERROR", "福彩3D", "数据抓取失败（主源+备源+缓存均无数据）")
+        # 审计 P1-1：返回结构化 failed dict（带全 unified_review 所需键），不再隐式 return None
+        return {
+            "game": "3D", "name": "福彩3D", "today": TODAY, "failed": True,
+            "yesterday_draw": None, "settlement": None, "summary": {
+                "total_days": 0, "settled_days": 0, "active_days": 0, "total_bets": 0,
+                "total_cost": 0, "total_hits": 0, "total_prize": 0, "net_pnl": 0,
+                "pending_bets": 0, "pending_cost": 0, "last_settled": "无", "last_hit": "无"},
+            "recommendations": [], "next_qihao": None,
+            "circuit": {"stop": True, "rules_fired": ["数据抓取失败"], "streak_type": "-",
+                        "streak_len": 0, "zl_streak": 0, "gs_count_30": 0,
+                        "last2_both_gs": False, "sums_3": [0, 0, 0],
+                        "push_type": DEFAULT_PUSH_TYPE, "push_count": 0},
+            "trend": None, "report_path": None,
+        }
     latest = history[0]
     print(f"  最新: {latest['qihao']} | {' '.join(map(str, latest['nums']))} | {latest['type']}")
     print(f"  范围: {history[-1]['qihao']} ~ {history[0]['qihao']} ({len(history)}期)")
@@ -529,8 +546,11 @@ def main():
                     print(f"  ✅ 数据正常(今日 {expected_qh} 尚未开奖, 基于最新 {current_latest} 推荐)")
                 else:
                     print(f"  ✅ 数据已含今日/更新, 最新 {current_latest}")
-            except ValueError:
-                pass
+            except ValueError as _e:
+                # 审计 A5：旧版 pass 会在推算失败时静默当作"数据正常"出号，改为保守判滞后
+                data_stale = True
+                ALERTS.add("WARN", "福彩3D", "期号推算失败(%s)，按数据滞后处理，暂停出号" % _e)
+                print(f"  ⚠️ 期号推算失败({_e}), 按数据滞后处理, 不出号")
     is_suspension = is_holiday
     if is_holiday:
         print(f"  ⏸ 休市: 今日为官方休市期(非交易日)")
@@ -597,14 +617,18 @@ def main():
             print(f"  生成{len(recs)}注{info['push_type']}:")
             for i, r in enumerate(recs):
                 print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
-            reason = f"{info['push_type']}{len(recs)}注随机采样 | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常出号"])
+            # 审计 A6：把引擎诊断（和值带/候选池→注数比/引擎降级）写进 reason，落盘 profit_loss.json
+            _diag = last_gen_desc()
+            reason = (f"{info['push_type']}{len(recs)}注随机采样"
+                      + (f"｜{_diag}" if _diag else "")
+                      + " | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常出号"]))
 
     # 计算目标期号 (休市或数据滞后则无)
     if is_suspension or data_stale:
         target_qihao = None
     else:
-        # 目标 = 最新已开期号 + 1 (下期). 直接用 history[0], 避免依赖 prev 记录状态字符串(休市/数据未更新等)
-        target_qihao = str(int(history[0]["qihao"]) + 1)
+        # 审计 P0-1：跨年修复——按最新开奖日期推算下一开奖日，跨年自动进位（2026355→2027001）
+        target_qihao = period_util.next_3d_qihao(history[0]["qihao"], history[0].get("date"))
 
     # 检查今天是否已有记录
     today_exists = any(r["date"] == TODAY for r in pl["records"])
@@ -625,7 +649,8 @@ def main():
                 else:
                     # 正常交易日: 若今日记录尚未结算(待开奖)且注数与当前规则(push_count)不符,
                     # 则按新规则刷新(确保"8注直选/暂停"等改动即时生效到今日记录)
-                    if r.get("hits") is None and (not r.get("recommendations") or r.get("notes") != len(recs)):
+                    # 审计 P1-1: 附加 recs 非空守卫，防止 stop 分支下 info 未定义即引用
+                    if recs and r.get("hits") is None and (not r.get("recommendations") or r.get("notes") != len(recs)):
                         r["recommendations"] = [rec["nums"] for rec in recs]
                         r["notes"] = len(recs)
                         r["cost"] = len(recs) * DIRECT_COST

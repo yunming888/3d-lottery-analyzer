@@ -324,9 +324,8 @@ def fill_gaps(records):
 
         os.makedirs("data", exist_ok=True)
 
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-
-            json.dump(merged, f, ensure_ascii=False, indent=2)
+        from atomic_io import save_json_locked
+        save_json_locked(DATA_FILE, merged)
 
         print(f"  缺口补全: {filled}/{len(gaps)}")
 
@@ -336,7 +335,7 @@ def fill_gaps(records):
 
 def merge_and_save(new_records):
 
-    """合并新数据到本地库，去重只保留最新"""
+    """合并新数据到本地库，去重只保留最新（带锁+原子写，审计 A1）"""
 
     if not new_records:
 
@@ -354,9 +353,8 @@ def merge_and_save(new_records):
 
     os.makedirs("data", exist_ok=True)
 
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-
-        json.dump(merged, f, ensure_ascii=False, indent=2)
+    from atomic_io import save_json_locked
+    save_json_locked(DATA_FILE, merged)
 
     return merged
 

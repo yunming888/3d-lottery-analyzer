@@ -21,6 +21,9 @@ from . import config
 from .fetcher import fetch_history
 from .analysis import load_history, hot_cold, latest
 from .selector import generate_notes, ENGINE_VERSION
+import period_util
+from atomic_io import save_json_atomic, load_json_checked, file_lock
+from alerts import ALERTS
 
 STATE_FILE = os.path.join(config.BASE_DIR, "data", "dlt_state.json")
 COST_PER_NOTE = 2  # 每注基本投注金额（元）
@@ -55,25 +58,23 @@ def _dlt_tier(red_match, blue_match):
 
 # ---------- 状态读写 ----------
 def load_state() -> dict:
+    """读取状态。文件损坏时备份为 *.corrupt-<ts> 并抛 RuntimeError —— 绝不静默返回空状态
+    （旧版 except:pass 会把损坏文件当成全新状态，随后 save_state 覆盖写回，
+    导致全部结算历史被无声清空，见审计 P0-2）。"""
     if os.path.exists(STATE_FILE):
-        try:
-            with open(STATE_FILE, "r", encoding="utf-8") as f:
-                st = json.load(f)
-            st.setdefault("records", [])
-            st.setdefault("summary", _empty_summary())
-            st.setdefault("portfolio", [])          # 当前持有组合（5组）
-            st.setdefault("last_rotation_date", None)  # 上次轮换日期
-            return st
-        except Exception:
-            pass
+        st = load_json_checked(STATE_FILE)
+        st.setdefault("records", [])
+        st.setdefault("summary", _empty_summary())
+        st.setdefault("portfolio", [])          # 当前持有组合（5组）
+        st.setdefault("last_rotation_date", None)  # 上次轮换日期
+        st.setdefault("core_ym", None)
+        return st
     return {"game": "dlt", "records": [], "portfolio": [], "last_rotation_date": None,
-            "summary": _empty_summary()}
+            "core_ym": None, "summary": _empty_summary()}
 
 
 def save_state(st: dict):
-    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
-        json.dump(st, f, ensure_ascii=False, indent=2)
+    save_json_atomic(STATE_FILE, st)
 
 
 def _empty_summary():
@@ -108,15 +109,31 @@ def _fmt_note(note):
 
 # ---------- 结算 ----------
 def _settle(st: dict, history: list):
-    """结算所有 pending 且目标期号 <= 最新期号的记录。返回结算明细列表。"""
+    """结算所有 pending 且目标期号 <= 最新期号的记录。返回结算明细列表。
+
+    防双计（审计 P1-2）：若某 pending 的 target_issue 已存在 settled 记录
+    （数据源滞后导致的重复建仓），则标记 skipped_duplicate 跳过，不重复计奖。"""
     if not history:
         return []
     latest_issue = int(history[0]["issue"])
+    settled_targets = set()
+    for rec in st["records"]:
+        if rec.get("status") == "settled" and rec.get("target_issue") is not None:
+            try:
+                settled_targets.add(int(rec["target_issue"]))
+            except (TypeError, ValueError):
+                pass
     settled = []
     for rec in st["records"]:
         if rec.get("status") != "pending":
             continue
         tgt = int(rec["target_issue"])
+        if tgt in settled_targets:
+            rec["status"] = "skipped_duplicate"
+            rec["_settle_note"] = "重复pending(已有同target已结算记录)，跳过以防奖金/成本双计"
+            ALERTS.add("WARN", "大乐透",
+                       "期号 %s 出现重复 pending，已跳过第二条（防双计）" % tgt)
+            continue
         if tgt > latest_issue:
             continue  # 目标开奖尚未发生
         draw = None
@@ -217,7 +234,12 @@ def _note_coldness(note, red_om, blue_om):
 
 
 def _rotate_portfolio(portfolio, records, n_notes, n_replace):
-    """轮换最冷的 n_replace 组：用遗漏和度量冷度，替换最冷的若干组为全新生成号。"""
+    """轮换最冷的 n_replace 组：用遗漏和度量冷度，替换最冷的若干组为全新生成号。
+    返回 (新组合, 告警文案或None)。
+
+    审计修复：① 去重基准改为全部现存注（旧版只对 remaining 去重，可能换回刚换掉的号）；
+    ② generate_notes 空列表保护（旧版 extra[0] 在池空时 IndexError 未捕获，轮换日直接崩溃）；
+    ③ 新注不足时显式告警，不静默少换。"""
     hc = hot_cold(records, config.WINDOW)
     red_om = hc["red_omission"]
     blue_om = hc["blue_omission"]
@@ -226,8 +248,7 @@ def _rotate_portfolio(portfolio, records, n_notes, n_replace):
         scored.append((_note_coldness(note, red_om, blue_om), i))
     scored.sort(key=lambda x: -x[0])  # 冷度降序（最冷在前）
     replace_idx = set(i for _, i in scored[:n_replace])
-    remaining = [portfolio[i] for i in range(len(portfolio)) if i not in replace_idx]
-    existing_keys = set(_note_key(n) for n in remaining)
+    existing_keys = set(_note_key(n) for n in portfolio)  # ① 全集去重
     fresh, _ = generate_notes(records, n_replace)
     final_new = []
     for n in fresh:
@@ -239,15 +260,21 @@ def _rotate_portfolio(portfolio, records, n_notes, n_replace):
     while len(final_new) < n_replace and guard < n_replace * 40:
         guard += 1
         extra, _ = generate_notes(records, 1)
+        if not extra:  # ② 池空保护
+            continue
         k = _note_key(extra[0])
         if k not in existing_keys:
             final_new.append(extra[0])
             existing_keys.add(k)
+    warn = None
+    if len(final_new) < n_replace:  # ③ 显式告警
+        warn = "轮换新注不足(%d/%d组)，保留原组合补位" % (len(final_new), n_replace)
+        ALERTS.add("WARN", "大乐透", warn)
     new_map = {idx: n for idx, n in zip(sorted(replace_idx), final_new)}
     new_portfolio = []
     for i, note in enumerate(portfolio):
         new_portfolio.append(new_map.get(i, note))
-    return new_portfolio
+    return new_portfolio, warn
 
 
 def _make_pending(today, target, portfolio):
@@ -366,81 +393,111 @@ def run_daily(today=None, n_notes=None):
     n_notes = n_notes or config.NOTES
     records, meta = fetch_history(config.WINDOW)
     if not records:
-        return {"game": "dlt", "today": today, "error": "未获取到历史数据", "notes": []}
+        ALERTS.add("ERROR", "大乐透", "未获取到历史数据（抓取失败且无缓存）")
+        # 审计 P1-1：error dict 必须带全 unified_review 所需键，否则 KeyError 崩掉整个编排
+        return {"game": "dlt", "name": "大乐透", "today": today, "failed": True,
+                "error": "未获取到历史数据", "notes": [], "target": None,
+                "latest_issue": None, "yesterday_draw": None, "settled": [],
+                "rotation": None, "trend": None, "meta": {},
+                "summary": _empty_summary()}
 
-    st = load_state()
-    # 1) 结算（按目标期号，pending -> settled）
-    settled = _settle(st, records)
+    # load→modify→save 全段持锁：防自动化与手动运行并发覆盖（审计 P1-3）
+    with file_lock(STATE_FILE):
+        st = load_state()
+        # 1) 结算（按目标期号，pending -> settled）
+        settled = _settle(st, records)
 
-    # 2) 轮换检查（每2周周五，且今日尚未轮换过）
-    today_date = date.fromisoformat(today)
-    rotation_happened = False
-    rotation_note = ""
-    if _is_rotation_day(today_date) and st.get("last_rotation_date") != today:
+        # 2) 轮换检查（每2周周五，且今日尚未轮换过）
+        today_date = date.fromisoformat(today)
+        rotation_happened = False
+        rotation_note = ""
+        rotation_warn = None
+        if _is_rotation_day(today_date) and st.get("last_rotation_date") != today:
+            portfolio = st.get("portfolio") or []
+            if len(portfolio) >= n_notes:
+                portfolio, rotation_warn = _rotate_portfolio(portfolio, records, n_notes, 2)
+                rotation_note = "本期为每2周周五轮换日：已替换最冷的2组"
+            else:
+                portfolio = generate_notes(records, n_notes)[0]
+                rotation_note = "本期为轮换日但组合不足，已重建%d组" % n_notes
+            st["portfolio"] = portfolio
+            st["last_rotation_date"] = today
+            rotation_happened = True
+            if rotation_warn:
+                rotation_note = rotation_note + "；⚠️" + rotation_warn
+
+        # 3) 确保组合存在（首跑或非轮换日但组合为空）
         portfolio = st.get("portfolio") or []
-        if len(portfolio) >= n_notes:
-            portfolio = _rotate_portfolio(portfolio, records, n_notes, 2)
-            rotation_note = "本期为每2周周五轮换日：已替换最冷的2组"
-        else:
-            portfolio = generate_notes(records, n_notes)[0]
-            rotation_note = "本期为轮换日但组合不足，已重建%d组" % n_notes
-        st["portfolio"] = portfolio
-        st["last_rotation_date"] = today
-        rotation_happened = True
-
-    # 3) 确保组合存在（首跑或非轮换日但组合为空）
-    portfolio = st.get("portfolio") or []
-    if not portfolio:
-        portfolio = generate_notes(records, n_notes)[0]
-        st["portfolio"] = portfolio
-
-    # 3.5) v3 热号追号：核心号校验
-    #      - 核心号跨月重选 → 重建组合（让新规则立即生效，不必等轮换日）
-    #      - 持仓中存在不含核心号的注 → 重建
-    rebuild_happened = False
-    try:
-        from hot_core import get_dlt_core, is_active
-        if not is_active():
-            raise ValueError("未到生效日，跳过核心号校验")
-        core, _meta = get_dlt_core(records)
-        core_set = set(core)
-        need = False
-        if st.get("core_ym") != _meta.get("ym"):
-            need = True
-        elif portfolio and not all(core_set <= set(n["reds"]) for n in portfolio):
-            need = True
-        if need:
+        if not portfolio:
             portfolio = generate_notes(records, n_notes)[0]
             st["portfolio"] = portfolio
-            st["core_ym"] = _meta.get("ym")
-            rebuild_happened = True
-            _msg = "热号追号·核心号%s，已重建%d组" % (
-                "/".join("%02d" % d for d in core), n_notes)
-            rotation_note = (rotation_note + "；" + _msg) if rotation_note else _msg
-    except Exception:
-        pass
 
-    # 4) 每个待开奖期仅保留一条 pending（按 target_issue 幂等，避免非开奖日重复堆积导致重复结算）
-    latest_issue = int(records[0]["issue"])
-    next_target = str(latest_issue + 1)
-    existing = None
-    for r in st["records"]:
-        if r.get("status") == "pending" and r.get("target_issue") == next_target:
-            existing = r
-            break
-    if existing is not None:
-        if rotation_happened or rebuild_happened:
-            existing["notes"] = portfolio  # 组合变更当日，pending 跟随最新组合
-        notes = existing["notes"]
-        target = existing["target_issue"]
-    else:
-        st["records"].append(_make_pending(today, next_target, portfolio))
-        notes = portfolio
-        target = next_target
+        # 3.5) v3 热号追号：核心号校验
+        #      - 核心号跨月重选 → 重建组合（让新规则立即生效，不必等轮换日）
+        #      - 持仓中存在不含核心号的注 → 重建
+        rebuild_happened = False
+        try:
+            from hot_core import get_dlt_core, is_active
+            if not is_active():
+                raise ValueError("未到生效日，跳过核心号校验")
+            core, _meta = get_dlt_core(records)
+            core_set = set(core)
+            need = False
+            if st.get("core_ym") != _meta.get("ym"):
+                need = True
+            elif portfolio and not all(core_set <= set(n["reds"]) for n in portfolio):
+                need = True
+            if need:
+                portfolio = generate_notes(records, n_notes)[0]
+                st["portfolio"] = portfolio
+                st["core_ym"] = _meta.get("ym")
+                rebuild_happened = True
+                _msg = "热号追号·核心号%s，已重建%d组" % (
+                    "/".join("%02d" % d for d in core), n_notes)
+                rotation_note = (rotation_note + "；" + _msg) if rotation_note else _msg
+        except Exception as _e:
+            # 旧版 except:pass 会把核心号校验失败变成静默旧号续投（审计 A5），改为可见告警
+            ALERTS.add("WARN", "大乐透", "核心号校验跳过/失败：%s" % _e)
 
-    bal = _balance_of(notes)
-    _calc_summary(st)
-    save_state(st)
+        # 4) 每个待开奖期仅保留一条 pending（按 target_issue 幂等，避免非开奖日重复堆积导致重复结算）
+        latest_issue = int(records[0]["issue"])
+        # 跨年期号修复（审计 P0-1）：按最新开奖日期推算下一开奖日，跨年自动进位（26154→27001）
+        next_target = period_util.next_dlt_issue(str(latest_issue), records[0].get("date"))
+        # 数据源滞后守卫（审计 P1-2）：目标期号不得 <= 已记录过的最大 target，
+        # 否则会给已开奖期号重复建仓 → 重复结算、成本/奖金双计
+        stale_reuse = False
+        _max_target = 0
+        for _r in st["records"]:
+            try:
+                _max_target = max(_max_target, int(_r.get("target_issue") or 0))
+            except (TypeError, ValueError):
+                pass
+        if int(next_target) < _max_target:
+            # 严格小于才算真滞后；等于说明 pending 本就存在（正常同日幂等重跑），不打扰
+            stale_reuse = True
+            next_target = str(_max_target)
+            ALERTS.add("WARN", "大乐透",
+                       "数据源滞后：最新期 %s 推算目标 %s <= 已挂 %s，复用已有 pending，未新增注"
+                       % (latest_issue, period_util.next_dlt_issue(str(latest_issue), records[0].get("date"), warn=False), _max_target))
+        existing = None
+        for r in st["records"]:
+            if r.get("status") == "pending" and r.get("target_issue") == next_target:
+                existing = r
+                break
+        if existing is not None:
+            if (rotation_happened or rebuild_happened) and not stale_reuse:
+                existing["notes"] = portfolio  # 组合变更当日，pending 跟随最新组合
+                existing["cost"] = len(existing["notes"]) * COST_PER_NOTE  # 同步成本（审计 B类修复）
+            notes = existing["notes"]
+            target = existing["target_issue"]
+        else:
+            st["records"].append(_make_pending(today, next_target, portfolio))
+            notes = portfolio
+            target = next_target
+
+        bal = _balance_of(notes)
+        _calc_summary(st)
+        save_state(st)
 
     yest_draw = _find_draw_by_date(records, _yesterday())
     report_path = _write_report(today, records, meta, notes, bal, n_notes,
@@ -466,6 +523,8 @@ def run_daily(today=None, n_notes=None):
         "name": "大乐透",
         "today": today,
         "meta": meta,
+        "stale_reuse": stale_reuse,
+        "warnings": [m for _, s, m, _t in ALERTS.items if s == "大乐透"],
         "latest_issue": latest(records).get("issue"),
         "yesterday_draw": yest_draw,
         "rotation": rotation_note,

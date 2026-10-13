@@ -2,3 +2,7 @@ data/3d_history.json
 data/analysis_report.json
 data/charts/
 __pycache__/
+*.lock
+.*.tmp
+*.corrupt-*
+.edge_profile/
