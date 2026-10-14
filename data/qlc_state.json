@@ -82,6 +82,108 @@
         }
       ],
       "cost": 10,
+      "status": "settled",
+      "draw_issue": "2026118",
+      "draw_date": "2026-10-14",
+      "draw_reds": [
+        6,
+        8,
+        14,
+        17,
+        19,
+        23,
+        26
+      ],
+      "draw_blues": [
+        28
+      ],
+      "win_notes": 1,
+      "best_tier": 7,
+      "float_win": false,
+      "prize": 5,
+      "daily_pnl": -5
+    },
+    {
+      "date": "2026-10-15",
+      "target_issue": "2026119",
+      "notes": [
+        {
+          "reds": [
+            3,
+            6,
+            13,
+            14,
+            20,
+            26,
+            27
+          ],
+          "blues": [
+            4
+          ],
+          "score": 1.3330438374618068
+        },
+        {
+          "reds": [
+            6,
+            11,
+            14,
+            15,
+            16,
+            22,
+            23
+          ],
+          "blues": [
+            3
+          ],
+          "score": 1.2578304509019589
+        },
+        {
+          "reds": [
+            6,
+            7,
+            13,
+            14,
+            17,
+            28,
+            30
+          ],
+          "blues": [
+            11
+          ],
+          "score": 1.0405804961574916
+        },
+        {
+          "reds": [
+            6,
+            8,
+            11,
+            14,
+            19,
+            20,
+            21
+          ],
+          "blues": [
+            15
+          ],
+          "score": 0.9777651945758223
+        },
+        {
+          "reds": [
+            6,
+            11,
+            14,
+            15,
+            18,
+            23,
+            27
+          ],
+          "blues": [
+            25
+          ],
+          "score": 1.1689174657468988
+        }
+      ],
+      "cost": 10,
       "status": "pending",
       "draw_issue": null,
       "draw_date": "",
@@ -174,12 +276,12 @@
   "last_rotation_date": null,
   "core_ym": "2026-10",
   "summary": {
-    "rounds": 0,
-    "total_notes": 0,
-    "total_cost": 0,
-    "total_prize": 0,
-    "net_pnl": 0,
-    "total_win_notes": 0,
+    "rounds": 1,
+    "total_notes": 5,
+    "total_cost": 10,
+    "total_prize": 5,
+    "net_pnl": -5,
+    "total_win_notes": 1,
     "pending_rounds": 1
   }
 }
