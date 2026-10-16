@@ -6853,9 +6853,13 @@
     {
       "date": "2026-10-16",
       "target_qihao": "2026275",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026275",
+      "draw_nums": [
+        2,
+        8,
+        7
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           0,
@@ -6895,26 +6899,73 @@
       ],
       "notes": 7,
       "cost": 14,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -14,
+      "push_type": "钟摆直选",
+      "reason": "直选7注->0命中 开奖287组六",
+      "near_hits": 0
+    },
+    {
+      "date": "2026-10-17",
+      "target_qihao": "2026276",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          0,
+          5,
+          6
+        ],
+        [
+          0,
+          7,
+          4
+        ],
+        [
+          0,
+          7,
+          6
+        ],
+        [
+          4,
+          7,
+          4
+        ],
+        [
+          4,
+          7,
+          6
+        ],
+        [
+          6,
+          7,
+          4
+        ]
+      ],
+      "notes": 6,
+      "cost": 12,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
       "push_type": "钟摆直选",
-      "reason": "钟摆直选7注随机采样｜v2钟摆直选：目标7注/实出7注（和值带内0注，补全0注）｜和值带11-18; 候选18→7注 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 9 期 (仅供走势参考, 不做出号门槛)"
+      "reason": "钟摆直选6注随机采样｜v2钟摆直选：目标6注/实出6注（和值带内0注，补全0注）｜和值带11-18; 候选18→6注 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 10 期 (仅供走势参考, 不做出号门槛)"
     }
   ],
   "summary": {
-    "total_days": 120,
-    "settled_days": 119,
-    "active_days": 97,
-    "total_bets": 920,
-    "total_cost": 1840,
+    "total_days": 121,
+    "settled_days": 120,
+    "active_days": 98,
+    "total_bets": 927,
+    "total_cost": 1854,
     "total_hits": 3,
     "total_prize": 480,
-    "net_pnl": -1360,
-    "pending_bets": 7,
-    "pending_cost": 14,
-    "last_settled": "2026-10-16",
-    "last_hit": "2026-10-16 3注"
+    "net_pnl": -1374,
+    "pending_bets": 6,
+    "pending_cost": 12,
+    "last_settled": "2026-10-17",
+    "last_hit": "2026-10-17 3注"
   },
-  "last_draw_qihao": "2026274"
+  "last_draw_qihao": "2026275"
 }
