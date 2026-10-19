@@ -7011,9 +7011,13 @@
     {
       "date": "2026-10-19",
       "target_qihao": "2026278",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026278",
+      "draw_nums": [
+        6,
+        6,
+        6
+      ],
+      "draw_type": "豹子",
       "recommendations": [
         [
           0,
@@ -7068,26 +7072,68 @@
       ],
       "notes": 10,
       "cost": 20,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -20,
+      "push_type": "钟摆直选",
+      "reason": "直选10注->0命中 开奖666豹子",
+      "near_hits": 0
+    },
+    {
+      "date": "2026-10-20",
+      "target_qihao": "2026279",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          3,
+          5,
+          0
+        ],
+        [
+          3,
+          5,
+          1
+        ],
+        [
+          4,
+          3,
+          1
+        ],
+        [
+          4,
+          5,
+          0
+        ],
+        [
+          4,
+          5,
+          1
+        ]
+      ],
+      "notes": 5,
+      "cost": 10,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
       "push_type": "钟摆直选",
-      "reason": "钟摆直选10注随机采样｜v2钟摆直选：目标10注/实出10注（和值带内0注，补全0注）｜和值带11-18; 候选18→10注 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 12 期 (仅供走势参考, 不做出号门槛)"
+      "reason": "钟摆直选5注随机采样｜v2钟摆直选：目标5注/实出5注（和值带内0注，补全0注）｜和值带11-18; 候选18→5注 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 0 期 (仅供走势参考, 不做出号门槛)"
     }
   ],
   "summary": {
-    "total_days": 123,
-    "settled_days": 122,
-    "active_days": 100,
-    "total_bets": 939,
-    "total_cost": 1878,
+    "total_days": 124,
+    "settled_days": 123,
+    "active_days": 101,
+    "total_bets": 949,
+    "total_cost": 1898,
     "total_hits": 3,
     "total_prize": 480,
-    "net_pnl": -1398,
-    "pending_bets": 10,
-    "pending_cost": 20,
-    "last_settled": "2026-10-19",
-    "last_hit": "2026-10-19 3注"
+    "net_pnl": -1418,
+    "pending_bets": 5,
+    "pending_cost": 10,
+    "last_settled": "2026-10-20",
+    "last_hit": "2026-10-20 3注"
   },
-  "last_draw_qihao": "2026277"
+  "last_draw_qihao": "2026278"
 }
