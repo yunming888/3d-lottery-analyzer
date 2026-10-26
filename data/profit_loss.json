@@ -7378,9 +7378,13 @@
     {
       "date": "2026-10-26",
       "target_qihao": "2026285",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026285",
+      "draw_nums": [
+        9,
+        3,
+        2
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           5,
@@ -7400,26 +7404,88 @@
       ],
       "notes": 3,
       "cost": 6,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -6,
+      "push_type": "钟摆直选",
+      "reason": "直选3注->0命中 开奖932组六",
+      "near_hits": 0
+    },
+    {
+      "date": "2026-10-27",
+      "target_qihao": "2026286",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          0,
+          5,
+          7
+        ],
+        [
+          0,
+          5,
+          9
+        ],
+        [
+          0,
+          6,
+          7
+        ],
+        [
+          0,
+          6,
+          9
+        ],
+        [
+          0,
+          8,
+          7
+        ],
+        [
+          0,
+          8,
+          9
+        ],
+        [
+          5,
+          5,
+          7
+        ],
+        [
+          5,
+          6,
+          7
+        ],
+        [
+          6,
+          5,
+          7
+        ]
+      ],
+      "notes": 9,
+      "cost": 18,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
       "push_type": "钟摆直选",
-      "reason": "钟摆直选3注随机采样｜v2钟摆直选：目标3注/实出3注（和值带内0注，补全0注）｜和值带11-18; 候选18→3注 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 1 期 (仅供走势参考, 不做出号门槛)"
+      "reason": "钟摆直选9注随机采样｜v2钟摆直选：目标9注/实出9注（和值带内0注，补全0注）｜和值带11-18; 候选18→9注 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 2 期 (仅供走势参考, 不做出号门槛)"
     }
   ],
   "summary": {
-    "total_days": 130,
-    "settled_days": 129,
-    "active_days": 107,
-    "total_bets": 983,
-    "total_cost": 1966,
+    "total_days": 131,
+    "settled_days": 130,
+    "active_days": 108,
+    "total_bets": 986,
+    "total_cost": 1972,
     "total_hits": 4,
     "total_prize": 1520,
-    "net_pnl": -446,
-    "pending_bets": 3,
-    "pending_cost": 6,
-    "last_settled": "2026-10-26",
-    "last_hit": "2026-10-26 4注"
+    "net_pnl": -452,
+    "pending_bets": 9,
+    "pending_cost": 18,
+    "last_settled": "2026-10-27",
+    "last_hit": "2026-10-27 4注"
   },
-  "last_draw_qihao": "2026284"
+  "last_draw_qihao": "2026285"
 }
