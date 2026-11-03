@@ -7836,9 +7836,13 @@
     {
       "date": "2026-11-03",
       "target_qihao": "2026293",
-      "draw": "待开奖",
-      "draw_nums": [],
-      "draw_type": "",
+      "draw": "2026293",
+      "draw_nums": [
+        1,
+        8,
+        5
+      ],
+      "draw_type": "组六",
       "recommendations": [
         [
           1,
@@ -7898,26 +7902,103 @@
       ],
       "notes": 11,
       "cost": 22,
+      "hits": 0,
+      "prize": 0,
+      "daily_pnl": -22,
+      "push_type": "钟摆直选",
+      "reason": "直选11注->0命中 开奖185组六",
+      "near_hits": 0
+    },
+    {
+      "date": "2026-11-04",
+      "target_qihao": "2026294",
+      "draw": "待开奖",
+      "draw_nums": [],
+      "draw_type": "",
+      "recommendations": [
+        [
+          1,
+          1,
+          9
+        ],
+        [
+          1,
+          5,
+          7
+        ],
+        [
+          1,
+          5,
+          9
+        ],
+        [
+          1,
+          6,
+          7
+        ],
+        [
+          1,
+          6,
+          9
+        ],
+        [
+          5,
+          1,
+          7
+        ],
+        [
+          5,
+          1,
+          9
+        ],
+        [
+          5,
+          5,
+          7
+        ],
+        [
+          5,
+          6,
+          7
+        ],
+        [
+          6,
+          1,
+          7
+        ],
+        [
+          6,
+          1,
+          9
+        ],
+        [
+          6,
+          5,
+          7
+        ]
+      ],
+      "notes": 12,
+      "cost": 24,
       "hits": null,
       "prize": null,
       "daily_pnl": null,
       "push_type": "钟摆直选",
-      "reason": "钟摆直选11注随机采样｜v2钟摆直选：目标11注/实出11注（和值带内0注，补全0注）｜和值带11-18; 候选18→11注 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 0 期 (仅供走势参考, 不做出号门槛)"
+      "reason": "钟摆直选12注随机采样｜v2钟摆直选：目标12注/实出12注（和值带内0注，补全0注）｜和值带11-18; 候选18→12注 | 常态: 推钟摆v2直选(多窗口融合/z值/极值回撤/和值分位带/跨区约束), 注数动态(~12注); 形态统计: 组六连出 1 期 (仅供走势参考, 不做出号门槛)"
     }
   ],
   "summary": {
-    "total_days": 138,
-    "settled_days": 137,
-    "active_days": 115,
-    "total_bets": 1041,
-    "total_cost": 2082,
+    "total_days": 139,
+    "settled_days": 138,
+    "active_days": 116,
+    "total_bets": 1052,
+    "total_cost": 2104,
     "total_hits": 4,
     "total_prize": 1520,
-    "net_pnl": -562,
-    "pending_bets": 11,
-    "pending_cost": 22,
-    "last_settled": "2026-11-03",
-    "last_hit": "2026-11-03 4注"
+    "net_pnl": -584,
+    "pending_bets": 12,
+    "pending_cost": 24,
+    "last_settled": "2026-11-04",
+    "last_hit": "2026-11-04 4注"
   },
-  "last_draw_qihao": "2026292"
+  "last_draw_qihao": "2026293"
 }
