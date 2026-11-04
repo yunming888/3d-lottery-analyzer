@@ -388,7 +388,8 @@ def wechat_block(today, yesterday, r3, rd, rs, rq, rsz):
     lines.append("━━ 🧾 四品种合计 ━━")
     lines.append("累计净盈亏合计：%+d元（福彩3D %+d + 大乐透 %+d + 双色球 %+d + 七乐彩 %+d）" % (
         total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"], s_q["net_pnl"]))
-    lines.append("ℹ️ 3D 大小形态两组 16注/32元 已并入上方福彩3D累计，不另计。")
+    if not rsz.get("skipped"):
+        lines.append("ℹ️ 3D 大小形态两组 16注/32元 已并入上方福彩3D累计，不另计。")
     _failed = [g.get("name") or g.get("game") for g in (r3, rd, rs, rq) if g.get("failed")]
     if _failed:
         lines.append("⚠️ 本日失败品种：%s（其数据未计入合计，合计偏低）" % "、".join(_failed))
