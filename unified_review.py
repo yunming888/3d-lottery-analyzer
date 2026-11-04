@@ -25,7 +25,7 @@ import daily_review
 from dlt.settle import run_daily as dlt_run
 from ssq.settle import run_daily as ssq_run
 from qlc.settle import run_daily as qlc_run
-from size_pattern_daily import run_daily as size_run, ENGINE_VERSION as SIZE_VERSION
+from size_pattern_daily import ENGINE_VERSION as SIZE_VERSION, EFFECTIVE_FROM as SIZE_EFFECTIVE_FROM
 from alerts import ALERTS
 from analyze import ENGINE_VERSION as FCD_VERSION
 from dlt.selector import ENGINE_VERSION as DLT_VERSION
@@ -124,8 +124,15 @@ def build_summary():
     rs = _stage("双色球", ssq_run)
     print("\n########## [4/4] 七乐彩 复盘 ##########")
     rq = _stage("七乐彩", qlc_run)
-    print("\n###### [附] 福彩3D 大小形态两组（独立台账）######")
-    rsz = _stage("3D大小形态两组", size_run)
+    # 大小形态两组已并入 3D 主台账：不再单独跑模块、不再单独结算，此处只构造展示数据
+    rsz = {
+        "game": "3D大小形态两组", "failed": bool(r3.get("failed")),
+        "skipped": not r3.get("size_active"),
+        "skip_reason": "%s 起生效" % SIZE_EFFECTIVE_FROM,
+        "groups": r3.get("size_groups") or {},
+        "target": r3.get("next_qihao"),
+        "settled": [],
+    }
 
     return today, yesterday, r3, rd, rs, rq, rsz
 
@@ -177,8 +184,15 @@ def wechat_block(today, yesterday, r3, rd, rs, rq, rsz):
     recs3 = r3.get("recommendations", [])
     _3d_label = "钟摆直选" if "钟摆" in FCD_VERSION else "直选定位"
     if recs3:
-        lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s】" % (len(recs3), _3d_label, r3.get("next_qihao"), FCD_VERSION))
-        for i, r in enumerate(recs3, 1):
+        _n_sz = 16 if r3.get("size_active") else 0
+        _main_recs = recs3[:len(recs3) - _n_sz] if _n_sz else recs3
+        _sz_lbl = (" + " + SIZE_VERSION) if _n_sz else ""
+        lines.append("今日随机采样：%d注%s（押%s）｜等同机选·无预测力【选号引擎 %s%s】" % (
+            len(recs3), _3d_label, r3.get("next_qihao"), FCD_VERSION, _sz_lbl))
+        if _n_sz:
+            lines.append("  （其中 %d 注钟摆直选 + 16 注大小形态两组，已并入同一台账；两组号码见下方专段）"
+                         % (len(recs3) - _n_sz))
+        for i, r in enumerate(_main_recs, 1):
             lines.append("  %d. %s" % (i, _fmt_3d_nums(r["nums"])))
     elif r3.get("failed"):
         lines.append("今日随机采样：⚠️ 运行失败，0注")
@@ -189,37 +203,27 @@ def wechat_block(today, yesterday, r3, rd, rs, rq, rsz):
     if tr.get("conclusion"):
         lines.append("走势研判：%s" % tr["conclusion"])
 
-    # ===== 福彩3D 大小形态两组（独立台账）=====
+    # ===== 福彩3D 大小形态两组（已并入 3D 主台账）=====
     lines.append("")
-    lines.append("━━ 📐 福彩3D 大小形态两组（独立台账）━━")
+    lines.append("━━ 📐 福彩3D 大小形态两组（已并入 3D 主台账）━━")
     if rsz.get("skipped"):
-        lines.append("⏭ %s（本日不建仓）" % rsz.get("skip_reason", "尚未生效"))
+        lines.append("⏭ %s（本日不新增，3D 主台账仅主线号码）" % rsz.get("skip_reason", "尚未生效"))
     elif rsz.get("failed"):
-        lines.append("⚠️ 本品种运行失败，无法结算/出号")
+        lines.append("⚠️ 3D 主链路运行失败，本段号码不可用")
     else:
-        _sst = rsz.get("settled") or []
-        if _sst:
-            for x in _sst:
-                lines.append("结算：押%s期 → %d命中，奖金%d元，日盈亏%+d元" % (
-                    x["target_qihao"], x["win_notes"], x["prize"], x["daily_pnl"]))
-        else:
-            lines.append("结算：今日无待结算（首日建仓或目标期号尚未抓到）")
+        lines.append("结算：已并入 3D 主台账，由上方 3D 结算行统一结算（直选精确命中 1040 元/注）")
+        lines.append("成本：16注 × 2元 = 32元，已计入 3D 当日注数/成本与累计净盈亏")
         lines.append("复盘：形态固定 大大小 / 大小小；每日按各位该侧近100期频率 TOP2 重算数字（仅投注结构偏好，无预测力）")
-        szs = rsz.get("summary") or {}
-        lines.append("独立台账累计：%+d元（%d命中/%d注，已结算%d轮，待结算%d轮）｜不计入四品种合计" % (
-            szs.get("net_pnl", 0), szs.get("total_hits", 0), szs.get("total_bets", 0),
-            szs.get("rounds", 0), szs.get("pending_rounds", 0)))
         groups = rsz.get("groups") or {}
         if groups:
-            lines.append("今日随机采样：16注（2组各8注，押%s期，32元）｜等同机选·无预测力【选号引擎 %s】" % (
-                rsz.get("target"), SIZE_VERSION))
+            lines.append("今日随机采样：16注（2组各8注）｜等同机选·无预测力【选号引擎 %s】" % SIZE_VERSION)
             for _k, _pat in (("A", "大大小"), ("B", "大小小")):
                 _g = groups.get(_k) or {}
                 lines.append("  %s组（%s）：%s" % (
                     _k, _pat, " ".join("".join(str(x) for x in n)
                                       for n in (_g.get("notes") or []))))
         else:
-            lines.append("今日随机采样：无（休市 / 数据滞后沿用 pending）")
+            lines.append("今日随机采样：无（休市 / 数据滞后）")
 
     # ===== 大乐透 =====
     lines.append("")
@@ -384,8 +388,7 @@ def wechat_block(today, yesterday, r3, rd, rs, rq, rsz):
     lines.append("━━ 🧾 四品种合计 ━━")
     lines.append("累计净盈亏合计：%+d元（福彩3D %+d + 大乐透 %+d + 双色球 %+d + 七乐彩 %+d）" % (
         total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"], s_q["net_pnl"]))
-    _szs = rsz.get("summary") or {}
-    lines.append("另：3D大小形态两组独立台账 %+d元（16注/32元每天，未计入上方合计）" % _szs.get("net_pnl", 0))
+    lines.append("ℹ️ 3D 大小形态两组 16注/32元 已并入上方福彩3D累计，不另计。")
     _failed = [g.get("name") or g.get("game") for g in (r3, rd, rs, rq) if g.get("failed")]
     if _failed:
         lines.append("⚠️ 本日失败品种：%s（其数据未计入合计，合计偏低）" % "、".join(_failed))
@@ -430,25 +433,17 @@ def write_unified_report(today, yesterday, r3, rd, rs, rq, rsz, wechat):
     if tr.get("conclusion"):
         L.append("- 100期走势研判：%s\n" % tr["conclusion"])
 
-    L.append("\n## 福彩3D 大小形态两组（独立台账）\n")
+    L.append("\n## 福彩3D 大小形态两组（已并入 3D 主台账）\n")
     L.append("\n> ⚠️ **性质声明**：本节号码均为程序按历史分布随机采样生成，"
              "**等同投注站机选，不具备预测能力**。\n")
     L.append("> 开奖随机且每期独立，不存在可推算的下期号码；任何声称能预测或收费荐号者均属诈骗。"
              "仅供学习研究，不构成投注建议。\n")
-    _sz = rsz.get("summary") or {}
     L.append("- 引擎：%s｜形态固定 大大小 / 大小小｜每日按各位该侧近100期频率 TOP2 重算数字\n" % SIZE_VERSION)
-    L.append("- 成本：16注 × 2元 = 32元/天；直选精确命中 1040 元/注\n")
-    L.append("- 台账：`data/size_pattern_state.json`（独立，不并入四品种合计）\n")
-    for x in (rsz.get("settled") or []):
-        L.append("- 结算：押%s期 → %d命中，日盈亏%+d元\n" % (
-            x["target_qihao"], x["win_notes"], x["daily_pnl"]))
-    L.append("- 独立台账累计：%+d元（%d命中/%d注，已结算%d轮，待结算%d轮）\n" % (
-        _sz.get("net_pnl", 0), _sz.get("total_hits", 0), _sz.get("total_bets", 0),
-        _sz.get("rounds", 0), _sz.get("pending_rounds", 0)))
+    L.append("- 成本：16注 × 2元 = 32元/天，**已并入上方福彩3D当日注数/成本与累计净盈亏**，不另设台账\n")
+    L.append("- 结算：由 3D 主台账统一结算（直选精确命中 1040 元/注，组选集合相同不算中奖）\n")
     _groups = rsz.get("groups") or {}
     if _groups:
-        L.append("- 今日随机采样（押%s期，16注）｜等同机选·无预测力【选号引擎 %s】：\n" % (
-            rsz.get("target"), SIZE_VERSION))
+        L.append("- 今日随机采样（16注）｜等同机选·无预测力【选号引擎 %s】：\n" % SIZE_VERSION)
         for _k, _pat in (("A", "大大小"), ("B", "大小小")):
             _g = _groups.get(_k) or {}
             L.append("  - %s组（%s）：%s\n" % (
@@ -457,7 +452,7 @@ def write_unified_report(today, yesterday, r3, rd, rs, rq, rsz, wechat):
     elif rsz.get("skipped"):
         L.append("- 本日：%s\n" % rsz.get("skip_reason", "尚未生效"))
     else:
-        L.append("- 今日随机采样：无（休市 / 沿用 pending）\n")
+        L.append("- 今日随机采样：无（休市 / 数据滞后）\n")
 
     L.append("\n## 大乐透\n")
     if rd.get("yesterday_draw"):
@@ -595,20 +590,6 @@ def write_monthly_report():
     L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_s, r_s))
     L.append("\n## 七乐彩\n")
     L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_q, r_q))
-    # 附：3D 大小形态两组独立台账（不并入四品种合计）
-    sz_pnl = sz_rounds = 0
-    try:
-        with open(os.path.join(ROOT, "data", "size_pattern_state.json"), encoding="utf-8") as f:
-            _szst = json.load(f)
-        for _r in _szst.get("records", []):
-            if _r.get("hits") is not None and str(_r.get("date", "")).startswith(ym):
-                sz_pnl += _r.get("daily_pnl", 0) or 0
-                sz_rounds += 1
-    except Exception:
-        pass
-    L.append("\n## 附：福彩3D 大小形态两组（独立台账）\n")
-    L.append("- 月度净盈亏：**%+d元**（已结算%d轮，未计入四品种合计）\n" % (sz_pnl, sz_rounds))
-
     L.append("\n## 四品种合计\n")
     L.append("- 月度净盈亏合计：**%+d元**\n" % total)
     L.append("\n---\n*本报告由每日复盘自动化于次月1号汇总生成。仅供学习研究，不构成投注建议。*\n")

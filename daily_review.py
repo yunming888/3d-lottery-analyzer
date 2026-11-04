@@ -30,6 +30,7 @@ from trading_day import is_trading_day, expected_qihao_for_date
 import period_util
 from atomic_io import save_json_atomic, load_json_checked
 from alerts import ALERTS
+from size_pattern_daily import build_extra_notes, groups_payload, ENGINE_VERSION as SIZE_VERSION
 
 # 3D 出号模式（钟摆直选，2026-09-29 起；旧 v6 直选定位+和值带已替换）
 try:
@@ -435,7 +436,7 @@ def generate_report(history, pl, cb, recs, settlement, today_draw_qihao, trend=N
 - 近3期和值: {', '.join(map(str, cb['sums_3']))}
 
 {trend_section}
-## 四、今日随机采样 ({len(recs)}注{cb['push_type']})｜等同机选·无预测力  【选号引擎 {ENGINE_VERSION}】
+## 四、今日随机采样 ({len(recs)}注{cb['push_type']})｜等同机选·无预测力  【选号引擎 {cb.get('engine_label', ENGINE_VERSION)}】
 
 > ⚠️ 以下号码由程序按历史分布随机采样生成，**与投注站机选在统计上无区别，不具备任何预测能力**。
 > 开奖完全随机、每期独立，不存在可推算的下期号码。任何声称能预测中奖号的人或平台均为诈骗。
@@ -570,6 +571,7 @@ def main():
 
     # 5. 出号判定 + 6. 生成推荐 (休市或数据滞后时跳过)
     trend = None
+    extra = []      # 大小形态两组（2026-11-05 起并入同一条主台账记录）
     if is_suspension:
         cb = {"stop": True,
               "rules_fired": [f"休市: 今日为官方休市期, 无新开奖"],
@@ -612,15 +614,23 @@ def main():
             # 直选定位 + 和值带：百/十/个各取候选 -> 注数 = 各位候选数相乘
             info = {"stop": False, "push_type": DEFAULT_PUSH_TYPE, "push_count": DIRECT_COUNT}
             recs = generate_recommendations(history, info)
+            # 2026-11-05 起：大小形态两组 16 注并入同一条主台账记录（云明指令「并入 3D 主台账一起算」）
+            extra = build_extra_notes(history, TODAY)
+            if extra:
+                recs = recs + extra
+                info["push_type"] = "钟摆直选+大小形态两组"
+                cb["engine_label"] = ENGINE_VERSION + " + " + SIZE_VERSION
             info["push_count"] = len(recs)
             cb["push_count"] = len(recs)
-            print(f"  生成{len(recs)}注{info['push_type']}:")
+            _merge_note = f"（其中大小形态两组 {len(extra)} 注已并入主台账）" if extra else ""
+            print(f"  生成{len(recs)}注{info['push_type']}{_merge_note}:")
             for i, r in enumerate(recs):
                 print(f"    {i+1}. {' '.join(map(str, r['nums']))} | 和{r['sum_val']} 跨{r['span']} | {r['logic']}")
             # 审计 A6：把引擎诊断（和值带/候选池→注数比/引擎降级）写进 reason，落盘 profit_loss.json
             _diag = last_gen_desc()
             reason = (f"{info['push_type']}{len(recs)}注随机采样"
                       + (f"｜{_diag}" if _diag else "")
+                      + (f"｜大小形态两组{len(extra)}注已并入3D主台账" if extra else "")
                       + " | " + "; ".join(cb["rules_fired"] if cb["rules_fired"] else ["正常出号"]))
 
     # 计算目标期号 (休市或数据滞后则无)
@@ -717,7 +727,9 @@ def main():
         "yesterday": yesterday, "yesterday_draw": yesterday_draw,
         "settlement": settlement,  # (rec, draw, hits, hit_list) 或 None
         "summary": summary,
-        "recommendations": recs,   # list of {nums, sum_val, span, logic}
+        "recommendations": recs,   # list of {nums, sum_val, span, logic}（28注=12钟摆+16大小形态）
+        "size_groups": groups_payload(extra),
+        "size_active": bool(extra),
         "next_qihao": target_qihao,
         "circuit": cb,
         "trend": trend,
