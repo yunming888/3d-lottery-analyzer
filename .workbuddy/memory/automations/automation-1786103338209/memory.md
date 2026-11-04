@@ -5,6 +5,7 @@
 ✅ 已确认自动化 `cwds` = 项目根目录 → 相对路径 `data/` 安全，此前审计的"CWD 存疑"项关闭。
 
 ## 配置变更记录
+- **2026-11-04（云明指令「加两组按大小形态的号码，并每天复盘」）**：prompt 升 **v1.6**（只改 prompt，rrule 每日 05:00 不变，nextRunAt 已核对 2026-11-05 05:00 北京时间）。新增 `size_pattern_daily.py` + 独立台账 `data/size_pattern_state.json`，**11-05 起生效**；A 大大小 / B 大小小 固定形态、每日按各位该侧近100期频率 TOP2 重算、各 8 注 → 共 16 注 32 元/天，直选 1040 元/注；独立累计**不并入四品种合计**，主台账 `profit_loss.json` 零改动。微信摘要 / 统一报告 / 月度报告各新增一段，标签「随机采样·等同机选·无预测力【选号引擎 大小形态v1】」。生效前自动跳过且不写台账；**首日无待结算属正常**；数据源滞后打印「沿用pending」属保护行为。commit 9292771。
 - **2026-10-13（云明指令「加七乐彩」）**：新增七乐彩品种。
   - 代码：新增 `qlc/` 包（config/fetcher/analysis/selector/settle）；`period_util.next_qlc_qihao`（YYYYNNN 跨年进位，自检扩至15例全过）；`hot_core.get_qlc_core`（键 qlc）；`unified_review.py` 升四品种（含**月度报告加 qlc**）。git: 4bbf0da → **a9f83fd**。
   - 口径：reds=基本号(7)/blues=[特别号](1) 复用 dlt 结构；`_qlc_tier(basic_match, special_hit)` 特别号仅参与二/四/六等；一/二/三等浮动不计 PnL。
