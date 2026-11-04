@@ -61,6 +61,136 @@ def _fmt_qlc(note):
         " ".join("%02d" % d for d in note.get("blues", [])))
 
 
+def _load_json_safe(path):
+    """只读 JSON，失败返回 None（绝不因核对段拖垮主链路）。"""
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def _fmt_3d_compact(nums_list):
+    return " / ".join("".join(str(x) for x in n) for n in nums_list)
+
+
+def load_yesterday_notes(yesterday):
+    """读取昨日各品种挂出的号码（供核对）。只读，不改动任何台账。"""
+    out = {"3d": None, "dlt": None, "ssq": None, "qlc": None}
+    pl = _load_json_safe(PL_FILE)
+    if pl:
+        recs = [r for r in pl.get("records", [])
+                if r.get("date") == yesterday and (r.get("notes") or 0) > 0]
+        if not recs:
+            older = [r for r in pl.get("records", [])
+                     if r.get("date", "") <= yesterday and (r.get("notes") or 0) > 0]
+            recs = older[-1:]
+        if recs:
+            r3 = recs[-1]
+            notes = [list(n) for n in r3.get("recommendations", [])]
+            groups = None
+            # 生效日起 3D 主台账含大小形态两组 16 注，按 主线/A/B 拆分展示。
+            # 主线钟摆注数是动态的 8~13，不能靠总注数猜，改以生效日 + push_type 双重校验。
+            if (r3.get("date", "") >= SIZE_EFFECTIVE_FROM
+                    and "大小形态" in (r3.get("push_type") or "")
+                    and len(notes) > 16):
+                k = len(notes) - 16
+                groups = {"main": notes[:k], "A": notes[k:k + 8], "B": notes[k + 8:]}
+            out["3d"] = {"notes": notes, "groups": groups,
+                         "target": r3.get("target_qihao"), "date": r3.get("date")}
+    for key, fn in (("dlt", "dlt_state.json"), ("ssq", "ssq_state.json"),
+                    ("qlc", "qlc_state.json")):
+        st = _load_json_safe(os.path.join(ROOT, "data", fn))
+        if not st:
+            continue
+        cand = [r for r in st.get("records", [])
+                if r.get("date", "") <= yesterday and r.get("notes")]
+        if cand:
+            r = cand[-1]
+            out[key] = {"notes": r.get("notes", []), "target": r.get("target_issue"),
+                        "date": r.get("date")}
+    return out
+
+
+def _yn_tag(y, yesterday):
+    """挂出日期说明：非昨日挂出（非开奖日沿用 pending）明确标注，避免把更早的号码说成昨日挂出。"""
+    gd = y.get("date") or "—"
+    return "%s 挂出" % gd if gd == yesterday else "%s 挂出·沿用" % gd
+
+
+def yesterday_notes_lines(yesterday):
+    """微信摘要用：复盘前原样列出各品种最近一次挂出的号码，供人工核对。
+
+    ⚠️ 红线：一律称「随机采样」，不得写「预测/推荐/荐号」。
+    """
+    d = load_yesterday_notes(yesterday)
+    L = ["", "━━ 📋 昨日随机采样（供核对）━━",
+         "⚠️ 均为随机采样·等同机选·无预测力（复盘前原样复制截至%s最近一次挂出号码；与下方开奖/结算行对照）" % yesterday]
+    y3 = d["3d"]
+    if y3 and y3["notes"]:
+        ns, g = y3["notes"], y3.get("groups")
+        head = "🎯 福彩3D %d注（%s，押%s）" % (
+            len(ns), _yn_tag(y3, yesterday), y3.get("target") or "—")
+        if g:
+            L.append(head + "：")
+            L.append("  钟摆 %d注：%s" % (len(g["main"]), _fmt_3d_compact(g["main"])))
+            L.append("  A组(大大小)：%s" % _fmt_3d_compact(g["A"]))
+            L.append("  B组(大小小)：%s" % _fmt_3d_compact(g["B"]))
+        else:
+            L.append(head + "：" + _fmt_3d_compact(ns))
+    else:
+        L.append("🎯 福彩3D：无挂号记录（休市/数据滞后）")
+    for key, label, fmt in (("dlt", "🎲 大乐透", _fmt_dlt),
+                            ("ssq", "🔴 双色球", _fmt_ssq),
+                            ("qlc", "🎱 七乐彩", _fmt_qlc)):
+        y = d.get(key)
+        if y and y["notes"]:
+            L.append("%s %d注（%s，押%s）：" % (
+                label, len(y["notes"]), _yn_tag(y, yesterday), y.get("target") or "—"))
+            for i, n in enumerate(y["notes"], 1):
+                L.append("  %d. %s" % (i, fmt(n)))
+        else:
+            L.append("%s：无挂号记录（非开奖日/休市）" % label)
+    return L
+
+
+def yesterday_notes_md(yesterday):
+    """统一报告用：复盘前原样列出各品种最近一次挂出的号码（Markdown，供核对）。
+
+    ⚠️ 红线：段内必须自带性质声明，不得写「预测/推荐/荐号」。
+    """
+    d = load_yesterday_notes(yesterday)
+    L = ["\n## 昨日随机采样（供核对）\n",
+         "\n> ⚠️ **性质声明**：以下号码均为随机采样，**等同投注站机选，不具备预测能力**；"
+         "系截至 %s 各品种最近一次挂出号码的原样复制，可与下方开奖/结算行逐注对照。"
+         "开奖随机且每期独立，不存在可推算的下期号码；仅供学习研究，不构成投注建议。\n" % yesterday]
+    y3 = d["3d"]
+    if y3 and y3["notes"]:
+        ns, g = y3["notes"], y3.get("groups")
+        L.append("\n- **福彩3D** %d注（%s，押%s）\n" % (
+            len(ns), _yn_tag(y3, yesterday), y3.get("target") or "—"))
+        if g:
+            L.append("  - 钟摆 %d注：`%s`\n" % (len(g["main"]), _fmt_3d_compact(g["main"])))
+            L.append("  - A组（大大小）：`%s`\n" % _fmt_3d_compact(g["A"]))
+            L.append("  - B组（大小小）：`%s`\n" % _fmt_3d_compact(g["B"]))
+        else:
+            L.append("  - `%s`\n" % _fmt_3d_compact(ns))
+    else:
+        L.append("\n- **福彩3D**：无挂号记录（休市/数据滞后）\n")
+    for key, label, fmt in (("dlt", "大乐透", _fmt_dlt),
+                            ("ssq", "双色球", _fmt_ssq),
+                            ("qlc", "七乐彩", _fmt_qlc)):
+        y = d.get(key)
+        if y and y["notes"]:
+            L.append("\n- **%s** %d注（%s，押%s）\n" % (
+                label, len(y["notes"]), _yn_tag(y, yesterday), y.get("target") or "—"))
+            for i, n in enumerate(y["notes"], 1):
+                L.append("  - %d. `%s`\n" % (i, fmt(n)))
+        else:
+            L.append("\n- **%s**：无挂号记录（非开奖日/休市）\n" % label)
+    return L
+
+
 def _resolve_3d_settlement(r3):
     """返回规范化的 3D 昨日结算 dict；若本次未结算(已结算过)，则回查 profit_loss.json。"""
     st = r3.get("settlement")
@@ -142,6 +272,9 @@ def wechat_block(today, yesterday, r3, rd, rs, rq, rsz):
     lines.append("【微信推送摘要】")
     lines.append("📊 彩票每日复盘 %s（福彩3D + 大乐透 + 双色球 + 七乐彩）" % today)
     lines.append("（前一自然日：%s）" % yesterday)
+
+    # 复盘之前：先原样列出昨日挂出的号码，供人工核对
+    lines += yesterday_notes_lines(yesterday)
 
     # ===== 福彩3D =====
     lines.append("")
@@ -420,6 +553,9 @@ def write_unified_report(today, yesterday, r3, rd, rs, rq, rsz, wechat):
     L.append("\n> ⚠️ **性质声明**：本报告中的号码均为程序按历史分布随机采样生成，**等同投注站机选，不具备预测能力**。\n")
     L.append("> 彩票开奖完全随机、每期独立，不存在可推算的下期号码；任何声称能预测或推荐中奖号码的个人、平台或 AI 均属诈骗。\n")
     L.append("> 本报告仅供学习研究与盈亏记录，不构成投注建议。\n")
+
+    # 复盘之前：先原样列出各品种最近一次挂出的号码，供人工核对
+    L += yesterday_notes_md(yesterday)
 
     L.append("\n## 福彩3D\n")
     L.append("- 昨日开奖：%s %s（%s）\n" % (

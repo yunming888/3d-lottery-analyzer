@@ -102,3 +102,13 @@
 - 自动化 prompt **v1.7**（只改 prompt，rrule 每日 05:00 不变，nextRunAt 已核对 2026-11-05 05:00 北京时间）。健康检查新增「生效后 3D 注数 ≥24 / 必须含大小形态字样」。
 - **已作废的 v1.6 物件**：`data/size_pattern_state.json`（从未生成）、独立报告 `size_pattern_YYYY-MM-DD.md`、`run_daily()` 与独立台账/结算逻辑、月度报告独立附节。勿恢复。
 - 自测：`python size_pattern_daily.py --selftest` / `--dry-run --date 2026-11-05`；合并链路曾用隔离沙盒演练（11-05 主链路 24注/48元 + 28注统一结算 -56/+984 + 摘要/报告渲染），临时脚本已删。改 `daily_review.py`/`unified_review.py` 多段一律用**单个 Python 脚本原子完成**。
+
+## 昨日随机采样（供核对）段（2026-11-04，prompt v1.8）
+- 云明指令「每天复盘之前，把昨天预测的号复制过来，我可以核对」；对外统一称「**昨日随机采样（供核对）**」，段内自带性质声明，禁止「预测/推荐/荐号」字样。
+- 位置：微信摘要「（前一自然日：%s）」之后、`━━ 🎯 福彩3D ━━` 之前；统一报告顶部性质声明之后、`## 福彩3D` 之前。两处同口径，**纯展示、不参与结算**。
+- 实现：`unified_review.py` 的 `_load_json_safe()` / `load_yesterday_notes()` / `_fmt_3d_compact()` / `_yn_tag()` / `yesterday_notes_lines()` / `yesterday_notes_md()`；只读，绝不写台账。
+- 数据源：3D = `profit_loss.json` 的 `records[].recommendations`（**三位数字 list**，非 note dict）；dlt/ssq/qlc = `*_state.json` 的 `records[].notes`（note dict，用 `_fmt_dlt/_fmt_ssq/_fmt_qlc` 渲染）。筛选 `date <= yesterday`，主链路当天新写的 pending 天然被排除 → 幂等重跑稳定。
+- ⚠️ **口径坑（勿回退）**：dlt/ssq/qlc 非天天开奖，取的是「截至昨日最近一次挂出」，不一定是昨日。必须显示**实际挂出日期**并标「·沿用」，**禁止写死「昨日挂出」**。实测 11-04 复盘时双色球取 11-02 挂出（押 26126）。
+- 11-05 起 3D 主台账含大小形态 16 注 → 该段按「钟摆主线 N 注 / A组(大大小) / B组(大小小)」拆分；拆分条件用 `SIZE_EFFECTIVE_FROM` + `push_type` 含「大小形态」双重校验，**勿靠总注数猜**（钟摆主线动态 8~13）。
+- 验证基线：逐注交叉比对四本台账（26 注）+ 红线检查 + 完整链路 exit 0 / 无告警 / 台账指纹前后一致。验证脚本为临时文件，验完删除。
+- prompt **v1.8**（只改 prompt，rrule 每日 05:00 不变，`nextRunAt=1793826000000` = 2026-11-05 05:00 北京时间）。健康检查新增「两处都必须有昨日段且逐注一致」。
