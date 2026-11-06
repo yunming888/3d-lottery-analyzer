@@ -3,14 +3,30 @@
     "source": "huiniao镜像",
     "game": "qlc",
     "name": "七乐彩",
-    "fetched_at": "2026-11-06T05:01:02",
+    "fetched_at": "2026-11-07T05:01:44",
     "window": 100,
-    "latest_issue": "2026127",
+    "latest_issue": "2026128",
     "count": 100,
     "from_cache": false,
     "fallback": false
   },
   "draws": [
+    {
+      "issue": "2026128",
+      "date": "2026-11-06",
+      "reds": [
+        4,
+        9,
+        10,
+        23,
+        26,
+        29,
+        30
+      ],
+      "blues": [
+        21
+      ]
+    },
     {
       "issue": "2026127",
       "date": "2026-11-04",
@@ -1593,22 +1609,6 @@
       ],
       "blues": [
         26
-      ]
-    },
-    {
-      "issue": "2026028",
-      "date": "2026-03-16",
-      "reds": [
-        6,
-        15,
-        17,
-        18,
-        21,
-        26,
-        29
-      ],
-      "blues": [
-        24
       ]
     }
   ]

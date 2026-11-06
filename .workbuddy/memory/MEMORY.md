@@ -37,6 +37,7 @@
 - 数据源：3D = `profit_loss.json` 的 `records[].recommendations`（三位数字 list）；dlt/ssq/qlc = `*_state.json` 的 `records[].notes`（note dict）。筛选 `date <= yesterday`，当天新写 pending 天然排除→幂等。
 - ⚠️ **口径坑（勿回退）**：非天天开奖品种取「截至昨日最近一次挂出」，必须显示**实际挂出日期**并标「·沿用」，禁止写死「昨日挂出」。
 - 11-05 起 3D 主台账含 16 注 → 该段按「钟摆主线 N / A组 / B组」拆分；条件为 `SIZE_EFFECTIVE_FROM` + `push_type` 含「大小形态」+ 注数>16 三重校验，**勿靠总注数猜**。生效首日（11-05 复盘展示 11-04 挂出号）不拆分属正常，11-06 起才拆。
+- ⚠️ **轮换日展示失真（2026-11-06 首次暴露，未改码）**：`_is_rotation_day`（每14天周五）替换最冷2组时**就地改写 date<=昨日 的 pending 记录 notes**（不新增记录），只读段从运行后台账取号 → 显示的不是昨日真实挂出号，而是今日轮换后组合；「昨日段与今日段号码完全相同」即为信号。11-06 实证 dlt/qlc 11-05 记录被改写（`git show HEAD:data/*_state.json` 可还原昨日真号），ssq 因记录已结算、3D `profit_loss.json` 不改，均未受影响；非轮换日无影响。修法候选：只读段取 git 历史快照 / 轮换改新增记录；**待云明决策，勿擅改选号结算链路**。
 
 ## 规则、数据源、成本
 - 开奖日：3D 每日；dlt 周一/三/六；ssq 周二/四/日；qlc 周一/三/五。昨日无开奖的品种在报告中注明。结算按 target=最新+1 结算 pending；一/二等奖浮动奖不计 PnL（保守）。追踪区间见 `profit_loss.json end_date`。
