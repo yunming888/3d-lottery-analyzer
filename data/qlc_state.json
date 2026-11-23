@@ -1612,6 +1612,108 @@
         }
       ],
       "cost": 10,
+      "status": "settled",
+      "draw_issue": "2026135",
+      "draw_date": "2026-11-23",
+      "draw_reds": [
+        1,
+        2,
+        7,
+        10,
+        12,
+        21,
+        26
+      ],
+      "draw_blues": [
+        3
+      ],
+      "win_notes": 0,
+      "best_tier": 0,
+      "float_win": false,
+      "prize": 0,
+      "daily_pnl": -10
+    },
+    {
+      "date": "2026-11-24",
+      "target_issue": "2026136",
+      "notes": [
+        {
+          "reds": [
+            6,
+            9,
+            14,
+            15,
+            16,
+            17,
+            21
+          ],
+          "blues": [
+            7
+          ],
+          "score": 1.342142669315851
+        },
+        {
+          "reds": [
+            5,
+            6,
+            7,
+            14,
+            17,
+            18,
+            22
+          ],
+          "blues": [
+            30
+          ],
+          "score": 1.6226983980871594
+        },
+        {
+          "reds": [
+            1,
+            6,
+            14,
+            15,
+            20,
+            29,
+            30
+          ],
+          "blues": [
+            17
+          ],
+          "score": 0.8637174008611366
+        },
+        {
+          "reds": [
+            6,
+            9,
+            12,
+            14,
+            25,
+            27,
+            30
+          ],
+          "blues": [
+            15
+          ],
+          "score": 1.089776039251773
+        },
+        {
+          "reds": [
+            1,
+            4,
+            6,
+            14,
+            19,
+            27,
+            30
+          ],
+          "blues": [
+            11
+          ],
+          "score": 0.8419960274459479
+        }
+      ],
+      "cost": 10,
       "status": "pending",
       "draw_issue": null,
       "draw_date": "",
@@ -1704,11 +1806,11 @@
   "last_rotation_date": "2026-11-20",
   "core_ym": "2026-11",
   "summary": {
-    "rounds": 15,
-    "total_notes": 75,
-    "total_cost": 150,
+    "rounds": 16,
+    "total_notes": 80,
+    "total_cost": 160,
     "total_prize": 5,
-    "net_pnl": -145,
+    "net_pnl": -155,
     "total_win_notes": 1,
     "pending_rounds": 1
   }

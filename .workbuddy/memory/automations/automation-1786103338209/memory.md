@@ -28,6 +28,9 @@
   - 红线保持：3D 标「随机采样·等同机选·无预测力【选号引擎 v6】」，直选+和值带仅为结构偏好（单注 0.1%、ROI 52%），不改变负 EV。
 
 ## 配置变更记录（续·v1.8）
+- **2026-11-23 21:20（云明「C」拍板：补数据+补结算+fetch层加固）**：prompt 版本不变（仍 v1.8）。**补结算已执行**：3D 2026305=200 组三，11-15 的 22 注 0 命中 -44，累计 -1080→**-1124**（1322注/4命中）；qlc 2026132 结算 0 命中 -10，累计 -135→**-145**（15轮）；四品种合计 -1945→**-1999**。3D 恢复出号（30注押2026313）、qlc 新挂 2026135；data_freshness 四品种 gap=0，运行告警消失。
+  - 数据源：官方 cwl API `findDrawNotice`（需 Referer）补 3D 8期+qlc 3期；**fetch 层已加兜底**（fetch_data.official_backfill 尾部缺口≥2天触发 / qlc fetcher._cwl_backfill 落后≥2期触发，容差各1，失败静默不碰选号结算）；修 `ball_red`→`ball_orange` 过时正则。备份在 `data/backup/*.20261123_2106.bak`。git 7654225。
+  - **⚠️ 后续复盘注意**：① qlc 结算口径按台账现状（11-20 轮换改写后的 notes），与 git 原始口径金额一致（均 0 命中）；② 轮换就地改写失真仍未修（昨日段展示口径），待云明决策；③ data_freshness 自检断言已改为通用不变量（不再写死 gap 期望）；④ 明日 05:00 复盘 3D 应正常 N+16 出号（押 2026313），若 huiniao 仍未恢复，官方兜底会自动补数、不再静默滞后。
 - **2026-11-23 20:40（云明「加个数据新鲜度检查，防止 9 期滞后」）**：prompt 版本不变（仍 v1.8，仅代码侧新增只读诊断层，**不动选号/结算/成本/台账结构**）。
   - 新增 `data_freshness.py`（只读、幂等）：读四品种 `*_history.json` 最新开奖**日期**，对照截至昨日最近法定开奖日按开奖日历算 gap（3D 天天 / dlt 周一三六 / ssq 周二四日 / qlc 周一三五，休市日排除）。gap≤1 容差、=2 WARN、≥3 ERROR、gap<0 异常 ERROR。自检 `python data_freshness.py [yesterday]`。
   - `unified_review.py` 三处接入：import+`LAST_FRESHNESS` 快照；`build_summary()` 末尾 `check_all`+`alert_all(ALERTS)` → 经现有 `ALERTS.render()` 自动进微信摘要「⚠️ 运行告警」段（**未改摘要结构**）；`write_unified_report()` 加只读「## 数据新鲜度检查（只读）」表格。
