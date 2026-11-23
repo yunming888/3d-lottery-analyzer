@@ -27,6 +27,8 @@ from ssq.settle import run_daily as ssq_run
 from qlc.settle import run_daily as qlc_run
 from size_pattern_daily import ENGINE_VERSION as SIZE_VERSION, EFFECTIVE_FROM as SIZE_EFFECTIVE_FROM
 from alerts import ALERTS
+import data_freshness
+LAST_FRESHNESS = {}  # 最近一次只读数据新鲜度检查结果快照（build_summary 写入）
 from analyze import ENGINE_VERSION as FCD_VERSION
 from dlt.selector import ENGINE_VERSION as DLT_VERSION
 from ssq.selector import ENGINE_VERSION as SSQ_VERSION
@@ -254,6 +256,10 @@ def build_summary():
     rs = _stage("双色球", ssq_run)
     print("\n########## [4/4] 七乐彩 复盘 ##########")
     rq = _stage("七乐彩", qlc_run)
+    # 数据新鲜度检查（只读）：开奖数据落后开奖日历的品种升级为运行告警，走 ALERTS.render() 自动进微信摘要
+    global LAST_FRESHNESS
+    LAST_FRESHNESS = data_freshness.check_all(yesterday)
+    data_freshness.alert_all(LAST_FRESHNESS, ALERTS)
     # 大小形态两组已并入 3D 主台账：不再单独跑模块、不再单独结算，此处只构造展示数据
     rsz = {
         "game": "3D大小形态两组", "failed": bool(r3.get("failed")),
@@ -661,6 +667,26 @@ def write_unified_report(today, yesterday, r3, rd, rs, rq, rsz, wechat):
     L.append("\n## 四品种合计\n")
     L.append("- 累计净盈亏合计：**%+d元**（3D %+d / 大乐透 %+d / 双色球 %+d / 七乐彩 %+d）\n" % (
         total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"], s_q["net_pnl"]))
+
+    # 数据新鲜度检查（只读，不改选号/结算）：显示四品种开奖数据是否落后开奖日历
+    freshness = globals().get("LAST_FRESHNESS") or data_freshness.check_all(yesterday)
+    L.append("\n## 数据新鲜度检查（只读）\n")
+    L.append("> 口径：本地最新开奖日 vs 截至 %s 最近法定开奖日；落后1期容差、2期提醒、3期及以上告警，休市日不计开奖。\n" % yesterday)
+    L.append("")
+    L.append("| 品种 | 本地最新 | 应开至 | 落后 | 状态 |\n")
+    L.append("|---|---|---|---|---|\n")
+    for _g in ("3d", "dlt", "ssq", "qlc"):
+        _fr = freshness.get(_g, {})
+        _gap = _fr.get("gap")
+        _gap_s = "—" if _gap is None else ("超前" if _gap < 0 else ("%d 期" % _gap))
+        L.append("| %s | %s(%s) | %s | %s | %s |\n" % (
+            _fr.get("name", _g), _fr.get("issue") or "—", _fr.get("local_day") or "—",
+            _fr.get("expected_day") or "—", _gap_s, _fr.get("level", "—")))
+    L.append("")
+    for _g in ("3d", "dlt", "ssq", "qlc"):
+        _fr = freshness.get(_g, {})
+        if _fr.get("level") in ("WARN", "ERROR"):
+            L.append("- ⚠️ %s：%s\n" % (_fr["name"], _fr["msg"]))
 
     L.append("\n---\n*生成时间 %s*\n" % datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     L.append("\n## 微信推送摘要\n\n```\n%s\n```\n" % wechat)
