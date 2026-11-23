@@ -146,7 +146,8 @@ def fetch_500com(qihao):
 
         # 500.com format: <div class="ball_red">N</div>
 
-        nums_match = re.findall(r'ball_red[^>]*>\s*(\d)\s*<', html)
+        # 2026-11-23 实测：500 页面 3D 球号 class 为 ball_orange（旧正则 ball_red 永不匹配，补缺静默失败）
+        nums_match = re.findall(r'ball_(?:red|orange)[^>]*>\s*(\d)\s*<', html)
 
         if len(nums_match) >= 3:
 
@@ -248,6 +249,101 @@ def fetch_huiniao(limit=30):
     except Exception as e:
         print(f"  huiniao 抓取失败: {e}")
         return []
+
+
+def fetch_cwl(limit=25):
+    """
+    兜底数据源（2026-11-23 云明授权方案B）：中福彩官方开奖 API findDrawNotice。
+    背景：huiniao 镜像可能停更（HTTP 200 但期号落后），旧 fill_gaps 只查内部缺口、
+    检测不到"尾部缺口"。本函数返回官方一手数据，解析成 3D record 格式。
+    需带 Referer（否则 403）。
+    """
+    url = ("https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice"
+           "?name=3d&issueCount=%d" % limit)
+    try:
+        resp = requests.get(url, headers={**HEADERS, "Referer": "https://www.cwl.gov.cn/ygkj/wqkjgg/3d/",
+                                          "Accept": "application/json"}, timeout=15)
+        resp.encoding = "utf-8"
+        j = resp.json()
+        if j.get("state") != 0:
+            print(f"  cwl官方 返回异常: state={j.get('state')}")
+            return []
+        records = []
+        for it in j.get("result", []):
+            m = re.match(r"(\d{4}-\d{2}-\d{2})", str(it.get("date", "")))
+            date = m.group(1) if m else ""
+            nums = [int(x) for x in str(it.get("red", "")).split(",") if x.strip() != ""]
+            if len(nums) != 3:
+                continue
+            bai, shi, ge = nums
+            if bai == shi == ge:
+                lot_type = "豹子"
+            elif bai == shi or shi == ge or bai == ge:
+                lot_type = "组三"
+            else:
+                lot_type = "组六"
+            records.append({
+                "qihao": str(it.get("code")), "date": date,
+                "bai": bai, "shi": shi, "ge": ge, "nums": nums,
+                "sum_val": sum(nums), "span": max(nums) - min(nums),
+                "type": lot_type, "_source": "cwl官方",
+            })
+        return records
+    except Exception as e:
+        print(f"  cwl官方 抓取失败: {e}")
+        return []
+
+
+def official_backfill(records):
+    """
+    尾部缺口兜底（方案B核心）：若本地最新开奖落后"截至昨日最近交易日">=2 天，
+    说明主源停更 -> 从中福彩官方 API 拉取缺失期号并合并落盘。
+    容差 1 天（昨日 21:15 开奖的同步延迟）。不触碰选号/结算。
+    """
+    try:
+        from datetime import date as _date, timedelta as _td
+        from trading_day import load_holidays, is_trading_day
+        if not records:
+            return records
+        local_latest = records[0]
+        ld = local_latest.get("date") or ""
+        try:
+            local_day = _date.fromisoformat(ld)
+        except ValueError:
+            return records
+        holidays = load_holidays()
+        yday = _date.today() - _td(days=1)
+        # 截至昨日最近交易日（3D 天天开，休市除外）
+        d = yday
+        expected_day = None
+        for _ in range(15):
+            if is_trading_day(d, holidays=holidays):
+                expected_day = d
+                break
+            d -= _td(days=1)
+        if expected_day is None:
+            return records
+        gap_days = (expected_day - local_day).days
+        if gap_days < 2:
+            return records
+        print(f"  🔍 检测到尾部缺口: 本地最新 {local_latest['qihao']}({ld}) 落后日历 {gap_days} 天, 启用中福彩官方兜底")
+        official = fetch_cwl(limit=min(25, gap_days + 5))
+        if not official:
+            print("  ⚠️ 官方兜底无数据, 保持本地现状(数据新鲜度告警会提示)")
+            return records
+        official_map = {r["qihao"]: r for r in official}
+        # 3D 期号格式 YYYYNNN（年内连续），直接补官方返回中 qihao > 本地最新的期号
+        local_int = int(local_latest["qihao"])
+        to_add = [official_map[q] for q in sorted(official_map.keys(), key=int) if int(q) > local_int]
+        if not to_add:
+            print("  ⚠️ 官方兜底无新期号(官方可能同样滞后), 保持本地现状")
+            return records
+        merged = merge_and_save(to_add)
+        print(f"  ✅ 官方兜底补 {len(to_add)} 期: {[r['qihao'] for r in to_add]}")
+        return merged
+    except Exception as e:
+        print(f"  ⚠️ 尾部缺口兜底异常(不影响主链路): {e}")
+        return records
 
 
 def detect_gaps(records):
@@ -399,6 +495,9 @@ def load_or_fetch():
             if records:
 
                 print(f"使用本地缓存: {len(records)} 期")
+
+    # Step 1.5: 尾部缺口兜底（2026-11-23 方案B）：主源停更时用中福彩官方 API 补
+    records = official_backfill(records)
 
     # Step 2: 检测并补全缺口 (huiniao 缺失时尝试 500.com)
 

@@ -15,6 +15,7 @@
 from_cache / fallback，绝不因抓取失败而误判或中断选号。
 """
 import os
+import re
 import json
 import urllib.request
 from datetime import datetime, date
@@ -70,6 +71,71 @@ def _parse(j: dict) -> list:
     return draws
 
 
+def _fetch_cwl_qlc(count: int = 15) -> list:
+    """
+    兜底数据源（2026-11-23 云明授权方案B）：中福彩官方开奖 API findDrawNotice(name=qlc)。
+    背景：huiniao 镜像停更时（HTTP 200 但期号落后），结算静默沿用 pending。
+    需带 Referer（否则 403）。返回统一结构 list（最新在前），失败返回 []。
+    """
+    try:
+        url = ("https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice"
+               "?name=qlc&issueCount=%d" % count)
+        req = urllib.request.Request(url, headers={
+            "User-Agent": UA,
+            "Referer": "https://www.cwl.gov.cn/ygkj/wqkjgg/qlc/",
+            "Accept": "application/json",
+        })
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            j = json.loads(resp.read().decode("utf-8", "ignore"))
+        if j.get("state") != 0:
+            return []
+        out = []
+        for it in j.get("result", []):
+            m = re.match(r"(\d{4}-\d{2}-\d{2})", str(it.get("date", "")))
+            try:
+                reds = sorted(int(x) for x in str(it.get("red", "")).split(",") if x.strip() != "")
+                blues = [int(x) for x in str(it.get("blue", "")).split(",") if x.strip() != ""]
+            except ValueError:
+                continue
+            if len(reds) != config.BASIC_COUNT or len(blues) != 1:
+                continue
+            if not all(config.BASIC_MIN <= x <= config.BASIC_MAX for x in reds):
+                continue
+            if not (config.SPECIAL_MIN <= blues[0] <= config.SPECIAL_MAX) or blues[0] in reds:
+                continue
+            issue = str(it.get("code", ""))
+            if len(issue) != 7 or not issue.isdigit():
+                continue
+            out.append({"issue": issue, "date": m.group(1) if m else "",
+                        "reds": reds, "blues": blues})
+        return out
+    except Exception:
+        return []
+
+
+def _cwl_backfill(draws: list, window: int = None) -> list:
+    """
+    尾部缺口兜底：huiniao 返回成功但期号落后官方 >=2 期时，从官方 API 补缺失期。
+    容差 1 期（同步延迟）。只补数据，不触碰选号/结算。失败静默返回原 draws。
+    """
+    try:
+        if not draws:
+            return draws
+        local_latest = int(draws[0]["issue"])
+        official = _fetch_cwl_qlc(15)
+        if not official:
+            return draws
+        if int(official[0]["issue"]) - local_latest < 2:
+            return draws  # 官方也滞后或仅1期容差内，不动作
+        to_add = [d for d in official if int(d["issue"]) > local_latest]
+        if not to_add:
+            return draws
+        merged = sorted(draws + to_add, key=lambda d: int(d["issue"]), reverse=True)
+        return merged[:window] if window else merged
+    except Exception:
+        return draws
+
+
 def fetch_history(window: int = config.WINDOW, force_refresh: bool = False):
     """
     获取七乐彩最近 window 期历史。
@@ -99,7 +165,10 @@ def fetch_history(window: int = config.WINDOW, force_refresh: bool = False):
         draws = _parse(_http_get_json(url))
         if not draws:
             raise RuntimeError("解析七乐彩历史数据为空")
-        draws = draws[:window]
+        _before = draws[0]["issue"]
+        draws = _cwl_backfill(draws, window)
+        if draws[0]["issue"] != _before:
+            print("  🔍 huiniao 停更, 官方兜底已补至 %s" % draws[0]["issue"])
         meta.update({"latest_issue": draws[0]["issue"], "count": len(draws),
                      "from_cache": False, "fallback": False})
         try:
@@ -116,7 +185,7 @@ def fetch_history(window: int = config.WINDOW, force_refresh: bool = False):
             try:
                 with open(cache_path, "r", encoding="utf-8") as f:
                     cached = json.load(f)
-                draws = cached.get("draws", [])[:window]
+                draws = _cwl_backfill(cached.get("draws", [])[:window], window)
                 if draws:
                     meta.update({"latest_issue": draws[0]["issue"], "count": len(draws),
                                  "from_cache": True, "fallback": True, "error": str(e)})

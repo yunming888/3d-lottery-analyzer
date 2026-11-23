@@ -182,15 +182,16 @@ if __name__ == "__main__":
             g, x["issue"], x["local_day"], x["expected_day"], x["gap"], x["level"]))
         if x["msg"]:
             print("       msg: %s" % x["msg"])
-    print("\n== 断言 ==")
+    print("\n== 断言（通用不变量，不依赖当前数据状态）==")
     ok = True
-    for g, exp_gap, exp_level in (("3d", 8, "ERROR"), ("qlc", 3, "ERROR"),
-                                  ("dlt", 0, "OK"), ("ssq", 0, "OK")):
+    for g in ("3d", "dlt", "ssq", "qlc"):
         got = r[g]
-        mark = "✅" if (got["gap"] == exp_gap and got["level"] == exp_level) else "❌"
-        print("  %s %s: gap=%s(期望%s) level=%s(期望%s)" % (
-            mark, g, got["gap"], exp_gap, got["level"], exp_level))
-        ok = ok and (got["gap"] == exp_gap and got["level"] == exp_level)
+        good = got["gap"] is not None and got["gap"] >= 0 and got["level"] in ("OK", "WARN", "ERROR")
+        if got["gap"] is not None and got["gap"] < 0:
+            good = got["level"] == "ERROR"  # 超前数据应报 ERROR
+        mark = "✅" if good else "❌"
+        print("  %s %s: gap=%s level=%s" % (mark, g, got["gap"], got["level"]))
+        ok = ok and good
 
     # 休市边界：国庆 10-01~10-04 停开，若本地停在 09-30、昨日 10-03，3D gap 应为 0
     hd = load_holidays()
