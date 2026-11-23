@@ -447,42 +447,32 @@ def load_data():
     return []
 
 def load_or_fetch():
-
-    # Step 1: 主源 huiniao (中福彩官方开奖数据公开镜像, 免鉴权, 拉最近100期用于走势研判)
-
-    new_records = fetch_huiniao(limit=100)
-
+    # Step 1: 主源 = 中福彩官方 API findDrawNotice（一手权威数据, 2026-11-24 换源）
+    #   背景: huiniao 镜像自 11-14 停更 10 天 (HTTP 200 但期号冻结), 改官方为主源。
+    #   官方实测: 免鉴权(带 Referer), 100期覆盖~3个月, 与本地历史库100期零差异。
+    new_records = fetch_cwl(limit=100)
     if new_records:
-
         records = merge_and_save(new_records)
-
-        print(f"huiniao: {len(new_records)} 期新数据, 本地共 {len(records)} 期")
-
+        print(f"中福彩官方: {len(new_records)} 期新数据, 本地共 {len(records)} 期")
     else:
-
-        # 兜底: 东方财富
-
-        new_records = fetch_eastmoney()
-
+        # Step 1b: 官方 API 故障 → 回退 huiniao 镜像
+        print("  ⚠️ 官方 API 无数据, 回退 huiniao 镜像")
+        new_records = fetch_huiniao(limit=100)
         if new_records:
-
             records = merge_and_save(new_records)
-
-            print(f"东方财富: {len(new_records)} 期新数据, 本地共 {len(records)} 期")
-
+            print(f"huiniao(备用): {len(new_records)} 期新数据, 本地共 {len(records)} 期")
         else:
+            # Step 1c: 再回退东方财富 / 本地缓存
+            new_records = fetch_eastmoney()
+            if new_records:
+                records = merge_and_save(new_records)
+                print(f"东方财富(备用): {len(new_records)} 期新数据, 本地共 {len(records)} 期")
+            else:
+                records = load_data()
+                if records:
+                    print(f"使用本地缓存: {len(records)} 期")
 
-            records = load_data()
-
-            if records:
-
-                print(f"使用本地缓存: {len(records)} 期")
-
-    # Step 1.5: 尾部缺口兜底（2026-11-23 方案B）：主源停更时用中福彩官方 API 补
-    records = official_backfill(records)
-
-    # Step 2: 检测并补全缺口 (huiniao 缺失时尝试 500.com)
-
+    # Step 2: 检测并补全内部缺口 (官方数据若有断档则尝试 500.com)
     records, filled = fill_gaps(records)
 
     return records

@@ -140,12 +140,13 @@ def fetch_history(window: int = config.WINDOW, force_refresh: bool = False):
     """
     获取七乐彩最近 window 期历史。
     返回 (draws, meta)。draws 最新在前，仅取最近 window 期。
+    2026-11-24 换源: 主源=中福彩官方API, 回退huiniao镜像, 再回退本地缓存。
     """
     cache_path = config.HISTORY_FILE
-    meta = {"source": "huiniao镜像", "game": "qlc", "name": "七乐彩",
+    meta = {"source": "中福彩官方", "game": "qlc", "name": "七乐彩",
             "fetched_at": datetime.now().isoformat(timespec="seconds"), "window": window}
 
-    # 1) 尝试读当天缓存（非强制刷新时）—— 数据源约 5 分钟同步，同日缓存足够新
+    # 1) 尝试读当天缓存（非强制刷新时）
     if not force_refresh and os.path.exists(cache_path):
         try:
             with open(cache_path, "r", encoding="utf-8") as f:
@@ -159,28 +160,32 @@ def fetch_history(window: int = config.WINDOW, force_refresh: bool = False):
         except Exception:
             pass
 
-    # 2) 实时抓取
+    # 2) 主源: 中福彩官方 API（一手权威数据）
+    draws = []
     try:
-        url = f"{config.SOURCE_HUINIAO}?type=qlc&page=1&limit={max(window, 100)}"
-        draws = _parse(_http_get_json(url))
-        if not draws:
-            raise RuntimeError("解析七乐彩历史数据为空")
-        _before = draws[0]["issue"]
-        draws = _cwl_backfill(draws, window)
-        if draws[0]["issue"] != _before:
-            print("  🔍 huiniao 停更, 官方兜底已补至 %s" % draws[0]["issue"])
-        meta.update({"latest_issue": draws[0]["issue"], "count": len(draws),
-                     "from_cache": False, "fallback": False})
+        draws = _fetch_cwl_qlc(max(window, 100))
+        if draws:
+            meta.update({"latest_issue": draws[0]["issue"], "count": len(draws),
+                         "from_cache": False, "fallback": False, "source": "中福彩官方"})
+    except Exception as _e:
+        meta["official_error"] = str(_e)
+
+    # 3) 官方失败 → 回退 huiniao 镜像
+    if not draws:
         try:
-            os.makedirs(os.path.dirname(cache_path), exist_ok=True)
-            from atomic_io import save_json_atomic
-            save_json_atomic(cache_path, {"meta": meta, "draws": draws})
+            url = f"{config.SOURCE_HUINIAO}?type=qlc&page=1&limit={max(window, 100)}"
+            draws = _parse(_http_get_json(url))
+            if draws:
+                draws = _cwl_backfill(draws, window)
+                meta.update({"latest_issue": draws[0]["issue"], "count": len(draws),
+                             "from_cache": False, "fallback": True,
+                             "source": "huiniao(备用)"})
+                print("  ⚠️ 官方 API 无数据, 回退 huiniao(备用): %s" % draws[0]["issue"])
         except Exception as _e:
-            from alerts import ALERTS
-            ALERTS.add("WARN", "七乐彩", "缓存写盘失败：%s" % _e)
-        return draws, meta
-    except Exception as e:
-        # 3) 抓取失败 → 回退本地缓存（若存在）
+            meta["huiniao_error"] = str(_e)
+
+    # 4) 都失败 → 回退本地缓存
+    if not draws:
         if os.path.exists(cache_path):
             try:
                 with open(cache_path, "r", encoding="utf-8") as f:
@@ -188,12 +193,22 @@ def fetch_history(window: int = config.WINDOW, force_refresh: bool = False):
                 draws = _cwl_backfill(cached.get("draws", [])[:window], window)
                 if draws:
                     meta.update({"latest_issue": draws[0]["issue"], "count": len(draws),
-                                 "from_cache": True, "fallback": True, "error": str(e)})
+                                 "from_cache": True, "fallback": True, "source": "本地缓存"})
                     return draws, meta
             except Exception:
                 pass
-        meta.update({"from_cache": False, "fallback": True, "error": str(e), "count": 0})
+        meta.update({"from_cache": False, "fallback": True, "count": 0})
         return [], meta
+
+    # 5) 缓存写盘
+    try:
+        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+        from atomic_io import save_json_atomic
+        save_json_atomic(cache_path, {"meta": meta, "draws": draws})
+    except Exception as _e:
+        from alerts import ALERTS
+        ALERTS.add("WARN", "七乐彩", "缓存写盘失败：%s" % _e)
+    return draws, meta
 
 
 def load_cache(path: str = config.HISTORY_FILE) -> list:
