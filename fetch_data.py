@@ -296,50 +296,32 @@ def fetch_cwl(limit=25):
 
 def official_backfill(records):
     """
-    尾部缺口兜底（方案B核心）：若本地最新开奖落后"截至昨日最近交易日">=2 天，
-    说明主源停更 -> 从中福彩官方 API 拉取缺失期号并合并落盘。
-    容差 1 天（昨日 21:15 开奖的同步延迟）。不触碰选号/结算。
+    尾部缺口兜底（2026-11-24 修复）：无条件查中福彩官方 API，只要官方有比本地新的期号就补齐。
+
+    背景（静默 0 注根因）：旧版用「本地最新日期 vs 昨日交易日」的日差 >= 2 才触发；
+    当本地恰好落后 1 天（如本地 11-22、昨日 11-23）时不补，但官方其实已有该期
+    （2026313=346）。同时出号层 daily_review 用「期号差 > 1」判数据滞后 → 暂停出号，
+    新鲜度层 data_freshness 又因日差=1 报 OK 不告警 —— 三层口径错配导致连续多日静默 0 注。
+
+    新逻辑与 qlc/fetcher._cwl_backfill 保持一致：每次拉官方、按期号差补，
+    不再依赖脆弱的日差阈值。只补数据，不触碰选号/结算/成本/台账结构。
     """
     try:
-        from datetime import date as _date, timedelta as _td
-        from trading_day import load_holidays, is_trading_day
         if not records:
             return records
         local_latest = records[0]
-        ld = local_latest.get("date") or ""
-        try:
-            local_day = _date.fromisoformat(ld)
-        except ValueError:
-            return records
-        holidays = load_holidays()
-        yday = _date.today() - _td(days=1)
-        # 截至昨日最近交易日（3D 天天开，休市除外）
-        d = yday
-        expected_day = None
-        for _ in range(15):
-            if is_trading_day(d, holidays=holidays):
-                expected_day = d
-                break
-            d -= _td(days=1)
-        if expected_day is None:
-            return records
-        gap_days = (expected_day - local_day).days
-        if gap_days < 2:
-            return records
-        print(f"  🔍 检测到尾部缺口: 本地最新 {local_latest['qihao']}({ld}) 落后日历 {gap_days} 天, 启用中福彩官方兜底")
-        official = fetch_cwl(limit=min(25, gap_days + 5))
-        if not official:
-            print("  ⚠️ 官方兜底无数据, 保持本地现状(数据新鲜度告警会提示)")
-            return records
-        official_map = {r["qihao"]: r for r in official}
-        # 3D 期号格式 YYYYNNN（年内连续），直接补官方返回中 qihao > 本地最新的期号
         local_int = int(local_latest["qihao"])
-        to_add = [official_map[q] for q in sorted(official_map.keys(), key=int) if int(q) > local_int]
+        official = fetch_cwl(limit=25)
+        if not official:
+            return records  # 官方无数据/临时故障：静默保持现状，数据新鲜度层仍会告警
+        official_map = {r["qihao"]: r for r in official}
+        to_add = [official_map[q] for q in sorted(official_map.keys(), key=int)
+                  if int(q) > local_int]
         if not to_add:
-            print("  ⚠️ 官方兜底无新期号(官方可能同样滞后), 保持本地现状")
             return records
+        print(f"  🔍 huiniao 停更/尾部缺口: 本地 {local_latest['qihao']} → 官方有 {[r['qihao'] for r in to_add]}")
         merged = merge_and_save(to_add)
-        print(f"  ✅ 官方兜底补 {len(to_add)} 期: {[r['qihao'] for r in to_add]}")
+        print(f"  ✅ 官方兜底补 {len(to_add)} 期")
         return merged
     except Exception as e:
         print(f"  ⚠️ 尾部缺口兜底异常(不影响主链路): {e}")

@@ -1,0 +1,3266 @@
+[
+  {
+    "qihao": "2026312",
+    "date": "2026-11-22",
+    "bai": 4,
+    "shi": 0,
+    "ge": 8,
+    "nums": [
+      4,
+      0,
+      8
+    ],
+    "sum_val": 12,
+    "span": 8,
+    "type": "组六",
+    "_source": "cwl官方"
+  },
+  {
+    "qihao": "2026311",
+    "date": "2026-11-21",
+    "bai": 8,
+    "shi": 1,
+    "ge": 5,
+    "nums": [
+      8,
+      1,
+      5
+    ],
+    "sum_val": 14,
+    "span": 7,
+    "type": "组六",
+    "_source": "cwl官方"
+  },
+  {
+    "qihao": "2026310",
+    "date": "2026-11-20",
+    "bai": 3,
+    "shi": 1,
+    "ge": 8,
+    "nums": [
+      3,
+      1,
+      8
+    ],
+    "sum_val": 12,
+    "span": 7,
+    "type": "组六",
+    "_source": "cwl官方"
+  },
+  {
+    "qihao": "2026309",
+    "date": "2026-11-19",
+    "bai": 1,
+    "shi": 5,
+    "ge": 6,
+    "nums": [
+      1,
+      5,
+      6
+    ],
+    "sum_val": 12,
+    "span": 5,
+    "type": "组六",
+    "_source": "cwl官方"
+  },
+  {
+    "qihao": "2026308",
+    "date": "2026-11-18",
+    "bai": 0,
+    "shi": 4,
+    "ge": 1,
+    "nums": [
+      0,
+      4,
+      1
+    ],
+    "sum_val": 5,
+    "span": 4,
+    "type": "组六",
+    "_source": "cwl官方"
+  },
+  {
+    "qihao": "2026307",
+    "date": "2026-11-17",
+    "bai": 6,
+    "shi": 0,
+    "ge": 1,
+    "nums": [
+      6,
+      0,
+      1
+    ],
+    "sum_val": 7,
+    "span": 6,
+    "type": "组六",
+    "_source": "cwl官方"
+  },
+  {
+    "qihao": "2026306",
+    "date": "2026-11-16",
+    "bai": 4,
+    "shi": 3,
+    "ge": 2,
+    "nums": [
+      4,
+      3,
+      2
+    ],
+    "sum_val": 9,
+    "span": 2,
+    "type": "组六",
+    "_source": "cwl官方"
+  },
+  {
+    "qihao": "2026305",
+    "date": "2026-11-15",
+    "bai": 2,
+    "shi": 0,
+    "ge": 0,
+    "nums": [
+      2,
+      0,
+      0
+    ],
+    "sum_val": 2,
+    "span": 2,
+    "type": "组三",
+    "_source": "cwl官方"
+  },
+  {
+    "qihao": "2026304",
+    "date": "2026-11-14",
+    "bai": 8,
+    "shi": 2,
+    "ge": 3,
+    "nums": [
+      8,
+      2,
+      3
+    ],
+    "sum_val": 13,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026303",
+    "date": "2026-11-13",
+    "bai": 0,
+    "shi": 6,
+    "ge": 9,
+    "nums": [
+      0,
+      6,
+      9
+    ],
+    "sum_val": 15,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026302",
+    "date": "2026-11-12",
+    "bai": 4,
+    "shi": 2,
+    "ge": 8,
+    "nums": [
+      4,
+      2,
+      8
+    ],
+    "sum_val": 14,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026301",
+    "date": "2026-11-11",
+    "bai": 8,
+    "shi": 4,
+    "ge": 9,
+    "nums": [
+      8,
+      4,
+      9
+    ],
+    "sum_val": 21,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026300",
+    "date": "2026-11-10",
+    "bai": 1,
+    "shi": 9,
+    "ge": 0,
+    "nums": [
+      1,
+      9,
+      0
+    ],
+    "sum_val": 10,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026299",
+    "date": "2026-11-09",
+    "bai": 3,
+    "shi": 8,
+    "ge": 2,
+    "nums": [
+      3,
+      8,
+      2
+    ],
+    "sum_val": 13,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026298",
+    "date": "2026-11-08",
+    "bai": 0,
+    "shi": 8,
+    "ge": 5,
+    "nums": [
+      0,
+      8,
+      5
+    ],
+    "sum_val": 13,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026297",
+    "date": "2026-11-07",
+    "bai": 1,
+    "shi": 2,
+    "ge": 3,
+    "nums": [
+      1,
+      2,
+      3
+    ],
+    "sum_val": 6,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026296",
+    "date": "2026-11-06",
+    "bai": 9,
+    "shi": 0,
+    "ge": 7,
+    "nums": [
+      9,
+      0,
+      7
+    ],
+    "sum_val": 16,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026295",
+    "date": "2026-11-05",
+    "bai": 7,
+    "shi": 4,
+    "ge": 1,
+    "nums": [
+      7,
+      4,
+      1
+    ],
+    "sum_val": 12,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026294",
+    "date": "2026-11-04",
+    "bai": 2,
+    "shi": 6,
+    "ge": 1,
+    "nums": [
+      2,
+      6,
+      1
+    ],
+    "sum_val": 9,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026293",
+    "date": "2026-11-03",
+    "bai": 1,
+    "shi": 8,
+    "ge": 5,
+    "nums": [
+      1,
+      8,
+      5
+    ],
+    "sum_val": 14,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026292",
+    "date": "2026-11-02",
+    "bai": 9,
+    "shi": 9,
+    "ge": 3,
+    "nums": [
+      9,
+      9,
+      3
+    ],
+    "sum_val": 21,
+    "span": 6,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026291",
+    "date": "2026-11-01",
+    "bai": 0,
+    "shi": 8,
+    "ge": 6,
+    "nums": [
+      0,
+      8,
+      6
+    ],
+    "sum_val": 14,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026290",
+    "date": "2026-10-31",
+    "bai": 7,
+    "shi": 3,
+    "ge": 5,
+    "nums": [
+      7,
+      3,
+      5
+    ],
+    "sum_val": 15,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026289",
+    "date": "2026-10-30",
+    "bai": 8,
+    "shi": 4,
+    "ge": 3,
+    "nums": [
+      8,
+      4,
+      3
+    ],
+    "sum_val": 15,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026288",
+    "date": "2026-10-29",
+    "bai": 6,
+    "shi": 1,
+    "ge": 2,
+    "nums": [
+      6,
+      1,
+      2
+    ],
+    "sum_val": 9,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026287",
+    "date": "2026-10-28",
+    "bai": 1,
+    "shi": 2,
+    "ge": 1,
+    "nums": [
+      1,
+      2,
+      1
+    ],
+    "sum_val": 4,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026286",
+    "date": "2026-10-27",
+    "bai": 1,
+    "shi": 9,
+    "ge": 2,
+    "nums": [
+      1,
+      9,
+      2
+    ],
+    "sum_val": 12,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026285",
+    "date": "2026-10-26",
+    "bai": 9,
+    "shi": 3,
+    "ge": 2,
+    "nums": [
+      9,
+      3,
+      2
+    ],
+    "sum_val": 14,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026284",
+    "date": "2026-10-25",
+    "bai": 1,
+    "shi": 7,
+    "ge": 6,
+    "nums": [
+      1,
+      7,
+      6
+    ],
+    "sum_val": 14,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026283",
+    "date": "2026-10-24",
+    "bai": 2,
+    "shi": 0,
+    "ge": 2,
+    "nums": [
+      2,
+      0,
+      2
+    ],
+    "sum_val": 4,
+    "span": 2,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026282",
+    "date": "2026-10-23",
+    "bai": 3,
+    "shi": 0,
+    "ge": 0,
+    "nums": [
+      3,
+      0,
+      0
+    ],
+    "sum_val": 3,
+    "span": 3,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026281",
+    "date": "2026-10-22",
+    "bai": 8,
+    "shi": 1,
+    "ge": 3,
+    "nums": [
+      8,
+      1,
+      3
+    ],
+    "sum_val": 12,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026280",
+    "date": "2026-10-21",
+    "bai": 4,
+    "shi": 3,
+    "ge": 5,
+    "nums": [
+      4,
+      3,
+      5
+    ],
+    "sum_val": 12,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026279",
+    "date": "2026-10-20",
+    "bai": 7,
+    "shi": 9,
+    "ge": 1,
+    "nums": [
+      7,
+      9,
+      1
+    ],
+    "sum_val": 17,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026278",
+    "date": "2026-10-19",
+    "bai": 6,
+    "shi": 6,
+    "ge": 6,
+    "nums": [
+      6,
+      6,
+      6
+    ],
+    "sum_val": 18,
+    "span": 0,
+    "type": "豹子",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026277",
+    "date": "2026-10-18",
+    "bai": 5,
+    "shi": 6,
+    "ge": 8,
+    "nums": [
+      5,
+      6,
+      8
+    ],
+    "sum_val": 19,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026276",
+    "date": "2026-10-17",
+    "bai": 9,
+    "shi": 6,
+    "ge": 0,
+    "nums": [
+      9,
+      6,
+      0
+    ],
+    "sum_val": 15,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026275",
+    "date": "2026-10-16",
+    "bai": 2,
+    "shi": 8,
+    "ge": 7,
+    "nums": [
+      2,
+      8,
+      7
+    ],
+    "sum_val": 17,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026274",
+    "date": "2026-10-15",
+    "bai": 8,
+    "shi": 2,
+    "ge": 3,
+    "nums": [
+      8,
+      2,
+      3
+    ],
+    "sum_val": 13,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026273",
+    "date": "2026-10-14",
+    "bai": 9,
+    "shi": 0,
+    "ge": 2,
+    "nums": [
+      9,
+      0,
+      2
+    ],
+    "sum_val": 11,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026272",
+    "date": "2026-10-13",
+    "bai": 0,
+    "shi": 1,
+    "ge": 5,
+    "nums": [
+      0,
+      1,
+      5
+    ],
+    "sum_val": 6,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026271",
+    "date": "2026-10-12",
+    "bai": 2,
+    "shi": 8,
+    "ge": 0,
+    "nums": [
+      2,
+      8,
+      0
+    ],
+    "sum_val": 10,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026270",
+    "date": "2026-10-11",
+    "bai": 0,
+    "shi": 8,
+    "ge": 4,
+    "nums": [
+      0,
+      8,
+      4
+    ],
+    "sum_val": 12,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026269",
+    "date": "2026-10-10",
+    "bai": 3,
+    "shi": 4,
+    "ge": 1,
+    "nums": [
+      3,
+      4,
+      1
+    ],
+    "sum_val": 8,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026268",
+    "date": "2026-10-09",
+    "bai": 8,
+    "shi": 9,
+    "ge": 0,
+    "nums": [
+      8,
+      9,
+      0
+    ],
+    "sum_val": 17,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026267",
+    "date": "2026-10-08",
+    "bai": 8,
+    "shi": 5,
+    "ge": 7,
+    "nums": [
+      8,
+      5,
+      7
+    ],
+    "sum_val": 20,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026266",
+    "date": "2026-10-07",
+    "bai": 3,
+    "shi": 4,
+    "ge": 6,
+    "nums": [
+      3,
+      4,
+      6
+    ],
+    "sum_val": 13,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026265",
+    "date": "2026-10-06",
+    "bai": 1,
+    "shi": 6,
+    "ge": 1,
+    "nums": [
+      1,
+      6,
+      1
+    ],
+    "sum_val": 8,
+    "span": 5,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026264",
+    "date": "2026-10-05",
+    "bai": 1,
+    "shi": 1,
+    "ge": 9,
+    "nums": [
+      1,
+      1,
+      9
+    ],
+    "sum_val": 11,
+    "span": 8,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026263",
+    "date": "2026-09-30",
+    "bai": 9,
+    "shi": 8,
+    "ge": 7,
+    "nums": [
+      9,
+      8,
+      7
+    ],
+    "sum_val": 24,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026262",
+    "date": "2026-09-29",
+    "bai": 3,
+    "shi": 4,
+    "ge": 7,
+    "nums": [
+      3,
+      4,
+      7
+    ],
+    "sum_val": 14,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026261",
+    "date": "2026-09-28",
+    "bai": 5,
+    "shi": 1,
+    "ge": 1,
+    "nums": [
+      5,
+      1,
+      1
+    ],
+    "sum_val": 7,
+    "span": 4,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026260",
+    "date": "2026-09-27",
+    "bai": 6,
+    "shi": 1,
+    "ge": 9,
+    "nums": [
+      6,
+      1,
+      9
+    ],
+    "sum_val": 16,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026259",
+    "date": "2026-09-26",
+    "bai": 7,
+    "shi": 3,
+    "ge": 1,
+    "nums": [
+      7,
+      3,
+      1
+    ],
+    "sum_val": 11,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026258",
+    "date": "2026-09-25",
+    "bai": 6,
+    "shi": 3,
+    "ge": 5,
+    "nums": [
+      6,
+      3,
+      5
+    ],
+    "sum_val": 14,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026257",
+    "date": "2026-09-24",
+    "bai": 4,
+    "shi": 8,
+    "ge": 6,
+    "nums": [
+      4,
+      8,
+      6
+    ],
+    "sum_val": 18,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026256",
+    "date": "2026-09-23",
+    "bai": 0,
+    "shi": 5,
+    "ge": 1,
+    "nums": [
+      0,
+      5,
+      1
+    ],
+    "sum_val": 6,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026255",
+    "date": "2026-09-22",
+    "bai": 6,
+    "shi": 9,
+    "ge": 9,
+    "nums": [
+      6,
+      9,
+      9
+    ],
+    "sum_val": 24,
+    "span": 3,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026254",
+    "date": "2026-09-21",
+    "bai": 8,
+    "shi": 5,
+    "ge": 0,
+    "nums": [
+      8,
+      5,
+      0
+    ],
+    "sum_val": 13,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026253",
+    "date": "2026-09-20",
+    "bai": 0,
+    "shi": 3,
+    "ge": 4,
+    "nums": [
+      0,
+      3,
+      4
+    ],
+    "sum_val": 7,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026252",
+    "date": "2026-09-19",
+    "bai": 0,
+    "shi": 9,
+    "ge": 2,
+    "nums": [
+      0,
+      9,
+      2
+    ],
+    "sum_val": 11,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026251",
+    "date": "2026-09-18",
+    "bai": 7,
+    "shi": 7,
+    "ge": 7,
+    "nums": [
+      7,
+      7,
+      7
+    ],
+    "sum_val": 21,
+    "span": 0,
+    "type": "豹子",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026250",
+    "date": "2026-09-17",
+    "bai": 9,
+    "shi": 5,
+    "ge": 4,
+    "nums": [
+      9,
+      5,
+      4
+    ],
+    "sum_val": 18,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026249",
+    "date": "2026-09-16",
+    "bai": 6,
+    "shi": 8,
+    "ge": 9,
+    "nums": [
+      6,
+      8,
+      9
+    ],
+    "sum_val": 23,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026248",
+    "date": "2026-09-15",
+    "bai": 8,
+    "shi": 7,
+    "ge": 6,
+    "nums": [
+      8,
+      7,
+      6
+    ],
+    "sum_val": 21,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026247",
+    "date": "2026-09-14",
+    "bai": 6,
+    "shi": 0,
+    "ge": 9,
+    "nums": [
+      6,
+      0,
+      9
+    ],
+    "sum_val": 15,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026246",
+    "date": "2026-09-13",
+    "bai": 9,
+    "shi": 8,
+    "ge": 2,
+    "nums": [
+      9,
+      8,
+      2
+    ],
+    "sum_val": 19,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026245",
+    "date": "2026-09-12",
+    "bai": 5,
+    "shi": 4,
+    "ge": 9,
+    "nums": [
+      5,
+      4,
+      9
+    ],
+    "sum_val": 18,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026244",
+    "date": "2026-09-11",
+    "bai": 6,
+    "shi": 5,
+    "ge": 4,
+    "nums": [
+      6,
+      5,
+      4
+    ],
+    "sum_val": 15,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026243",
+    "date": "2026-09-10",
+    "bai": 2,
+    "shi": 1,
+    "ge": 9,
+    "nums": [
+      2,
+      1,
+      9
+    ],
+    "sum_val": 12,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026242",
+    "date": "2026-09-09",
+    "bai": 5,
+    "shi": 5,
+    "ge": 5,
+    "nums": [
+      5,
+      5,
+      5
+    ],
+    "sum_val": 15,
+    "span": 0,
+    "type": "豹子",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026241",
+    "date": "2026-09-08",
+    "bai": 0,
+    "shi": 0,
+    "ge": 2,
+    "nums": [
+      0,
+      0,
+      2
+    ],
+    "sum_val": 2,
+    "span": 2,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026240",
+    "date": "2026-09-07",
+    "bai": 9,
+    "shi": 8,
+    "ge": 1,
+    "nums": [
+      9,
+      8,
+      1
+    ],
+    "sum_val": 18,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026239",
+    "date": "2026-09-06",
+    "bai": 0,
+    "shi": 0,
+    "ge": 2,
+    "nums": [
+      0,
+      0,
+      2
+    ],
+    "sum_val": 2,
+    "span": 2,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026238",
+    "date": "2026-09-05",
+    "bai": 8,
+    "shi": 9,
+    "ge": 9,
+    "nums": [
+      8,
+      9,
+      9
+    ],
+    "sum_val": 26,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026237",
+    "date": "2026-09-04",
+    "bai": 8,
+    "shi": 5,
+    "ge": 4,
+    "nums": [
+      8,
+      5,
+      4
+    ],
+    "sum_val": 17,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026236",
+    "date": "2026-09-03",
+    "bai": 0,
+    "shi": 4,
+    "ge": 7,
+    "nums": [
+      0,
+      4,
+      7
+    ],
+    "sum_val": 11,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026235",
+    "date": "2026-09-02",
+    "bai": 2,
+    "shi": 1,
+    "ge": 9,
+    "nums": [
+      2,
+      1,
+      9
+    ],
+    "sum_val": 12,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026234",
+    "date": "2026-09-01",
+    "bai": 6,
+    "shi": 9,
+    "ge": 5,
+    "nums": [
+      6,
+      9,
+      5
+    ],
+    "sum_val": 20,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026233",
+    "date": "2026-08-31",
+    "bai": 9,
+    "shi": 7,
+    "ge": 0,
+    "nums": [
+      9,
+      7,
+      0
+    ],
+    "sum_val": 16,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026232",
+    "date": "2026-08-30",
+    "bai": 6,
+    "shi": 5,
+    "ge": 8,
+    "nums": [
+      6,
+      5,
+      8
+    ],
+    "sum_val": 19,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026231",
+    "date": "2026-08-29",
+    "bai": 7,
+    "shi": 3,
+    "ge": 3,
+    "nums": [
+      7,
+      3,
+      3
+    ],
+    "sum_val": 13,
+    "span": 4,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026230",
+    "date": "2026-08-28",
+    "bai": 0,
+    "shi": 6,
+    "ge": 6,
+    "nums": [
+      0,
+      6,
+      6
+    ],
+    "sum_val": 12,
+    "span": 6,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026229",
+    "date": "2026-08-27",
+    "bai": 8,
+    "shi": 2,
+    "ge": 8,
+    "nums": [
+      8,
+      2,
+      8
+    ],
+    "sum_val": 18,
+    "span": 6,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026228",
+    "date": "2026-08-26",
+    "bai": 3,
+    "shi": 9,
+    "ge": 9,
+    "nums": [
+      3,
+      9,
+      9
+    ],
+    "sum_val": 21,
+    "span": 6,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026227",
+    "date": "2026-08-25",
+    "bai": 5,
+    "shi": 2,
+    "ge": 2,
+    "nums": [
+      5,
+      2,
+      2
+    ],
+    "sum_val": 9,
+    "span": 3,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026226",
+    "date": "2026-08-24",
+    "bai": 8,
+    "shi": 5,
+    "ge": 1,
+    "nums": [
+      8,
+      5,
+      1
+    ],
+    "sum_val": 14,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026225",
+    "date": "2026-08-23",
+    "bai": 5,
+    "shi": 5,
+    "ge": 5,
+    "nums": [
+      5,
+      5,
+      5
+    ],
+    "sum_val": 15,
+    "span": 0,
+    "type": "豹子",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026224",
+    "date": "2026-08-22",
+    "bai": 8,
+    "shi": 6,
+    "ge": 2,
+    "nums": [
+      8,
+      6,
+      2
+    ],
+    "sum_val": 16,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026223",
+    "date": "2026-08-21",
+    "bai": 9,
+    "shi": 4,
+    "ge": 8,
+    "nums": [
+      9,
+      4,
+      8
+    ],
+    "sum_val": 21,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026222",
+    "date": "2026-08-20",
+    "bai": 3,
+    "shi": 8,
+    "ge": 0,
+    "nums": [
+      3,
+      8,
+      0
+    ],
+    "sum_val": 11,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026221",
+    "date": "2026-08-19",
+    "bai": 2,
+    "shi": 9,
+    "ge": 6,
+    "nums": [
+      2,
+      9,
+      6
+    ],
+    "sum_val": 17,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026220",
+    "date": "2026-08-18",
+    "bai": 3,
+    "shi": 7,
+    "ge": 3,
+    "nums": [
+      3,
+      7,
+      3
+    ],
+    "sum_val": 13,
+    "span": 4,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026219",
+    "date": "2026-08-17",
+    "bai": 2,
+    "shi": 2,
+    "ge": 5,
+    "nums": [
+      2,
+      2,
+      5
+    ],
+    "sum_val": 9,
+    "span": 3,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026218",
+    "date": "2026-08-16",
+    "bai": 3,
+    "shi": 8,
+    "ge": 2,
+    "nums": [
+      3,
+      8,
+      2
+    ],
+    "sum_val": 13,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026217",
+    "date": "2026-08-15",
+    "bai": 8,
+    "shi": 8,
+    "ge": 2,
+    "nums": [
+      8,
+      8,
+      2
+    ],
+    "sum_val": 18,
+    "span": 6,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026216",
+    "date": "2026-08-14",
+    "bai": 9,
+    "shi": 3,
+    "ge": 5,
+    "nums": [
+      9,
+      3,
+      5
+    ],
+    "sum_val": 17,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026215",
+    "date": "2026-08-13",
+    "bai": 1,
+    "shi": 7,
+    "ge": 2,
+    "nums": [
+      1,
+      7,
+      2
+    ],
+    "sum_val": 10,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026214",
+    "date": "2026-08-12",
+    "bai": 5,
+    "shi": 4,
+    "ge": 5,
+    "nums": [
+      5,
+      4,
+      5
+    ],
+    "sum_val": 14,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026213",
+    "date": "2026-08-11",
+    "bai": 8,
+    "shi": 7,
+    "ge": 2,
+    "nums": [
+      8,
+      7,
+      2
+    ],
+    "sum_val": 17,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026212",
+    "date": "2026-08-10",
+    "bai": 5,
+    "shi": 6,
+    "ge": 1,
+    "nums": [
+      5,
+      6,
+      1
+    ],
+    "sum_val": 12,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026211",
+    "date": "2026-08-09",
+    "bai": 7,
+    "shi": 0,
+    "ge": 8,
+    "nums": [
+      7,
+      0,
+      8
+    ],
+    "sum_val": 15,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026210",
+    "date": "2026-08-08",
+    "bai": 7,
+    "shi": 5,
+    "ge": 5,
+    "nums": [
+      7,
+      5,
+      5
+    ],
+    "sum_val": 17,
+    "span": 2,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026209",
+    "date": "2026-08-07",
+    "bai": 2,
+    "shi": 8,
+    "ge": 9,
+    "nums": [
+      2,
+      8,
+      9
+    ],
+    "sum_val": 19,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026208",
+    "date": "2026-08-06",
+    "bai": 6,
+    "shi": 3,
+    "ge": 2,
+    "nums": [
+      6,
+      3,
+      2
+    ],
+    "sum_val": 11,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026207",
+    "date": "2026-08-05",
+    "bai": 4,
+    "shi": 1,
+    "ge": 5,
+    "nums": [
+      4,
+      1,
+      5
+    ],
+    "sum_val": 10,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026206",
+    "date": "2026-08-04",
+    "bai": 9,
+    "shi": 4,
+    "ge": 2,
+    "nums": [
+      9,
+      4,
+      2
+    ],
+    "sum_val": 15,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026205",
+    "date": "2026-08-03",
+    "bai": 8,
+    "shi": 1,
+    "ge": 4,
+    "nums": [
+      8,
+      1,
+      4
+    ],
+    "sum_val": 13,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026204",
+    "date": "2026-08-02",
+    "bai": 9,
+    "shi": 7,
+    "ge": 8,
+    "nums": [
+      9,
+      7,
+      8
+    ],
+    "sum_val": 24,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026203",
+    "date": "2026-08-01",
+    "bai": 4,
+    "shi": 3,
+    "ge": 5,
+    "nums": [
+      4,
+      3,
+      5
+    ],
+    "sum_val": 12,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026202",
+    "date": "2026-07-31",
+    "bai": 9,
+    "shi": 8,
+    "ge": 8,
+    "nums": [
+      9,
+      8,
+      8
+    ],
+    "sum_val": 25,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026201",
+    "date": "2026-07-30",
+    "bai": 3,
+    "shi": 2,
+    "ge": 1,
+    "nums": [
+      3,
+      2,
+      1
+    ],
+    "sum_val": 6,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026200",
+    "date": "2026-07-29",
+    "bai": 9,
+    "shi": 1,
+    "ge": 2,
+    "nums": [
+      9,
+      1,
+      2
+    ],
+    "sum_val": 12,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026199",
+    "date": "2026-07-28",
+    "bai": 5,
+    "shi": 9,
+    "ge": 1,
+    "nums": [
+      5,
+      9,
+      1
+    ],
+    "sum_val": 15,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026198",
+    "date": "2026-07-27",
+    "bai": 6,
+    "shi": 8,
+    "ge": 5,
+    "nums": [
+      6,
+      8,
+      5
+    ],
+    "sum_val": 19,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026197",
+    "date": "2026-07-26",
+    "bai": 2,
+    "shi": 3,
+    "ge": 2,
+    "nums": [
+      2,
+      3,
+      2
+    ],
+    "sum_val": 7,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026196",
+    "date": "2026-07-25",
+    "bai": 4,
+    "shi": 1,
+    "ge": 9,
+    "nums": [
+      4,
+      1,
+      9
+    ],
+    "sum_val": 14,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026195",
+    "date": "2026-07-24",
+    "bai": 2,
+    "shi": 7,
+    "ge": 5,
+    "nums": [
+      2,
+      7,
+      5
+    ],
+    "sum_val": 14,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026194",
+    "date": "2026-07-23",
+    "bai": 2,
+    "shi": 8,
+    "ge": 3,
+    "nums": [
+      2,
+      8,
+      3
+    ],
+    "sum_val": 13,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026193",
+    "date": "2026-07-22",
+    "bai": 2,
+    "shi": 5,
+    "ge": 4,
+    "nums": [
+      2,
+      5,
+      4
+    ],
+    "sum_val": 11,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026192",
+    "date": "2026-07-21",
+    "bai": 4,
+    "shi": 2,
+    "ge": 5,
+    "nums": [
+      4,
+      2,
+      5
+    ],
+    "sum_val": 11,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026191",
+    "date": "2026-07-20",
+    "bai": 9,
+    "shi": 0,
+    "ge": 6,
+    "nums": [
+      9,
+      0,
+      6
+    ],
+    "sum_val": 15,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026190",
+    "date": "2026-07-19",
+    "bai": 0,
+    "shi": 2,
+    "ge": 6,
+    "nums": [
+      0,
+      2,
+      6
+    ],
+    "sum_val": 8,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026189",
+    "date": "2026-07-18",
+    "bai": 5,
+    "shi": 5,
+    "ge": 8,
+    "nums": [
+      5,
+      5,
+      8
+    ],
+    "sum_val": 18,
+    "span": 3,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026188",
+    "date": "2026-07-17",
+    "bai": 9,
+    "shi": 6,
+    "ge": 9,
+    "nums": [
+      9,
+      6,
+      9
+    ],
+    "sum_val": 24,
+    "span": 3,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026187",
+    "date": "2026-07-16",
+    "bai": 0,
+    "shi": 2,
+    "ge": 3,
+    "nums": [
+      0,
+      2,
+      3
+    ],
+    "sum_val": 5,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026186",
+    "date": "2026-07-15",
+    "bai": 0,
+    "shi": 4,
+    "ge": 5,
+    "nums": [
+      0,
+      4,
+      5
+    ],
+    "sum_val": 9,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026185",
+    "date": "2026-07-14",
+    "bai": 3,
+    "shi": 9,
+    "ge": 7,
+    "nums": [
+      3,
+      9,
+      7
+    ],
+    "sum_val": 19,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026184",
+    "date": "2026-07-13",
+    "bai": 9,
+    "shi": 0,
+    "ge": 2,
+    "nums": [
+      9,
+      0,
+      2
+    ],
+    "sum_val": 11,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026183",
+    "date": "2026-07-12",
+    "bai": 9,
+    "shi": 2,
+    "ge": 3,
+    "nums": [
+      9,
+      2,
+      3
+    ],
+    "sum_val": 14,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026182",
+    "date": "2026-07-11",
+    "bai": 6,
+    "shi": 6,
+    "ge": 2,
+    "nums": [
+      6,
+      6,
+      2
+    ],
+    "sum_val": 14,
+    "span": 4,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026181",
+    "date": "2026-07-10",
+    "bai": 8,
+    "shi": 1,
+    "ge": 8,
+    "nums": [
+      8,
+      1,
+      8
+    ],
+    "sum_val": 17,
+    "span": 7,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026180",
+    "date": "2026-07-09",
+    "bai": 5,
+    "shi": 2,
+    "ge": 0,
+    "nums": [
+      5,
+      2,
+      0
+    ],
+    "sum_val": 7,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026179",
+    "date": "2026-07-08",
+    "bai": 9,
+    "shi": 9,
+    "ge": 3,
+    "nums": [
+      9,
+      9,
+      3
+    ],
+    "sum_val": 21,
+    "span": 6,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026178",
+    "date": "2026-07-07",
+    "bai": 2,
+    "shi": 6,
+    "ge": 6,
+    "nums": [
+      2,
+      6,
+      6
+    ],
+    "sum_val": 14,
+    "span": 4,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026177",
+    "date": "2026-07-06",
+    "bai": 8,
+    "shi": 0,
+    "ge": 8,
+    "nums": [
+      8,
+      0,
+      8
+    ],
+    "sum_val": 16,
+    "span": 8,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026176",
+    "date": "2026-07-05",
+    "bai": 2,
+    "shi": 6,
+    "ge": 9,
+    "nums": [
+      2,
+      6,
+      9
+    ],
+    "sum_val": 17,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026175",
+    "date": "2026-07-04",
+    "bai": 4,
+    "shi": 2,
+    "ge": 1,
+    "nums": [
+      4,
+      2,
+      1
+    ],
+    "sum_val": 7,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026174",
+    "date": "2026-07-03",
+    "bai": 6,
+    "shi": 1,
+    "ge": 8,
+    "nums": [
+      6,
+      1,
+      8
+    ],
+    "sum_val": 15,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026173",
+    "date": "2026-07-02",
+    "bai": 6,
+    "shi": 7,
+    "ge": 7,
+    "nums": [
+      6,
+      7,
+      7
+    ],
+    "sum_val": 20,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026172",
+    "date": "2026-07-01",
+    "bai": 4,
+    "shi": 4,
+    "ge": 5,
+    "nums": [
+      4,
+      4,
+      5
+    ],
+    "sum_val": 13,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026171",
+    "date": "2026-06-30",
+    "bai": 1,
+    "shi": 3,
+    "ge": 4,
+    "nums": [
+      1,
+      3,
+      4
+    ],
+    "sum_val": 8,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026170",
+    "date": "2026-06-29",
+    "bai": 8,
+    "shi": 0,
+    "ge": 5,
+    "nums": [
+      8,
+      0,
+      5
+    ],
+    "sum_val": 13,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026169",
+    "date": "2026-06-28",
+    "bai": 8,
+    "shi": 3,
+    "ge": 2,
+    "nums": [
+      8,
+      3,
+      2
+    ],
+    "sum_val": 13,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026168",
+    "date": "2026-06-27",
+    "bai": 1,
+    "shi": 3,
+    "ge": 0,
+    "nums": [
+      1,
+      3,
+      0
+    ],
+    "sum_val": 4,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026167",
+    "date": "2026-06-26",
+    "bai": 6,
+    "shi": 3,
+    "ge": 1,
+    "nums": [
+      6,
+      3,
+      1
+    ],
+    "sum_val": 10,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026166",
+    "date": "2026-06-25",
+    "bai": 9,
+    "shi": 0,
+    "ge": 0,
+    "nums": [
+      9,
+      0,
+      0
+    ],
+    "sum_val": 9,
+    "span": 9,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026165",
+    "date": "2026-06-24",
+    "bai": 4,
+    "shi": 2,
+    "ge": 4,
+    "nums": [
+      4,
+      2,
+      4
+    ],
+    "sum_val": 10,
+    "span": 2,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026164",
+    "date": "2026-06-23",
+    "bai": 6,
+    "shi": 9,
+    "ge": 0,
+    "nums": [
+      6,
+      9,
+      0
+    ],
+    "sum_val": 15,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026163",
+    "date": "2026-06-22",
+    "bai": 5,
+    "shi": 3,
+    "ge": 7,
+    "nums": [
+      5,
+      3,
+      7
+    ],
+    "sum_val": 15,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026162",
+    "date": "2026-06-21",
+    "bai": 5,
+    "shi": 8,
+    "ge": 5,
+    "nums": [
+      5,
+      8,
+      5
+    ],
+    "sum_val": 18,
+    "span": 3,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026161",
+    "date": "2026-06-20",
+    "bai": 5,
+    "shi": 2,
+    "ge": 9,
+    "nums": [
+      5,
+      2,
+      9
+    ],
+    "sum_val": 16,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026160",
+    "date": "2026-06-19",
+    "bai": 3,
+    "shi": 3,
+    "ge": 2,
+    "nums": [
+      3,
+      3,
+      2
+    ],
+    "sum_val": 8,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026159",
+    "date": "2026-06-18",
+    "bai": 9,
+    "shi": 9,
+    "ge": 5,
+    "nums": [
+      9,
+      9,
+      5
+    ],
+    "sum_val": 23,
+    "span": 4,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026158",
+    "date": "2026-06-17",
+    "bai": 1,
+    "shi": 7,
+    "ge": 8,
+    "nums": [
+      1,
+      7,
+      8
+    ],
+    "sum_val": 16,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026157",
+    "date": "2026-06-16",
+    "bai": 3,
+    "shi": 2,
+    "ge": 7,
+    "nums": [
+      3,
+      2,
+      7
+    ],
+    "sum_val": 12,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026156",
+    "date": "2026-06-15",
+    "bai": 1,
+    "shi": 6,
+    "ge": 2,
+    "nums": [
+      1,
+      6,
+      2
+    ],
+    "sum_val": 9,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026155",
+    "date": "2026-06-14",
+    "bai": 4,
+    "shi": 0,
+    "ge": 9,
+    "nums": [
+      4,
+      0,
+      9
+    ],
+    "sum_val": 13,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026154",
+    "date": "2026-06-13",
+    "bai": 3,
+    "shi": 7,
+    "ge": 7,
+    "nums": [
+      3,
+      7,
+      7
+    ],
+    "sum_val": 17,
+    "span": 4,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026153",
+    "date": "2026-06-12",
+    "bai": 8,
+    "shi": 8,
+    "ge": 7,
+    "nums": [
+      8,
+      8,
+      7
+    ],
+    "sum_val": 23,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026152",
+    "date": "2026-06-11",
+    "bai": 2,
+    "shi": 2,
+    "ge": 0,
+    "nums": [
+      2,
+      2,
+      0
+    ],
+    "sum_val": 4,
+    "span": 2,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026151",
+    "date": "2026-06-10",
+    "bai": 6,
+    "shi": 3,
+    "ge": 1,
+    "nums": [
+      6,
+      3,
+      1
+    ],
+    "sum_val": 10,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026150",
+    "date": "2026-06-09",
+    "bai": 7,
+    "shi": 2,
+    "ge": 0,
+    "nums": [
+      7,
+      2,
+      0
+    ],
+    "sum_val": 9,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026149",
+    "date": "2026-06-08",
+    "bai": 6,
+    "shi": 9,
+    "ge": 6,
+    "nums": [
+      6,
+      9,
+      6
+    ],
+    "sum_val": 21,
+    "span": 3,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026148",
+    "date": "2026-06-07",
+    "bai": 4,
+    "shi": 0,
+    "ge": 8,
+    "nums": [
+      4,
+      0,
+      8
+    ],
+    "sum_val": 12,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026147",
+    "date": "2026-06-06",
+    "bai": 7,
+    "shi": 1,
+    "ge": 2,
+    "nums": [
+      7,
+      1,
+      2
+    ],
+    "sum_val": 10,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026146",
+    "date": "2026-06-05",
+    "bai": 4,
+    "shi": 6,
+    "ge": 4,
+    "nums": [
+      4,
+      6,
+      4
+    ],
+    "sum_val": 14,
+    "span": 2,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026145",
+    "date": "2026-06-04",
+    "bai": 2,
+    "shi": 7,
+    "ge": 9,
+    "nums": [
+      2,
+      7,
+      9
+    ],
+    "sum_val": 18,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026144",
+    "date": "2026-06-03",
+    "bai": 7,
+    "shi": 2,
+    "ge": 6,
+    "nums": [
+      7,
+      2,
+      6
+    ],
+    "sum_val": 15,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026143",
+    "date": "2026-06-02",
+    "bai": 3,
+    "shi": 7,
+    "ge": 6,
+    "nums": [
+      3,
+      7,
+      6
+    ],
+    "sum_val": 16,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026142",
+    "date": "2026-06-01",
+    "bai": 8,
+    "shi": 9,
+    "ge": 4,
+    "nums": [
+      8,
+      9,
+      4
+    ],
+    "sum_val": 21,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026141",
+    "date": "2026-05-31",
+    "bai": 3,
+    "shi": 9,
+    "ge": 7,
+    "nums": [
+      3,
+      9,
+      7
+    ],
+    "sum_val": 19,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026140",
+    "date": "2026-05-30",
+    "bai": 2,
+    "shi": 8,
+    "ge": 5,
+    "nums": [
+      2,
+      8,
+      5
+    ],
+    "sum_val": 15,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026139",
+    "date": "2026-05-29",
+    "bai": 2,
+    "shi": 8,
+    "ge": 6,
+    "nums": [
+      2,
+      8,
+      6
+    ],
+    "sum_val": 16,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026138",
+    "date": "2026-05-28",
+    "bai": 7,
+    "shi": 9,
+    "ge": 0,
+    "nums": [
+      7,
+      9,
+      0
+    ],
+    "sum_val": 16,
+    "span": 9,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026137",
+    "date": "2026-05-27",
+    "bai": 1,
+    "shi": 6,
+    "ge": 5,
+    "nums": [
+      1,
+      6,
+      5
+    ],
+    "sum_val": 12,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026136",
+    "date": "2026-05-26",
+    "bai": 8,
+    "shi": 8,
+    "ge": 9,
+    "nums": [
+      8,
+      8,
+      9
+    ],
+    "sum_val": 25,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026135",
+    "date": "2026-05-25",
+    "bai": 4,
+    "shi": 8,
+    "ge": 7,
+    "nums": [
+      4,
+      8,
+      7
+    ],
+    "sum_val": 19,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026134",
+    "date": "2026-05-24",
+    "bai": 6,
+    "shi": 5,
+    "ge": 4,
+    "nums": [
+      6,
+      5,
+      4
+    ],
+    "sum_val": 15,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026133",
+    "date": "2026-05-23",
+    "bai": 0,
+    "shi": 8,
+    "ge": 0,
+    "nums": [
+      0,
+      8,
+      0
+    ],
+    "sum_val": 8,
+    "span": 8,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026132",
+    "date": "2026-05-22",
+    "bai": 7,
+    "shi": 5,
+    "ge": 6,
+    "nums": [
+      7,
+      5,
+      6
+    ],
+    "sum_val": 18,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026131",
+    "date": "2026-05-21",
+    "bai": 5,
+    "shi": 9,
+    "ge": 8,
+    "nums": [
+      5,
+      9,
+      8
+    ],
+    "sum_val": 22,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026130",
+    "date": "2026-05-20",
+    "bai": 2,
+    "shi": 6,
+    "ge": 7,
+    "nums": [
+      2,
+      6,
+      7
+    ],
+    "sum_val": 15,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026129",
+    "date": "2026-05-19",
+    "bai": 0,
+    "shi": 2,
+    "ge": 3,
+    "nums": [
+      0,
+      2,
+      3
+    ],
+    "sum_val": 5,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026128",
+    "date": "2026-05-18",
+    "bai": 7,
+    "shi": 7,
+    "ge": 6,
+    "nums": [
+      7,
+      7,
+      6
+    ],
+    "sum_val": 20,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026127",
+    "date": "2026-05-17",
+    "bai": 7,
+    "shi": 0,
+    "ge": 0,
+    "nums": [
+      7,
+      0,
+      0
+    ],
+    "sum_val": 7,
+    "span": 7,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026126",
+    "date": "2026-05-16",
+    "bai": 8,
+    "shi": 4,
+    "ge": 6,
+    "nums": [
+      8,
+      4,
+      6
+    ],
+    "sum_val": 18,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026125",
+    "date": "2026-05-15",
+    "bai": 9,
+    "shi": 5,
+    "ge": 4,
+    "nums": [
+      9,
+      5,
+      4
+    ],
+    "sum_val": 18,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026124",
+    "date": "2026-05-14",
+    "bai": 2,
+    "shi": 8,
+    "ge": 0,
+    "nums": [
+      2,
+      8,
+      0
+    ],
+    "sum_val": 10,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026123",
+    "date": "2026-05-13",
+    "bai": 2,
+    "shi": 0,
+    "ge": 0,
+    "nums": [
+      2,
+      0,
+      0
+    ],
+    "sum_val": 2,
+    "span": 2,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026122",
+    "date": "2026-05-12",
+    "bai": 3,
+    "shi": 4,
+    "ge": 6,
+    "nums": [
+      3,
+      4,
+      6
+    ],
+    "sum_val": 13,
+    "span": 3,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026121",
+    "date": "2026-05-11",
+    "bai": 3,
+    "shi": 9,
+    "ge": 3,
+    "nums": [
+      3,
+      9,
+      3
+    ],
+    "sum_val": 15,
+    "span": 6,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026120",
+    "date": "2026-05-10",
+    "bai": 7,
+    "shi": 3,
+    "ge": 4,
+    "nums": [
+      7,
+      3,
+      4
+    ],
+    "sum_val": 14,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026119",
+    "date": "2026-05-09",
+    "bai": 1,
+    "shi": 1,
+    "ge": 2,
+    "nums": [
+      1,
+      1,
+      2
+    ],
+    "sum_val": 4,
+    "span": 1,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026118",
+    "date": "2026-05-08",
+    "bai": 1,
+    "shi": 3,
+    "ge": 2,
+    "nums": [
+      1,
+      3,
+      2
+    ],
+    "sum_val": 6,
+    "span": 2,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026117",
+    "date": "2026-05-07",
+    "bai": 4,
+    "shi": 1,
+    "ge": 1,
+    "nums": [
+      4,
+      1,
+      1
+    ],
+    "sum_val": 6,
+    "span": 3,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026116",
+    "date": "2026-05-06",
+    "bai": 0,
+    "shi": 2,
+    "ge": 0,
+    "nums": [
+      0,
+      2,
+      0
+    ],
+    "sum_val": 2,
+    "span": 2,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026115",
+    "date": "2026-05-05",
+    "bai": 5,
+    "shi": 8,
+    "ge": 1,
+    "nums": [
+      5,
+      8,
+      1
+    ],
+    "sum_val": 14,
+    "span": 7,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026114",
+    "date": "2026-05-04",
+    "bai": 8,
+    "shi": 6,
+    "ge": 4,
+    "nums": [
+      8,
+      6,
+      4
+    ],
+    "sum_val": 18,
+    "span": 4,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026113",
+    "date": "2026-05-03",
+    "bai": 0,
+    "shi": 4,
+    "ge": 0,
+    "nums": [
+      0,
+      4,
+      0
+    ],
+    "sum_val": 4,
+    "span": 4,
+    "type": "组三",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026112",
+    "date": "2026-05-02",
+    "bai": 0,
+    "shi": 6,
+    "ge": 5,
+    "nums": [
+      0,
+      6,
+      5
+    ],
+    "sum_val": 11,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026111",
+    "date": "2026-05-01",
+    "bai": 8,
+    "shi": 6,
+    "ge": 3,
+    "nums": [
+      8,
+      6,
+      3
+    ],
+    "sum_val": 17,
+    "span": 5,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026110",
+    "date": "2026-04-30",
+    "bai": 3,
+    "shi": 7,
+    "ge": 9,
+    "nums": [
+      3,
+      7,
+      9
+    ],
+    "sum_val": 19,
+    "span": 6,
+    "type": "组六",
+    "_source": "huiniao"
+  },
+  {
+    "qihao": "2026109",
+    "date": "2026-04-29",
+    "bai": 1,
+    "shi": 9,
+    "ge": 5,
+    "nums": [
+      1,
+      9,
+      5
+    ],
+    "sum_val": 15,
+    "span": 8,
+    "type": "组六",
+    "_source": "huiniao"
+  }
+]

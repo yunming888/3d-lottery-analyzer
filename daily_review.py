@@ -657,16 +657,26 @@ def main():
                               "hits": 0, "prize": 0, "daily_pnl": 0,
                               "reason": reason, "target_qihao": None})
                 else:
-                    # 正常交易日: 若今日记录尚未结算(待开奖)且注数与当前规则(push_count)不符,
+                    # 正常交易日: 若今日记录尚未结算且注数与当前规则(push_count)不符,
                     # 则按新规则刷新(确保"8注直选/暂停"等改动即时生效到今日记录)
                     # 审计 P1-1: 附加 recs 非空守卫，防止 stop 分支下 info 未定义即引用
-                    if recs and r.get("hits") is None and (not r.get("recommendations") or r.get("notes") != len(recs)):
+                    # 2026-11-24 修复: 数据源恢复后重跑, 需覆盖此前"数据未更新"的0注占位记录
+                    #   (占位记录 hits=0 而非 None, 旧条件 hits is None 会漏判 → 30注不落盘)
+                    _is_unsettled = (r.get("hits") is None) or (
+                        r.get("hits") == 0 and r.get("draw") == "数据未更新")
+                    if recs and _is_unsettled and (not r.get("recommendations") or r.get("notes") != len(recs)):
                         r["recommendations"] = [rec["nums"] for rec in recs]
                         r["notes"] = len(recs)
                         r["cost"] = len(recs) * DIRECT_COST
                         r["push_type"] = info["push_type"]
                         r["reason"] = reason
                         r["target_qihao"] = target_qihao
+                        # 占位记录恢复: 把"数据未更新"还原为待开奖, 清空0/0结算占位值
+                        r["draw"] = "待开奖"
+                        r["draw_type"] = ""
+                        r["hits"] = None
+                        r["prize"] = None
+                        r["daily_pnl"] = None
                 break
     else:
         if is_suspension:
