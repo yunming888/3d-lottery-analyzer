@@ -28,6 +28,11 @@
   - 红线保持：3D 标「随机采样·等同机选·无预测力【选号引擎 v6】」，直选+和值带仅为结构偏好（单注 0.1%、ROI 52%），不改变负 EV。
 
 ## 配置变更记录（续·v1.8）
+- **2026-11-24 07:20（云明「huiniao 停更了，帮我换个更稳定的源」）**：3D + 七乐彩**主源改中福彩官方 API `findDrawNotice`**，huiniao 降为备用。**未动选号/结算/成本/台账**。
+  - 依据：huiniao 停更 10 天不可靠；官方实测 HTTP 200、可拉 100 期、免鉴权(带 Referer)、与本地历史库 100 期**号码零差异**。
+  - 改动：① `fetch_data.load_or_fetch` 主源 = `fetch_cwl(100)`，失败回退 huiniao→东财→缓存，移除尾部 `official_backfill` 调用；② `qlc/fetcher.fetch_history` 整体重写为三层回退（官方→huiniao→缓存），保留当日缓存/写盘；修掉切片替换导致的缩进嵌套 bug（`cannot unpack NoneType`）。底层 `fetch_cwl`/`_fetch_cwl_qlc` 沿用未改。
+  - 验证：3D 官方 100 期最新 2026313；qlc source=中福彩官方/fallback False/最新 2026135；完整复盘 3D 30 注押 2026314、四品种新鲜度全 OK、无 huiniao 停更日志、无告警、红线全 PASS。备份 `data/backup/*.bak_20261124_src`。git 7369fdb → **e394895**。
+  - ⚠️ 后续注意：huiniao 仍保留为备用（官方 API 故障时自动回退，届时可能又滞后）；官方 API 需 Referer（代码中已带），若未来 403 需更新 Referer。dlt/ssq 走 500 彩票网，**不受本次换源影响**。
 - **2026-11-24 07:00（云明「抓取源再次滞后的原因好好检查并修复」）**：修 2 个 bug，**未动选号/结算核心算法**。
   - ① **根因=三层口径错配**：huiniao fcsd 自 11-14 停更（HTTP 200 有 100 期、最新 2026304）；`fetch_data.official_backfill` 用**日差** gap≥2 才拉官方 → 本地 11-22 vs 昨日 11-23=1 天不补（但官方有 2026313=346）；`daily_review` 用**期号差**>1 判滞后 → 2026312 vs 2026314=2 期 → 0 注停发；`data_freshness` gap=1 报 OK 不告警。官方有号却静默 0 注。
   - ② **修 fetch_data.official_backfill**：改**无条件查中福彩官方 API**，只要官方 qihao>本地最新就补（按期号差，弃用脆弱日差阈值），对齐 qlc `_cwl_backfill` 成功模式；官方无数据/故障静默保持现状。实测补入 2026313=346 ✅。
