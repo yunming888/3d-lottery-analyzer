@@ -3,14 +3,29 @@
     "source": "500彩票网",
     "game": "ssq",
     "name": "双色球",
-    "fetched_at": "2026-11-26T05:01:38",
+    "fetched_at": "2026-11-27T05:00:42",
     "window": 100,
-    "latest_issue": "26135",
+    "latest_issue": "26136",
     "count": 100,
     "from_cache": false,
     "fallback": false
   },
   "draws": [
+    {
+      "issue": "26136",
+      "date": "2026-11-26",
+      "reds": [
+        9,
+        11,
+        22,
+        27,
+        30,
+        33
+      ],
+      "blues": [
+        5
+      ]
+    },
     {
       "issue": "26135",
       "date": "2026-11-24",
@@ -1494,21 +1509,6 @@
       ],
       "blues": [
         12
-      ]
-    },
-    {
-      "issue": "26036",
-      "date": "2026-04-02",
-      "reds": [
-        6,
-        10,
-        12,
-        15,
-        22,
-        28
-      ],
-      "blues": [
-        8
       ]
     }
   ]
