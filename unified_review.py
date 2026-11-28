@@ -11,7 +11,8 @@
 并打印唯一【微信推送摘要】供自动化抓取推送。
 每月1号额外生成上月月度盈亏报告（替代已删除的月度盈亏自动化）。
 
-用法: python unified_review.py
+用法: python unified_review.py             # 四品种
+      python unified_review.py --3d-only    # 仅聚焦福彩3D（2026-11-28 起每日复盘默认）
 """
 import os
 import sys
@@ -20,6 +21,14 @@ from datetime import date, datetime, timedelta
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
+
+# ---- 仅聚焦福彩3D 模式（云明 2026-11-28 指令：不再研究/更新/出号其它品种）----
+# 用法: python unified_review.py --3d-only   —— 只跑 3D 主链路；其它品种不运行、不结算、不展示号码。
+# 仅改编排与展示层，选号/结算/台账结构零改动；去掉参数即恢复四品种。
+ONLY_3D = "--3d-only" in sys.argv
+if ONLY_3D:
+    sys.argv = [a for a in sys.argv if a != "--3d-only"]  # 不把本参数透传给子模块
+_FRESH_KEYS = ("3d",) if ONLY_3D else ("3d", "dlt", "ssq", "qlc")
 
 import daily_review
 from dlt.settle import run_daily as dlt_run
@@ -142,9 +151,9 @@ def yesterday_notes_lines(yesterday):
             L.append(head + "：" + _fmt_3d_compact(ns))
     else:
         L.append("🎯 福彩3D：无挂号记录（休市/数据滞后）")
-    for key, label, fmt in (("dlt", "🎲 大乐透", _fmt_dlt),
+    for key, label, fmt in (() if ONLY_3D else (("dlt", "🎲 大乐透", _fmt_dlt),
                             ("ssq", "🔴 双色球", _fmt_ssq),
-                            ("qlc", "🎱 七乐彩", _fmt_qlc)):
+                            ("qlc", "🎱 七乐彩", _fmt_qlc))):
         y = d.get(key)
         if y and y["notes"]:
             L.append("%s %d注（%s，押%s）：" % (
@@ -179,9 +188,9 @@ def yesterday_notes_md(yesterday):
             L.append("  - `%s`\n" % _fmt_3d_compact(ns))
     else:
         L.append("\n- **福彩3D**：无挂号记录（休市/数据滞后）\n")
-    for key, label, fmt in (("dlt", "大乐透", _fmt_dlt),
+    for key, label, fmt in (() if ONLY_3D else (("dlt", "大乐透", _fmt_dlt),
                             ("ssq", "双色球", _fmt_ssq),
-                            ("qlc", "七乐彩", _fmt_qlc)):
+                            ("qlc", "七乐彩", _fmt_qlc))):
         y = d.get(key)
         if y and y["notes"]:
             L.append("\n- **%s** %d注（%s，押%s）\n" % (
@@ -231,6 +240,17 @@ def _err(name):
                         "rounds": 0, "pending_rounds": 0}}
 
 
+def _skipped(name):
+    """仅聚焦3D模式下的占位结果：语义为「按指令停止研究」，不是失败、也不是「无待结算」。
+    台账文件原样冻结（不读不写）。"""
+    return {"game": name, "failed": False, "skipped": True, "today": date.today().isoformat(),
+            "yesterday_draw": None, "settlement": None, "settled": [],
+            "recommendations": [], "notes": [], "rotation": None, "trend": None,
+            "latest_issue": None, "target": None,
+            "summary": {"net_pnl": 0, "total_hits": 0, "total_bets": 0,
+                        "rounds": 0, "pending_rounds": 0}}
+
+
 def _stage(name, fn):
     """阶段化执行：单品种异常不再拖垮全局——旧版任一品种抛异常 → 整脚本非零退出，
     统一报告与微信摘要全部消失，形成"静默失联"（审计 P1-1）。"""
@@ -248,17 +268,23 @@ def build_summary():
     today = date.today().isoformat()
     yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 
-    print("\n########## [1/4] 福彩3D 复盘 ##########")
+    print("\n########## [1/1] 福彩3D 复盘 ##########" if ONLY_3D else "\n########## [1/4] 福彩3D 复盘 ##########")
     r3 = _stage("福彩3D", daily_review.main)
-    print("\n########## [2/4] 大乐透 复盘 ##########")
-    rd = _stage("大乐透", dlt_run)
-    print("\n########## [3/4] 双色球 复盘 ##########")
-    rs = _stage("双色球", ssq_run)
-    print("\n########## [4/4] 七乐彩 复盘 ##########")
-    rq = _stage("七乐彩", qlc_run)
+    if ONLY_3D:
+        print("\nℹ️ 仅聚焦福彩3D：大乐透 / 双色球 / 七乐彩 不运行、不结算、不出号（台账冻结）")
+        rd = rs = rq = _skipped("已停止研究的品种")
+    else:
+        print("\n########## [2/4] 大乐透 复盘 ##########")
+        rd = _stage("大乐透", dlt_run)
+        print("\n########## [3/4] 双色球 复盘 ##########")
+        rs = _stage("双色球", ssq_run)
+        print("\n########## [4/4] 七乐彩 复盘 ##########")
+        rq = _stage("七乐彩", qlc_run)
     # 数据新鲜度检查（只读）：开奖数据落后开奖日历的品种升级为运行告警，走 ALERTS.render() 自动进微信摘要
     global LAST_FRESHNESS
     LAST_FRESHNESS = data_freshness.check_all(yesterday)
+    if ONLY_3D:  # 仅聚焦3D：其它品种数据新鲜度不再检查/告警
+        LAST_FRESHNESS = {k: v for k, v in LAST_FRESHNESS.items() if k == "3d"}
     data_freshness.alert_all(LAST_FRESHNESS, ALERTS)
     # 大小形态两组已并入 3D 主台账：不再单独跑模块、不再单独结算，此处只构造展示数据
     rsz = {
@@ -276,7 +302,7 @@ def build_summary():
 def wechat_block(today, yesterday, r3, rd, rs, rq, rsz):
     lines = []
     lines.append("【微信推送摘要】")
-    lines.append("📊 彩票每日复盘 %s（福彩3D + 大乐透 + 双色球 + 七乐彩）" % today)
+    lines.append("📊 彩票每日复盘 %s（%s）" % (today, "仅福彩3D" if ONLY_3D else "福彩3D + 大乐透 + 双色球 + 七乐彩"))
     lines.append("（前一自然日：%s）" % yesterday)
 
     # 复盘之前：先原样列出昨日挂出的号码，供人工核对
@@ -364,179 +390,189 @@ def wechat_block(today, yesterday, r3, rd, rs, rq, rsz):
         else:
             lines.append("今日随机采样：无（休市 / 数据滞后）")
 
-    # ===== 大乐透 =====
-    lines.append("")
-    lines.append("━━ 🎲 大乐透 ━━")
-    yd = rd.get("yesterday_draw")
-    if yd:
-        lines.append("昨日开奖：%s 前区 %s 后区 %s" % (
-            yd["issue"], " ".join("%02d" % d for d in yd["reds"]),
-            " ".join("%02d" % d for d in yd["blues"])))
-    else:
-        lines.append("昨日(%s)：无开奖（开奖日 周一/三/六）｜最新 %s 期" % (yesterday, rd.get("latest_issue")))
-    sd = rd.get("settled") or []
-    if rd.get("failed"):
-        lines.append("结算：⚠️ 本品种运行失败，无法结算")
-    elif sd:
-        for x in sd:
-            lines.append("结算：%s期 → %d命中，奖金%d元，日盈亏%+d元" % (
-                x["draw_issue"], x["win_notes"], x["prize"], x["daily_pnl"]))
-    else:
-        lines.append("结算：今日无待结算（待%s期开奖）" % rd.get("target"))
+    # 仅聚焦3D模式下其余品种为 _skipped 占位（净盈亏 0），合计段只计福彩3D
     s_d = rd["summary"]
-    rot_d = rd.get("rotation")
-    lines.append("复盘：5组持有·每2周周五轮换最冷2组" + ("；" + rot_d if rot_d else "；热号为主+冷号补足，奇偶/大小均衡"))
-    try:
-        import hot_core
-        _cd = hot_core.peek("dlt") if hot_core.is_active() else None
-        if _cd:
-            lines.append("热号核心：前区 %s（每注必含，%s 锁定，每月1号重选）%s" % (
-                " / ".join("%02d" % d for d in _cd["core_red"]), _cd.get("ym", ""), HOT_NOTE))
-    except Exception:
-        pass
-    lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
-        s_d["net_pnl"], s_d["rounds"], s_d["pending_rounds"]))
-    nd = rd.get("notes", [])
-    if nd:
-        lines.append("今日随机采样：%d注（押%s期）｜等同机选·无预测力【选号引擎 %s】" % (len(nd), rd.get("target"), DLT_VERSION))
-        for _i, n in enumerate(nd, 1):
-            lines.append("  %d. %s" % (_i, _fmt_dlt(n)))
-        if rd.get("rotation"):
-            lines.append("  🔄 %s" % rd["rotation"])
-    elif rd.get("failed"):
-        lines.append("今日随机采样：⚠️ 运行失败，无")
-    else:
-        lines.append("今日随机采样：无")
-    tr_d = rd.get("trend") or {}
-    if tr_d:
-        b_d = tr_d.get("bal", {})
-        lines.append("走势研判：热号 前区[%s]/后区[%s]；冷号 前区[%s]/后区[%s]" % (
-            tr_d.get("hot_red", ""), tr_d.get("hot_blue", ""),
-            tr_d.get("cold_red", ""), tr_d.get("cold_blue", "")))
-        lines.append("  采样均衡：前区奇%d/偶%d、大%d/小%d；后区奇%d/偶%d、大%d/小%d" % (
-            b_d.get("r_odd", 0), b_d.get("r_even", 0), b_d.get("r_big", 0), b_d.get("r_small", 0),
-            b_d.get("b_odd", 0), b_d.get("b_even", 0), b_d.get("b_big", 0), b_d.get("b_small", 0)))
-
-    # ===== 双色球 =====
-    lines.append("")
-    lines.append("━━ 🔴 双色球 ━━")
-    ys = rs.get("yesterday_draw")
-    if ys:
-        lines.append("昨日开奖：%s 红球 %s 蓝球 %s" % (
-            ys["issue"], " ".join("%02d" % d for d in ys["reds"]),
-            " ".join("%02d" % d for d in ys["blues"])))
-    else:
-        lines.append("昨日(%s)：无开奖（开奖日 周二/四/日）｜最新 %s 期" % (yesterday, rs.get("latest_issue")))
-    ss = rs.get("settled") or []
-    if rs.get("failed"):
-        lines.append("结算：⚠️ 本品种运行失败，无法结算")
-    elif ss:
-        for x in ss:
-            lines.append("结算：%s期 → %d命中，奖金%d元，日盈亏%+d元" % (
-                x["draw_issue"], x["win_notes"], x["prize"], x["daily_pnl"]))
-    else:
-        lines.append("结算：今日无待结算（待%s期开奖）" % rs.get("target"))
     s_s = rs["summary"]
-    rot_s = rs.get("rotation")
-    lines.append("复盘：5组持有·每2周周五轮换最冷2组" + ("；" + rot_s if rot_s else "；热号为主+冷号补足，奇偶/大小均衡"))
-    try:
-        import hot_core
-        _cs = hot_core.peek("ssq") if hot_core.is_active() else None
-        if _cs:
-            lines.append("热号核心：红球 %s（每注必含，%s 锁定，每月1号重选）%s" % (
-                " / ".join("%02d" % d for d in _cs["core_red"]), _cs.get("ym", ""), HOT_NOTE))
-    except Exception:
-        pass
-    lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
-        s_s["net_pnl"], s_s["rounds"], s_s["pending_rounds"]))
-    ns = rs.get("notes", [])
-    if ns:
-        lines.append("今日随机采样：%d注（押%s期）｜等同机选·无预测力【选号引擎 %s】" % (len(ns), rs.get("target"), SSQ_VERSION))
-        for _i, n in enumerate(ns, 1):
-            lines.append("  %d. %s" % (_i, _fmt_ssq(n)))
-        if rs.get("rotation"):
-            lines.append("  🔄 %s" % rs["rotation"])
-    elif rs.get("failed"):
-        lines.append("今日随机采样：⚠️ 运行失败，无")
-    else:
-        lines.append("今日随机采样：无")
-    tr_s = rs.get("trend") or {}
-    if tr_s:
-        b_s = tr_s.get("bal", {})
-        lines.append("走势研判：热号 红球[%s]/蓝球[%s]；冷号 红球[%s]/蓝球[%s]" % (
-            tr_s.get("hot_red", ""), tr_s.get("hot_blue", ""),
-            tr_s.get("cold_red", ""), tr_s.get("cold_blue", "")))
-        lines.append("  采样均衡：红球奇%d/偶%d、大%d/小%d；蓝球奇%d/偶%d、大%d/小%d" % (
-            b_s.get("r_odd", 0), b_s.get("r_even", 0), b_s.get("r_big", 0), b_s.get("r_small", 0),
-            b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
-
-    # ===== 七乐彩 =====
-    lines.append("")
-    lines.append("━━ 🎱 七乐彩 ━━")
-    yq = rq.get("yesterday_draw")
-    if yq:
-        lines.append("昨日开奖：%s 基本号 %s 特别号 %s" % (
-            yq["issue"], " ".join("%02d" % d for d in yq["reds"]),
-            " ".join("%02d" % d for d in yq.get("blues", []))))
-    else:
-        lines.append("昨日(%s)：无开奖（开奖日 周一/三/五）｜最新 %s 期" % (yesterday, rq.get("latest_issue")))
-    sq_ = rq.get("settled") or []
-    if rq.get("failed"):
-        lines.append("结算：⚠️ 本品种运行失败，无法结算")
-    elif sq_:
-        for x in sq_:
-            lines.append("结算：%s期 → %d命中，奖金%d元，日盈亏%+d元" % (
-                x["draw_issue"], x["win_notes"], x["prize"], x["daily_pnl"]))
-    else:
-        lines.append("结算：今日无待结算（待%s期开奖）" % rq.get("target"))
     s_q = rq["summary"]
-    rot_q = rq.get("rotation")
-    lines.append("复盘：每周一/三/五开奖·5组持有·每2周周五轮换最冷2组" + ("；" + rot_q if rot_q else "；热号为主+冷号补足，奇偶/大小均衡"))
-    try:
-        import hot_core
-        _cq = hot_core.peek("qlc") if hot_core.is_active() else None
-        if _cq:
-            lines.append("热号核心：基本号 %s（每注必含，%s 锁定，每月1号重选）%s" % (
-                " / ".join("%02d" % d for d in _cq["core_red"]), _cq.get("ym", ""), HOT_NOTE))
-    except Exception:
-        pass
-    lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
-        s_q["net_pnl"], s_q["rounds"], s_q["pending_rounds"]))
-    nq = rq.get("notes", [])
-    if nq:
-        lines.append("今日随机采样：%d注（押%s期）｜等同机选·无预测力【选号引擎 %s】" % (len(nq), rq.get("target"), QLC_VERSION))
-        for _i, n in enumerate(nq, 1):
-            lines.append("  %d. %s" % (_i, _fmt_qlc(n)))
-        if rq.get("rotation"):
-            lines.append("  🔄 %s" % rq["rotation"])
-    elif rq.get("failed"):
-        lines.append("今日随机采样：⚠️ 运行失败，无")
-    else:
-        lines.append("今日随机采样：无")
-    tr_q = rq.get("trend") or {}
-    if tr_q:
-        b_q = tr_q.get("bal", {})
-        lines.append("走势研判：热号 基本号[%s]/特别号[%s]；冷号 基本号[%s]" % (
-            tr_q.get("hot_red", ""), tr_q.get("hot_blue", ""), tr_q.get("cold_red", "")))
-        lines.append("  采样均衡：基本号奇%d/偶%d、大%d/小%d" % (
-            b_q.get("r_odd", 0), b_q.get("r_even", 0), b_q.get("r_big", 0), b_q.get("r_small", 0)))
+    # ===== 大乐透 / 双色球 / 七乐彩（仅聚焦3D模式下整段不展示）=====
+    if not ONLY_3D:
+        # ===== 大乐透 =====
+        lines.append("")
+        lines.append("━━ 🎲 大乐透 ━━")
+        yd = rd.get("yesterday_draw")
+        if yd:
+            lines.append("昨日开奖：%s 前区 %s 后区 %s" % (
+                yd["issue"], " ".join("%02d" % d for d in yd["reds"]),
+                " ".join("%02d" % d for d in yd["blues"])))
+        else:
+            lines.append("昨日(%s)：无开奖（开奖日 周一/三/六）｜最新 %s 期" % (yesterday, rd.get("latest_issue")))
+        sd = rd.get("settled") or []
+        if rd.get("failed"):
+            lines.append("结算：⚠️ 本品种运行失败，无法结算")
+        elif sd:
+            for x in sd:
+                lines.append("结算：%s期 → %d命中，奖金%d元，日盈亏%+d元" % (
+                    x["draw_issue"], x["win_notes"], x["prize"], x["daily_pnl"]))
+        else:
+            lines.append("结算：今日无待结算（待%s期开奖）" % rd.get("target"))
+        s_d = rd["summary"]
+        rot_d = rd.get("rotation")
+        lines.append("复盘：5组持有·每2周周五轮换最冷2组" + ("；" + rot_d if rot_d else "；热号为主+冷号补足，奇偶/大小均衡"))
+        try:
+            import hot_core
+            _cd = hot_core.peek("dlt") if hot_core.is_active() else None
+            if _cd:
+                lines.append("热号核心：前区 %s（每注必含，%s 锁定，每月1号重选）%s" % (
+                    " / ".join("%02d" % d for d in _cd["core_red"]), _cd.get("ym", ""), HOT_NOTE))
+        except Exception:
+            pass
+        lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
+            s_d["net_pnl"], s_d["rounds"], s_d["pending_rounds"]))
+        nd = rd.get("notes", [])
+        if nd:
+            lines.append("今日随机采样：%d注（押%s期）｜等同机选·无预测力【选号引擎 %s】" % (len(nd), rd.get("target"), DLT_VERSION))
+            for _i, n in enumerate(nd, 1):
+                lines.append("  %d. %s" % (_i, _fmt_dlt(n)))
+            if rd.get("rotation"):
+                lines.append("  🔄 %s" % rd["rotation"])
+        elif rd.get("failed"):
+            lines.append("今日随机采样：⚠️ 运行失败，无")
+        else:
+            lines.append("今日随机采样：无")
+        tr_d = rd.get("trend") or {}
+        if tr_d:
+            b_d = tr_d.get("bal", {})
+            lines.append("走势研判：热号 前区[%s]/后区[%s]；冷号 前区[%s]/后区[%s]" % (
+                tr_d.get("hot_red", ""), tr_d.get("hot_blue", ""),
+                tr_d.get("cold_red", ""), tr_d.get("cold_blue", "")))
+            lines.append("  采样均衡：前区奇%d/偶%d、大%d/小%d；后区奇%d/偶%d、大%d/小%d" % (
+                b_d.get("r_odd", 0), b_d.get("r_even", 0), b_d.get("r_big", 0), b_d.get("r_small", 0),
+                b_d.get("b_odd", 0), b_d.get("b_even", 0), b_d.get("b_big", 0), b_d.get("b_small", 0)))
+
+        # ===== 双色球 =====
+        lines.append("")
+        lines.append("━━ 🔴 双色球 ━━")
+        ys = rs.get("yesterday_draw")
+        if ys:
+            lines.append("昨日开奖：%s 红球 %s 蓝球 %s" % (
+                ys["issue"], " ".join("%02d" % d for d in ys["reds"]),
+                " ".join("%02d" % d for d in ys["blues"])))
+        else:
+            lines.append("昨日(%s)：无开奖（开奖日 周二/四/日）｜最新 %s 期" % (yesterday, rs.get("latest_issue")))
+        ss = rs.get("settled") or []
+        if rs.get("failed"):
+            lines.append("结算：⚠️ 本品种运行失败，无法结算")
+        elif ss:
+            for x in ss:
+                lines.append("结算：%s期 → %d命中，奖金%d元，日盈亏%+d元" % (
+                    x["draw_issue"], x["win_notes"], x["prize"], x["daily_pnl"]))
+        else:
+            lines.append("结算：今日无待结算（待%s期开奖）" % rs.get("target"))
+        s_s = rs["summary"]
+        rot_s = rs.get("rotation")
+        lines.append("复盘：5组持有·每2周周五轮换最冷2组" + ("；" + rot_s if rot_s else "；热号为主+冷号补足，奇偶/大小均衡"))
+        try:
+            import hot_core
+            _cs = hot_core.peek("ssq") if hot_core.is_active() else None
+            if _cs:
+                lines.append("热号核心：红球 %s（每注必含，%s 锁定，每月1号重选）%s" % (
+                    " / ".join("%02d" % d for d in _cs["core_red"]), _cs.get("ym", ""), HOT_NOTE))
+        except Exception:
+            pass
+        lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
+            s_s["net_pnl"], s_s["rounds"], s_s["pending_rounds"]))
+        ns = rs.get("notes", [])
+        if ns:
+            lines.append("今日随机采样：%d注（押%s期）｜等同机选·无预测力【选号引擎 %s】" % (len(ns), rs.get("target"), SSQ_VERSION))
+            for _i, n in enumerate(ns, 1):
+                lines.append("  %d. %s" % (_i, _fmt_ssq(n)))
+            if rs.get("rotation"):
+                lines.append("  🔄 %s" % rs["rotation"])
+        elif rs.get("failed"):
+            lines.append("今日随机采样：⚠️ 运行失败，无")
+        else:
+            lines.append("今日随机采样：无")
+        tr_s = rs.get("trend") or {}
+        if tr_s:
+            b_s = tr_s.get("bal", {})
+            lines.append("走势研判：热号 红球[%s]/蓝球[%s]；冷号 红球[%s]/蓝球[%s]" % (
+                tr_s.get("hot_red", ""), tr_s.get("hot_blue", ""),
+                tr_s.get("cold_red", ""), tr_s.get("cold_blue", "")))
+            lines.append("  采样均衡：红球奇%d/偶%d、大%d/小%d；蓝球奇%d/偶%d、大%d/小%d" % (
+                b_s.get("r_odd", 0), b_s.get("r_even", 0), b_s.get("r_big", 0), b_s.get("r_small", 0),
+                b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
+
+        # ===== 七乐彩 =====
+        lines.append("")
+        lines.append("━━ 🎱 七乐彩 ━━")
+        yq = rq.get("yesterday_draw")
+        if yq:
+            lines.append("昨日开奖：%s 基本号 %s 特别号 %s" % (
+                yq["issue"], " ".join("%02d" % d for d in yq["reds"]),
+                " ".join("%02d" % d for d in yq.get("blues", []))))
+        else:
+            lines.append("昨日(%s)：无开奖（开奖日 周一/三/五）｜最新 %s 期" % (yesterday, rq.get("latest_issue")))
+        sq_ = rq.get("settled") or []
+        if rq.get("failed"):
+            lines.append("结算：⚠️ 本品种运行失败，无法结算")
+        elif sq_:
+            for x in sq_:
+                lines.append("结算：%s期 → %d命中，奖金%d元，日盈亏%+d元" % (
+                    x["draw_issue"], x["win_notes"], x["prize"], x["daily_pnl"]))
+        else:
+            lines.append("结算：今日无待结算（待%s期开奖）" % rq.get("target"))
+        s_q = rq["summary"]
+        rot_q = rq.get("rotation")
+        lines.append("复盘：每周一/三/五开奖·5组持有·每2周周五轮换最冷2组" + ("；" + rot_q if rot_q else "；热号为主+冷号补足，奇偶/大小均衡"))
+        try:
+            import hot_core
+            _cq = hot_core.peek("qlc") if hot_core.is_active() else None
+            if _cq:
+                lines.append("热号核心：基本号 %s（每注必含，%s 锁定，每月1号重选）%s" % (
+                    " / ".join("%02d" % d for d in _cq["core_red"]), _cq.get("ym", ""), HOT_NOTE))
+        except Exception:
+            pass
+        lines.append("累计净盈亏：%+d元（已结算%d轮，待结算%d轮）" % (
+            s_q["net_pnl"], s_q["rounds"], s_q["pending_rounds"]))
+        nq = rq.get("notes", [])
+        if nq:
+            lines.append("今日随机采样：%d注（押%s期）｜等同机选·无预测力【选号引擎 %s】" % (len(nq), rq.get("target"), QLC_VERSION))
+            for _i, n in enumerate(nq, 1):
+                lines.append("  %d. %s" % (_i, _fmt_qlc(n)))
+            if rq.get("rotation"):
+                lines.append("  🔄 %s" % rq["rotation"])
+        elif rq.get("failed"):
+            lines.append("今日随机采样：⚠️ 运行失败，无")
+        else:
+            lines.append("今日随机采样：无")
+        tr_q = rq.get("trend") or {}
+        if tr_q:
+            b_q = tr_q.get("bal", {})
+            lines.append("走势研判：热号 基本号[%s]/特别号[%s]；冷号 基本号[%s]" % (
+                tr_q.get("hot_red", ""), tr_q.get("hot_blue", ""), tr_q.get("cold_red", "")))
+            lines.append("  采样均衡：基本号奇%d/偶%d、大%d/小%d" % (
+                b_q.get("r_odd", 0), b_q.get("r_even", 0), b_q.get("r_big", 0), b_q.get("r_small", 0)))
 
     # ===== 合计 =====
     total = s3["net_pnl"] + s_d["net_pnl"] + s_s["net_pnl"] + s_q["net_pnl"]
     lines.append("")
-    lines.append("━━ 🧾 四品种合计 ━━")
-    lines.append("累计净盈亏合计：%+d元（福彩3D %+d + 大乐透 %+d + 双色球 %+d + 七乐彩 %+d）" % (
-        total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"], s_q["net_pnl"]))
+    lines.append("━━ 🧾 福彩3D 合计 ━━" if ONLY_3D else "━━ 🧾 四品种合计 ━━")
+    if ONLY_3D:
+        lines.append("累计净盈亏：%+d元（仅福彩3D；大乐透/双色球/七乐彩 自 2026-11-28 起停止研究、更新与出号，台账冻结不结算）" % s3["net_pnl"])
+    else:
+        lines.append("累计净盈亏合计：%+d元（福彩3D %+d + 大乐透 %+d + 双色球 %+d + 七乐彩 %+d）" % (
+            total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"], s_q["net_pnl"]))
     if not rsz.get("skipped"):
         lines.append("ℹ️ 3D 大小形态两组 16注/32元 已并入上方福彩3D累计，不另计。")
     _failed = [g.get("name") or g.get("game") for g in (r3, rd, rs, rq) if g.get("failed")]
     if _failed:
         lines.append("⚠️ 本日失败品种：%s（其数据未计入合计，合计偏低）" % "、".join(_failed))
-    try:
-        import hot_core
-        lines.append("ℹ️ %s" % hot_core.effective_desc())
-    except Exception:
-        pass
+    if not ONLY_3D:  # 热号追号说明仅适用于大乐透/双色球/七乐彩
+        try:
+            import hot_core
+            lines.append("ℹ️ %s" % hot_core.effective_desc())
+        except Exception:
+            pass
     lines += ALERTS.render()   # 运行告警（审计 A2/A5）：数据源回退/核心号异常/失败品种等
     lines.append("⚠️ 上述号码均为随机采样，等同机选、无预测力；开奖随机且每期独立，不存在可推算的下期号码。")
     lines.append("⚠️ 仅供学习研究，不构成投注建议；任何收费荐号均属诈骗，切勿转账。彩票为负EV，理性购彩。")
@@ -597,76 +633,83 @@ def write_unified_report(today, yesterday, r3, rd, rs, rq, rsz, wechat):
     else:
         L.append("- 今日随机采样：无（休市 / 数据滞后）\n")
 
-    L.append("\n## 大乐透\n")
-    if rd.get("yesterday_draw"):
-        yd = rd["yesterday_draw"]
-        L.append("- 昨日开奖：%s 前区 %s 后区 %s\n" % (
-            yd["issue"], " ".join("%02d" % d for d in yd["reds"]), " ".join("%02d" % d for d in yd["blues"])))
+    if ONLY_3D:
+        L.append("\n## 大乐透 / 双色球 / 七乐彩\n")
+        L.append("- 自 2026-11-28 起停止研究、更新与出号（仅聚焦福彩3D）；台账原样冻结、不再结算，未结算的挂出记录保留备查。\n")
     else:
-        L.append("- 昨日：无开奖（开奖日 周一/三/六）｜最新 %s 期\n" % rd.get("latest_issue"))
-    for x in (rd.get("settled") or []):
-        L.append("- 结算：%s期 → %d命中，日盈亏%+d元\n" % (x["draw_issue"], x["win_notes"], x["daily_pnl"]))
-    L.append("- 累计净盈亏：%+d元（已结算%d轮，待结算%d轮）\n" % (s_d["net_pnl"], s_d["rounds"], s_d["pending_rounds"]))
-    tr_d = rd.get("trend") or {}
-    if tr_d:
-        b_d = tr_d.get("bal", {})
-        L.append("- 走势研判：热号 前区[%s]/后区[%s]；冷号 前区[%s]/后区[%s]\n" % (
-            tr_d.get("hot_red", ""), tr_d.get("hot_blue", ""),
-            tr_d.get("cold_red", ""), tr_d.get("cold_blue", "")))
-        L.append("- 选号均衡：前区奇%d/偶%d、大%d/小%d；后区奇%d/偶%d、大%d/小%d\n" % (
-            b_d.get("r_odd", 0), b_d.get("r_even", 0), b_d.get("r_big", 0), b_d.get("r_small", 0),
-            b_d.get("b_odd", 0), b_d.get("b_even", 0), b_d.get("b_big", 0), b_d.get("b_small", 0)))
-    _nd = rd.get("notes", [])
-    if _nd:
-        L.append("- 今日随机采样（押%s期，%d注）｜等同机选·无预测力【选号引擎 %s】：\n" % (rd.get("target"), len(_nd), DLT_VERSION))
-        for n in _nd:
-            L.append("  - %s\n" % _fmt_dlt(n))
+        L.append("\n## 大乐透\n")
+        if rd.get("yesterday_draw"):
+            yd = rd["yesterday_draw"]
+            L.append("- 昨日开奖：%s 前区 %s 后区 %s\n" % (
+                yd["issue"], " ".join("%02d" % d for d in yd["reds"]), " ".join("%02d" % d for d in yd["blues"])))
+        else:
+            L.append("- 昨日：无开奖（开奖日 周一/三/六）｜最新 %s 期\n" % rd.get("latest_issue"))
+        for x in (rd.get("settled") or []):
+            L.append("- 结算：%s期 → %d命中，日盈亏%+d元\n" % (x["draw_issue"], x["win_notes"], x["daily_pnl"]))
+        L.append("- 累计净盈亏：%+d元（已结算%d轮，待结算%d轮）\n" % (s_d["net_pnl"], s_d["rounds"], s_d["pending_rounds"]))
+        tr_d = rd.get("trend") or {}
+        if tr_d:
+            b_d = tr_d.get("bal", {})
+            L.append("- 走势研判：热号 前区[%s]/后区[%s]；冷号 前区[%s]/后区[%s]\n" % (
+                tr_d.get("hot_red", ""), tr_d.get("hot_blue", ""),
+                tr_d.get("cold_red", ""), tr_d.get("cold_blue", "")))
+            L.append("- 选号均衡：前区奇%d/偶%d、大%d/小%d；后区奇%d/偶%d、大%d/小%d\n" % (
+                b_d.get("r_odd", 0), b_d.get("r_even", 0), b_d.get("r_big", 0), b_d.get("r_small", 0),
+                b_d.get("b_odd", 0), b_d.get("b_even", 0), b_d.get("b_big", 0), b_d.get("b_small", 0)))
+        _nd = rd.get("notes", [])
+        if _nd:
+            L.append("- 今日随机采样（押%s期，%d注）｜等同机选·无预测力【选号引擎 %s】：\n" % (rd.get("target"), len(_nd), DLT_VERSION))
+            for n in _nd:
+                L.append("  - %s\n" % _fmt_dlt(n))
 
-    L.append("\n## 双色球\n")
-    if rs.get("yesterday_draw"):
-        ys = rs["yesterday_draw"]
-        L.append("- 昨日开奖：%s 红球 %s 蓝球 %s\n" % (
-            ys["issue"], " ".join("%02d" % d for d in ys["reds"]), " ".join("%02d" % d for d in ys["blues"])))
+        L.append("\n## 双色球\n")
+        if rs.get("yesterday_draw"):
+            ys = rs["yesterday_draw"]
+            L.append("- 昨日开奖：%s 红球 %s 蓝球 %s\n" % (
+                ys["issue"], " ".join("%02d" % d for d in ys["reds"]), " ".join("%02d" % d for d in ys["blues"])))
+        else:
+            L.append("- 昨日：无开奖（开奖日 周二/四/日）｜最新 %s 期\n" % rs.get("latest_issue"))
+        for x in (rs.get("settled") or []):
+            L.append("- 结算：%s期 → %d命中，日盈亏%+d元\n" % (x["draw_issue"], x["win_notes"], x["daily_pnl"]))
+        L.append("- 累计净盈亏：%+d元（已结算%d轮，待结算%d轮）\n" % (s_s["net_pnl"], s_s["rounds"], s_s["pending_rounds"]))
+        tr_s = rs.get("trend") or {}
+        if tr_s:
+            b_s = tr_s.get("bal", {})
+            L.append("- 走势研判：热号 红球[%s]/蓝球[%s]；冷号 红球[%s]/蓝球[%s]\n" % (
+                tr_s.get("hot_red", ""), tr_s.get("hot_blue", ""),
+                tr_s.get("cold_red", ""), tr_s.get("cold_blue", "")))
+            L.append("- 选号均衡：红球奇%d/偶%d、大%d/小%d；蓝球奇%d/偶%d、大%d/小%d\n" % (
+                b_s.get("r_odd", 0), b_s.get("r_even", 0), b_s.get("r_big", 0), b_s.get("r_small", 0),
+                b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
+        _ns = rs.get("notes", [])
+        if _ns:
+            L.append("- 今日随机采样（押%s期，%d注）｜等同机选·无预测力【选号引擎 %s】：\n" % (rs.get("target"), len(_ns), SSQ_VERSION))
+            for n in _ns:
+                L.append("  - %s\n" % _fmt_ssq(n))
+
+        L.append("\n## 七乐彩\n")
+        if rq.get("yesterday_draw"):
+            yq = rq["yesterday_draw"]
+            L.append("- 昨日开奖：%s 基本号 %s 特别号 %s\n" % (
+                yq["issue"], " ".join("%02d" % d for d in yq["reds"]),
+                " ".join("%02d" % d for d in yq.get("blues", []))))
+        else:
+            L.append("- 昨日：无开奖（开奖日 周一/三/五）｜最新 %s 期\n" % rq.get("latest_issue"))
+        for x in (rq.get("settled") or []):
+            L.append("- 结算：%s期 → %d命中，日盈亏%+d元\n" % (x["draw_issue"], x["win_notes"], x["daily_pnl"]))
+        L.append("- 累计净盈亏：%+d元（已结算%d轮，待结算%d轮）\n" % (s_q["net_pnl"], s_q["rounds"], s_q["pending_rounds"]))
+        _nq = rq.get("notes", [])
+        if _nq:
+            L.append("- 今日随机采样（押%s期，%d注）｜等同机选·无预测力【选号引擎 %s】：\n" % (rq.get("target"), len(_nq), QLC_VERSION))
+            for n in _nq:
+                L.append("  - %s\n" % _fmt_qlc(n))
+
+    L.append("\n## 福彩3D 合计\n" if ONLY_3D else "\n## 四品种合计\n")
+    if ONLY_3D:
+        L.append("- 福彩3D 累计净盈亏：**%+d元**\n" % s3["net_pnl"])
     else:
-        L.append("- 昨日：无开奖（开奖日 周二/四/日）｜最新 %s 期\n" % rs.get("latest_issue"))
-    for x in (rs.get("settled") or []):
-        L.append("- 结算：%s期 → %d命中，日盈亏%+d元\n" % (x["draw_issue"], x["win_notes"], x["daily_pnl"]))
-    L.append("- 累计净盈亏：%+d元（已结算%d轮，待结算%d轮）\n" % (s_s["net_pnl"], s_s["rounds"], s_s["pending_rounds"]))
-    tr_s = rs.get("trend") or {}
-    if tr_s:
-        b_s = tr_s.get("bal", {})
-        L.append("- 走势研判：热号 红球[%s]/蓝球[%s]；冷号 红球[%s]/蓝球[%s]\n" % (
-            tr_s.get("hot_red", ""), tr_s.get("hot_blue", ""),
-            tr_s.get("cold_red", ""), tr_s.get("cold_blue", "")))
-        L.append("- 选号均衡：红球奇%d/偶%d、大%d/小%d；蓝球奇%d/偶%d、大%d/小%d\n" % (
-            b_s.get("r_odd", 0), b_s.get("r_even", 0), b_s.get("r_big", 0), b_s.get("r_small", 0),
-            b_s.get("b_odd", 0), b_s.get("b_even", 0), b_s.get("b_big", 0), b_s.get("b_small", 0)))
-    _ns = rs.get("notes", [])
-    if _ns:
-        L.append("- 今日随机采样（押%s期，%d注）｜等同机选·无预测力【选号引擎 %s】：\n" % (rs.get("target"), len(_ns), SSQ_VERSION))
-        for n in _ns:
-            L.append("  - %s\n" % _fmt_ssq(n))
-
-    L.append("\n## 七乐彩\n")
-    if rq.get("yesterday_draw"):
-        yq = rq["yesterday_draw"]
-        L.append("- 昨日开奖：%s 基本号 %s 特别号 %s\n" % (
-            yq["issue"], " ".join("%02d" % d for d in yq["reds"]),
-            " ".join("%02d" % d for d in yq.get("blues", []))))
-    else:
-        L.append("- 昨日：无开奖（开奖日 周一/三/五）｜最新 %s 期\n" % rq.get("latest_issue"))
-    for x in (rq.get("settled") or []):
-        L.append("- 结算：%s期 → %d命中，日盈亏%+d元\n" % (x["draw_issue"], x["win_notes"], x["daily_pnl"]))
-    L.append("- 累计净盈亏：%+d元（已结算%d轮，待结算%d轮）\n" % (s_q["net_pnl"], s_q["rounds"], s_q["pending_rounds"]))
-    _nq = rq.get("notes", [])
-    if _nq:
-        L.append("- 今日随机采样（押%s期，%d注）｜等同机选·无预测力【选号引擎 %s】：\n" % (rq.get("target"), len(_nq), QLC_VERSION))
-        for n in _nq:
-            L.append("  - %s\n" % _fmt_qlc(n))
-
-    L.append("\n## 四品种合计\n")
-    L.append("- 累计净盈亏合计：**%+d元**（3D %+d / 大乐透 %+d / 双色球 %+d / 七乐彩 %+d）\n" % (
-        total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"], s_q["net_pnl"]))
+        L.append("- 累计净盈亏合计：**%+d元**（3D %+d / 大乐透 %+d / 双色球 %+d / 七乐彩 %+d）\n" % (
+            total, s3["net_pnl"], s_d["net_pnl"], s_s["net_pnl"], s_q["net_pnl"]))
 
     # 数据新鲜度检查（只读，不改选号/结算）：显示四品种开奖数据是否落后开奖日历
     freshness = globals().get("LAST_FRESHNESS") or data_freshness.check_all(yesterday)
@@ -675,7 +718,7 @@ def write_unified_report(today, yesterday, r3, rd, rs, rq, rsz, wechat):
     L.append("")
     L.append("| 品种 | 本地最新 | 应开至 | 落后 | 状态 |\n")
     L.append("|---|---|---|---|---|\n")
-    for _g in ("3d", "dlt", "ssq", "qlc"):
+    for _g in _FRESH_KEYS:
         _fr = freshness.get(_g, {})
         _gap = _fr.get("gap")
         _gap_s = "—" if _gap is None else ("超前" if _gap < 0 else ("%d 期" % _gap))
@@ -683,7 +726,7 @@ def write_unified_report(today, yesterday, r3, rd, rs, rq, rsz, wechat):
             _fr.get("name", _g), _fr.get("issue") or "—", _fr.get("local_day") or "—",
             _fr.get("expected_day") or "—", _gap_s, _fr.get("level", "—")))
     L.append("")
-    for _g in ("3d", "dlt", "ssq", "qlc"):
+    for _g in _FRESH_KEYS:
         _fr = freshness.get(_g, {})
         if _fr.get("level") in ("WARN", "ERROR"):
             L.append("- ⚠️ %s：%s\n" % (_fr["name"], _fr["msg"]))
@@ -747,14 +790,17 @@ def write_monthly_report():
     L.append("# 彩票月度盈亏报告 %s\n" % ym)
     L.append("\n## 福彩3D\n")
     L.append("- 净盈亏：**%+d元**（%d注/%d命中）\n" % (p3, b3, h3))
-    L.append("\n## 大乐透\n")
-    L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_d, r_d))
-    L.append("\n## 双色球\n")
-    L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_s, r_s))
-    L.append("\n## 七乐彩\n")
-    L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_q, r_q))
-    L.append("\n## 四品种合计\n")
-    L.append("- 月度净盈亏合计：**%+d元**\n" % total)
+    if ONLY_3D:
+        pass  # 仅聚焦3D：月度报告只列福彩3D
+    else:
+        L.append("\n## 大乐透\n")
+        L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_d, r_d))
+        L.append("\n## 双色球\n")
+        L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_s, r_s))
+        L.append("\n## 七乐彩\n")
+        L.append("- 净盈亏：**%+d元**（已结算%d轮）\n" % (p_q, r_q))
+    L.append("\n## 福彩3D 合计\n" if ONLY_3D else "\n## 四品种合计\n")
+    L.append("- 福彩3D 月度净盈亏：**%+d元**\n" % p3 if ONLY_3D else "- 月度净盈亏合计：**%+d元**\n" % total)
     L.append("\n---\n*本报告由每日复盘自动化于次月1号汇总生成。仅供学习研究，不构成投注建议。*\n")
     with open(path, "w", encoding="utf-8") as f:
         f.writelines(L)
